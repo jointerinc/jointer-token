@@ -2,6 +2,7 @@ pragma solidity ^0.5.9;
 
 import "../common/ProxyOwnable.sol";
 import "../common/SafeMath.sol";
+import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IAuctionTagAlong.sol";
 import "../InterFaces/IERC20Token.sol";
@@ -14,84 +15,6 @@ interface InitializeInterface {
         address _authorityAddress,
         address _registeryAddress
     ) external;
-}
-
-
-/**
- * @title IRegistry
- * @dev This contract represents the interface of a registry contract
- */
-interface IRegistry {
-    /**
-     * @dev This event will be emitted every time a new proxy is created
-     * @param proxy representing the address of the proxy created
-     */
-    event ProxyCreated(address proxy);
-
-    /**
-     * @dev This event will be emitted every time a new implementation is registered
-     * @param version representing the version name of the registered implementation
-     * @param implementation representing the address of the registered implementation
-     */
-    event VersionAdded(string version, address implementation);
-
-    /**
-     * @dev Registers a new version with its implementation address
-     * @param version representing the version name of the new implementation to be registered
-     * @param implementation representing the address of the new implementation to be registered
-     */
-    function addVersion(string calldata version, address implementation)
-        external;
-
-    /**
-     * @dev Tells the address of the implementation for a given version
-     * @param version to query the implementation of
-     * @return address of the implementation registered for the given version
-     */
-    function getVersion(string calldata version)
-        external
-        view
-        returns (address);
-}
-
-
-/**
- * @title UpgradeabilityStorage
- * @dev This contract holds all the necessary state variables to support the upgrade functionality
- */
-contract UpgradeabilityStorage {
-    // Versions registry
-    IRegistry internal registry;
-
-    // Address of the current implementation
-    address internal _implementation;
-
-    /**
-     * @dev Tells the address of the current implementation
-     * @return address of the current implementation
-     */
-    function implementation() public view returns (address) {
-        return _implementation;
-    }
-}
-
-
-/**
- * @title Upgradeable
- * @dev This contract holds all the minimum required functionality for a behavior to be upgradeable.
- * This means, required state variables for owned upgradeability purpose and simple initialization validation.
- */
-contract Upgradeable is UpgradeabilityStorage {
-    /**
-     * @dev Validates the caller is the versions registry.
-     * THIS FUNCTION SHOULD BE OVERRIDDEN CALLING SUPER
-     */
-    function initialize() public view {
-        require(
-            msg.sender == address(registry),
-            "ERR_ONLY_REGISTRERY_CAN_CALL"
-        );
-    }
 }
 
 
@@ -480,3 +403,4 @@ contract AuctionProtection is
         return true;
     }
 }
+
