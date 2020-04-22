@@ -5,12 +5,22 @@ import "../Proxy/UpgradeabilityProxy.sol";
 
 interface InitializeInterface {
     function initialize(
+        string calldata _name,
+        string calldata _symbol,
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress,
-        address _registeryAddress
+        address _registeryAddress,
+        uint256 _tokenPrice,
+        uint256 _tokenMaturityDays,
+        uint256 _tokenHoldBackDays
     ) external;
+    
+    function premint(address[] calldata _which,uint256[] calldata _amount) external;
 }
+
+
+
 
 /**
  * @title Registry
@@ -57,29 +67,49 @@ contract SuperTokenRegistry is RegisteryOwnable, IRegistry {
     function getVersion(uint256 version) public view returns (address) {
         return versions[version];
     }
-
+    
+    //function setTokenDetails()
+    
     /**
      * @dev Creates an upgradeable proxy
      * @param version representing the first version to be set for the proxy
      * @return address of the new proxy created
      */
     function createProxy(
-        uint256  version,
+        string memory _name,
+        string memory _symbol,
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress,
-        address _registeryAddress
-    ) public onlyOneOfOnwer() returns (address) {
+        address _registeryAddress,
+        uint256 _tokenPrice,
+        uint256 _tokenMaturityDays,
+        uint256 _tokenHoldBackDays,
+        address[] memory _which,
+        uint256[] memory _amount,
+        uint256 version
+    ) public onlyOneOfOnwer() 
+    
+
+    returns (address) {
         
         require(proxyAddress == address(0),"ERR_PROXY_ALREADY_CREATED");
         
         UpgradeabilityProxy proxy = new UpgradeabilityProxy(version);
         
         InitializeInterface(address(proxy)).initialize(
+            _name,
+            _symbol,
             _primaryOwner,
             _systemAddress,
             _authorityAddress,
-            _registeryAddress
+            _registeryAddress,
+            _tokenPrice,
+            _tokenMaturityDays,
+            _tokenHoldBackDays
+        );
+        InitializeInterface(address(proxy)).premint(
+            _which,_amount
         );
         
         currentVersion = version;

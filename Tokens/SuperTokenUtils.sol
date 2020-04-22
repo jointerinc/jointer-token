@@ -30,7 +30,7 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
 }
 
 
-contract TokenMinter is StandardToken,AuctionRegistery {
+contract TokenMinter is StandardToken {
     
     mapping(address=>bool) tokenMinters;
     
@@ -75,7 +75,7 @@ contract TokenMinter is StandardToken,AuctionRegistery {
 
 
 
-
+// token paid from vault address
 contract ForceSwap is StandardToken,AuctionRegistery {
     
     address public returnToken;
@@ -92,13 +92,13 @@ contract ForceSwap is StandardToken,AuctionRegistery {
         uint256 retunTokenPrice = currencyPrice.getCurrencyPrice(returnToken);
         uint256 currentTokenPrice = currencyPrice.getCurrencyPrice(address(this));
         uint256 _assignToken = safeDiv(safeMul(_amount,currentTokenPrice),retunTokenPrice);
-        //
+        //here we have to develop vault it is not yet developed
     }
     
 }
 
 
-contract SuperTokenUtils is TokenMinter {
+contract SuperTokenUtils is AuctionRegistery,TokenMinter {
     
     uint256 public tokenPrice;
     
