@@ -18,7 +18,7 @@ interface InitializeInterface {
 }
 
 
-contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
+contract AuctionProtectionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     
     IAuctionRegistery public registry;
     IAuctionRegistery public prevRegistry;
@@ -60,7 +60,7 @@ contract UtilsStorage {
 }
 
 
-contract Utils is SafeMath, UtilsStorage, AuctionRegistery {
+contract Utils is SafeMath, UtilsStorage, AuctionProtectionRegistery {
     
     modifier allowedTokenOnly(address _which) {
         require(tokenAllowed[_which],"ERR_ONLY_ALLOWED_TOKEN");
@@ -403,4 +403,3 @@ contract AuctionProtection is
         return true;
     }
 }
-
