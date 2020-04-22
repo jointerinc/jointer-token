@@ -1,0 +1,616 @@
+{
+  "contractName": "Upgradeable",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "implementation",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "registry",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "initialize",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"implementation\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"registry\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"This contract holds all the minimum required functionality for a behavior to be upgradeable. This means, required state variables for owned upgradeability purpose and simple initialization validation.\",\"methods\":{\"implementation()\":{\"details\":\"Tells the address of the current implementation\",\"return\":\"address of the current implementation\"},\"initialize()\":{\"details\":\"Validates the caller is the versions registry. THIS FUNCTION SHOULD BE OVERRIDDEN CALLING SUPER\"}},\"title\":\"Upgradeable\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/Upgradeable.sol\":\"Upgradeable\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/IRegistry.sol\":{\"keccak256\":\"0x4046702de6033eac80487702f5a808005efdb7fd1154e589db40c8a1f42217c4\",\"urls\":[\"bzzr://4ad3e0b9d3ad8097be6704cd9e86d5cf7ec02a9024f743c5078724cb44485b23\",\"dweb:/ipfs/QmXzkfV2DNFVTe6Mx4eP7VzDKXPeanEjXeyJoo8pvDEUiJ\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/UpgradeabilityStorage.sol\":{\"keccak256\":\"0x9bd4c0a689ff1715b2c59c7f2eed242b45c1b2b9692ee2c224c8769cbc578097\",\"urls\":[\"bzzr://66cfb3544d2e98885e1945faa49c005c47e7b87f5dcf6a9c8175c3b9539c7914\",\"dweb:/ipfs/QmcsUSeTXhy9zpjAkx7YvEDUmgpmT8gzkh3xJqsqHZCoY9\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/Upgradeable.sol\":{\"keccak256\":\"0xdc6696f46d719826d9b42d7254d3e42c1a2de39722b8ef10c84d2fe4fecc9f59\",\"urls\":[\"bzzr://bcb5c4ad1cfed405c1b7ffc93439c52edf4e064fa19dad21a93e11c034ac77fa\",\"dweb:/ipfs/QmXfDMQKEzbg3d3EHXX4AVrzbawykwt7DPaKtpY8HQeTAZ\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610124806100206000396000f3fe6080604052348015600f57600080fd5b5060043610603c5760003560e01c80635c60da1b1460415780637b1039991460635780638129fc1c146069575b600080fd5b60476071565b604080516001600160a01b039092168252519081900360200190f35b60476080565b606f608f565b005b6001546001600160a01b031690565b6000546001600160a01b031681565b6000546001600160a01b0316331460ed576040805162461bcd60e51b815260206004820152601c60248201527f4552525f4f4e4c595f524547495354524552595f43414e5f43414c4c00000000604482015290519081900360640190fd5b56fea265627a7a72305820df0372993c6cee0e196349d88bc3f4d91fa312b8e9f3c28dd0a1aefc9b5596dc64736f6c63430005090032",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b5060043610603c5760003560e01c80635c60da1b1460415780637b1039991460635780638129fc1c146069575b600080fd5b60476071565b604080516001600160a01b039092168252519081900360200190f35b60476080565b606f608f565b005b6001546001600160a01b031690565b6000546001600160a01b031681565b6000546001600160a01b0316331460ed576040805162461bcd60e51b815260206004820152601c60248201527f4552525f4f4e4c595f524547495354524552595f43414e5f43414c4c00000000604482015290519081900360640190fd5b56fea265627a7a72305820df0372993c6cee0e196349d88bc3f4d91fa312b8e9f3c28dd0a1aefc9b5596dc64736f6c63430005090032",
+  "sourceMap": "308:307:14:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;308:307:14;;;;;;;",
+  "deployedSourceMap": "308:307:14:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;308:307:14;;;;;;;;;;;;;;;;;;;;;;;;;;;;;498:95:13;;;:::i;:::-;;;;-1:-1:-1;;;;;498:95:13;;;;;;;;;;;;;;253:25;;;:::i;491:122:14:-;;;:::i;:::-;;498:95:13;571:15;;-1:-1:-1;;;;;571:15:13;498:95;:::o;253:25::-;;;-1:-1:-1;;;;;253:25:13;;:::o;491:122:14:-;565:8;;-1:-1:-1;;;;;565:8:14;543:10;:31;535:71;;;;;-1:-1:-1;;;535:71:14;;;;;;;;;;;;;;;;;;;;;;;;;;;;491:122::o",
+  "source": "\npragma solidity ^0.5.9;\n\nimport './UpgradeabilityStorage.sol';\n\n\n/**\n * @title Upgradeable\n * @dev This contract holds all the minimum required functionality for a behavior to be upgradeable.\n * This means, required state variables for owned upgradeability purpose and simple initialization validation.\n */\ncontract Upgradeable is UpgradeabilityStorage {\n    /**\n     * @dev Validates the caller is the versions registry.\n     * THIS FUNCTION SHOULD BE OVERRIDDEN CALLING SUPER\n     */\n    function initialize() public view {\n        require(msg.sender == address(registry),\"ERR_ONLY_REGISTRERY_CAN_CALL\");\n    }\n}",
+  "sourcePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/Upgradeable.sol",
+  "ast": {
+    "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/Upgradeable.sol",
+    "exportedSymbols": {
+      "Upgradeable": [
+        1814
+      ]
+    },
+    "id": 1815,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1796,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".9"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "1:23:14"
+      },
+      {
+        "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/UpgradeabilityStorage.sol",
+        "file": "./UpgradeabilityStorage.sol",
+        "id": 1797,
+        "nodeType": "ImportDirective",
+        "scope": 1815,
+        "sourceUnit": 1795,
+        "src": "26:37:14",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 1798,
+              "name": "UpgradeabilityStorage",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 1794,
+              "src": "332:21:14",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_UpgradeabilityStorage_$1794",
+                "typeString": "contract UpgradeabilityStorage"
+              }
+            },
+            "id": 1799,
+            "nodeType": "InheritanceSpecifier",
+            "src": "332:21:14"
+          }
+        ],
+        "contractDependencies": [
+          1794
+        ],
+        "contractKind": "contract",
+        "documentation": "@title Upgradeable\n@dev This contract holds all the minimum required functionality for a behavior to be upgradeable.\nThis means, required state variables for owned upgradeability purpose and simple initialization validation.",
+        "fullyImplemented": true,
+        "id": 1814,
+        "linearizedBaseContracts": [
+          1814,
+          1794
+        ],
+        "name": "Upgradeable",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 1812,
+              "nodeType": "Block",
+              "src": "525:88:14",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        "id": 1808,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 1803,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 5859,
+                            "src": "543:3:14",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 1804,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "sender",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "543:10:14",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            {
+                              "argumentTypes": null,
+                              "id": 1806,
+                              "name": "registry",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 1783,
+                              "src": "565:8:14",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_contract$_IRegistry_$1701",
+                                "typeString": "contract IRegistry"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_contract$_IRegistry_$1701",
+                                "typeString": "contract IRegistry"
+                              }
+                            ],
+                            "id": 1805,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "lValueRequested": false,
+                            "nodeType": "ElementaryTypeNameExpression",
+                            "src": "557:7:14",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_address_$",
+                              "typeString": "type(address)"
+                            },
+                            "typeName": "address"
+                          },
+                          "id": 1807,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "typeConversion",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "557:17:14",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "src": "543:31:14",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "4552525f4f4e4c595f524547495354524552595f43414e5f43414c4c",
+                        "id": 1809,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "575:30:14",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_9abd1510b8502afd155eeb213cc3d966e814ee8a1af5043c0204ed1fa6e9491c",
+                          "typeString": "literal_string \"ERR_ONLY_REGISTRERY_CAN_CALL\""
+                        },
+                        "value": "ERR_ONLY_REGISTRERY_CAN_CALL"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_9abd1510b8502afd155eeb213cc3d966e814ee8a1af5043c0204ed1fa6e9491c",
+                          "typeString": "literal_string \"ERR_ONLY_REGISTRERY_CAN_CALL\""
+                        }
+                      ],
+                      "id": 1802,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        5862,
+                        5863
+                      ],
+                      "referencedDeclaration": 5863,
+                      "src": "535:7:14",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 1810,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "535:71:14",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 1811,
+                  "nodeType": "ExpressionStatement",
+                  "src": "535:71:14"
+                }
+              ]
+            },
+            "documentation": "@dev Validates the caller is the versions registry.\nTHIS FUNCTION SHOULD BE OVERRIDDEN CALLING SUPER",
+            "id": 1813,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "initialize",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1800,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "510:2:14"
+            },
+            "returnParameters": {
+              "id": 1801,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "525:0:14"
+            },
+            "scope": 1814,
+            "src": "491:122:14",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 1815,
+        "src": "308:307:14"
+      }
+    ],
+    "src": "1:614:14"
+  },
+  "legacyAST": {
+    "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/Upgradeable.sol",
+    "exportedSymbols": {
+      "Upgradeable": [
+        1814
+      ]
+    },
+    "id": 1815,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1796,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".9"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "1:23:14"
+      },
+      {
+        "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/UpgradeabilityStorage.sol",
+        "file": "./UpgradeabilityStorage.sol",
+        "id": 1797,
+        "nodeType": "ImportDirective",
+        "scope": 1815,
+        "sourceUnit": 1795,
+        "src": "26:37:14",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 1798,
+              "name": "UpgradeabilityStorage",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 1794,
+              "src": "332:21:14",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_UpgradeabilityStorage_$1794",
+                "typeString": "contract UpgradeabilityStorage"
+              }
+            },
+            "id": 1799,
+            "nodeType": "InheritanceSpecifier",
+            "src": "332:21:14"
+          }
+        ],
+        "contractDependencies": [
+          1794
+        ],
+        "contractKind": "contract",
+        "documentation": "@title Upgradeable\n@dev This contract holds all the minimum required functionality for a behavior to be upgradeable.\nThis means, required state variables for owned upgradeability purpose and simple initialization validation.",
+        "fullyImplemented": true,
+        "id": 1814,
+        "linearizedBaseContracts": [
+          1814,
+          1794
+        ],
+        "name": "Upgradeable",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 1812,
+              "nodeType": "Block",
+              "src": "525:88:14",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        "id": 1808,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 1803,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 5859,
+                            "src": "543:3:14",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 1804,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "sender",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "543:10:14",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            {
+                              "argumentTypes": null,
+                              "id": 1806,
+                              "name": "registry",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 1783,
+                              "src": "565:8:14",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_contract$_IRegistry_$1701",
+                                "typeString": "contract IRegistry"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_contract$_IRegistry_$1701",
+                                "typeString": "contract IRegistry"
+                              }
+                            ],
+                            "id": 1805,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "lValueRequested": false,
+                            "nodeType": "ElementaryTypeNameExpression",
+                            "src": "557:7:14",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_address_$",
+                              "typeString": "type(address)"
+                            },
+                            "typeName": "address"
+                          },
+                          "id": 1807,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "typeConversion",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "557:17:14",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "src": "543:31:14",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "4552525f4f4e4c595f524547495354524552595f43414e5f43414c4c",
+                        "id": 1809,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "575:30:14",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_9abd1510b8502afd155eeb213cc3d966e814ee8a1af5043c0204ed1fa6e9491c",
+                          "typeString": "literal_string \"ERR_ONLY_REGISTRERY_CAN_CALL\""
+                        },
+                        "value": "ERR_ONLY_REGISTRERY_CAN_CALL"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_9abd1510b8502afd155eeb213cc3d966e814ee8a1af5043c0204ed1fa6e9491c",
+                          "typeString": "literal_string \"ERR_ONLY_REGISTRERY_CAN_CALL\""
+                        }
+                      ],
+                      "id": 1802,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        5862,
+                        5863
+                      ],
+                      "referencedDeclaration": 5863,
+                      "src": "535:7:14",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 1810,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "535:71:14",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 1811,
+                  "nodeType": "ExpressionStatement",
+                  "src": "535:71:14"
+                }
+              ]
+            },
+            "documentation": "@dev Validates the caller is the versions registry.\nTHIS FUNCTION SHOULD BE OVERRIDDEN CALLING SUPER",
+            "id": 1813,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "initialize",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1800,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "510:2:14"
+            },
+            "returnParameters": {
+              "id": 1801,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "525:0:14"
+            },
+            "scope": 1814,
+            "src": "491:122:14",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 1815,
+        "src": "308:307:14"
+      }
+    ],
+    "src": "1:614:14"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.9+commit.e560f70d.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.16",
+  "updatedAt": "2020-04-22T14:52:56.460Z",
+  "devdoc": {
+    "details": "This contract holds all the minimum required functionality for a behavior to be upgradeable. This means, required state variables for owned upgradeability purpose and simple initialization validation.",
+    "methods": {
+      "implementation()": {
+        "details": "Tells the address of the current implementation",
+        "return": "address of the current implementation"
+      },
+      "initialize()": {
+        "details": "Validates the caller is the versions registry. THIS FUNCTION SHOULD BE OVERRIDDEN CALLING SUPER"
+      }
+    },
+    "title": "Upgradeable"
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}
