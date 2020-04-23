@@ -45,7 +45,9 @@ contract SuperToken is Upgradeable, SuperTokenUtils, InitializeInterface {
         
             super.initialize();
             ProxyOwnable.initializeOwner(_primaryOwner,_systemAddress,_authorityAddress);
-            registry = IAuctionRegistery(_registeryAddress);
+            contractsRegistry = IAuctionRegistery(_registeryAddress);
+            name = _name;
+            symbol = _symbol;
             tokenPrice = _tokenPrice;
             tokenSaleStartDate = now;
             tokenMaturityDays = _tokenMaturityDays;
@@ -56,6 +58,7 @@ contract SuperToken is Upgradeable, SuperTokenUtils, InitializeInterface {
     function premint(address[] calldata _which,uint256[] calldata _amount) external{
         require(_which.length == _amount.length,"ERR_NOT_SAME_LENGHT");
         require(preminted == false,"ERR_ALREADY_PREMINTED");
+        require(msg.sender == address(registry),"ERR_ONLY_REGISTRERY_CAN_CALL");
         for(uint256 tempX=0 ; tempX < _which.length ; tempX++){
             _mint(_which[tempX],_amount[tempX]);
         }

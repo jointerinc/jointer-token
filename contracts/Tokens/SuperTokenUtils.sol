@@ -6,17 +6,16 @@ import "../InterFaces/ICurrencyPrices.sol";
 
 contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     
-    IAuctionRegistery public registry;
-    IAuctionRegistery public prevRegistry;
-
+    IAuctionRegistery public contractsRegistry;
+    
     function updateRegistery(address _address)
         external
         onlyAuthorized()
         notZeroAddress(_address)
         returns (bool)
     {
-        prevRegistry = registry;
-        registry = IAuctionRegistery(_address);
+        
+        contractsRegistry = IAuctionRegistery(_address);
         return true;
     }
 
@@ -25,7 +24,7 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
         view
         returns (address)
     {
-        return registry.getAddressOf(_contractName);
+        return contractsRegistry.getAddressOf(_contractName);
     }
 }
 

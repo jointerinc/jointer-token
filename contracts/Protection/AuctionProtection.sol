@@ -18,19 +18,18 @@ interface InitializeInterface {
 }
 
 
-contract AuctionProtectionRegistery is ProxyOwnable, AuctionRegisteryContracts {
+contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     
-    IAuctionRegistery public registry;
-    IAuctionRegistery public prevRegistry;
-
+    IAuctionRegistery public contractsRegistry;
+    
     function updateRegistery(address _address)
         external
         onlyAuthorized()
         notZeroAddress(_address)
         returns (bool)
     {
-        prevRegistry = registry;
-        registry = IAuctionRegistery(_address);
+        
+        contractsRegistry = IAuctionRegistery(_address);
         return true;
     }
 
@@ -39,7 +38,7 @@ contract AuctionProtectionRegistery is ProxyOwnable, AuctionRegisteryContracts {
         view
         returns (address)
     {
-        return registry.getAddressOf(_contractName);
+        return contractsRegistry.getAddressOf(_contractName);
     }
 }
 
@@ -60,7 +59,7 @@ contract UtilsStorage {
 }
 
 
-contract Utils is SafeMath, UtilsStorage, AuctionProtectionRegistery {
+contract Utils is SafeMath, UtilsStorage, AuctionRegistery {
     
     modifier allowedTokenOnly(address _which) {
         require(tokenAllowed[_which],"ERR_ONLY_ALLOWED_TOKEN");
@@ -145,7 +144,7 @@ contract AuctionProtection is
         address _registeryAddress
     ) public {
         super.initialize();
-        registry = IAuctionRegistery(_registeryAddress);
+        contractsRegistry = IAuctionRegistery(_registeryAddress);
         tokenLockDuration = 365;
         ProxyOwnable.initializeOwner(
             _primaryOwner,
