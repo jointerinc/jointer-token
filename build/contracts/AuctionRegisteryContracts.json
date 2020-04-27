@@ -1,12 +1,12 @@
 {
   "contractName": "AuctionRegisteryContracts",
   "abi": [],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionRegistery.sol\":\"AuctionRegisteryContracts\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionRegistery.sol\":{\"keccak256\":\"0x58e298d603e39c93e52efe63931f854275193f86c3f0960d8303c58bd2f831d1\",\"urls\":[\"bzzr://2bd7ac96cd1cfdef81f5e569300c79d4ef2ac6908691d45611dc29be6a3f16c9\",\"dweb:/ipfs/QmcEPGztbHB7eeFw5GUTH3AacDF5XxgtNoDRKC45om8RY9\"]}},\"version\":1}",
-  "bytecode": "0x6080604052348015600f57600080fd5b50603e80601d6000396000f3fe6080604052600080fdfea265627a7a72305820ad8af3b0e6048c5cbfff657779a7f9f8286d1ebb36d2775e22c149096007d59064736f6c63430005090032",
-  "deployedBytecode": "0x6080604052600080fdfea265627a7a72305820ad8af3b0e6048c5cbfff657779a7f9f8286d1ebb36d2775e22c149096007d59064736f6c63430005090032",
-  "sourceMap": "24:635:0:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;24:635:0;;;;;;;",
-  "deployedSourceMap": "24:635:0:-;;;;;",
-  "source": "pragma solidity 0.5.9;\n\ncontract AuctionRegisteryContracts{\n    \n    bytes32 internal constant MAIN_TOKEN = \"MAIN_TOKEN\";\n    bytes32 internal constant AUCTION_FORMULA = \"AUCTION_FORMULA\";\n    bytes32 internal constant DOWNSIDE_PROTECTION = \"DOWNSIDE_PROTECTION\";\n    \n    bytes32 internal constant WHITE_LIST = \"WHITE_LIST\";\n    bytes32 internal constant AUCTION = \"AUCTION\";\n    bytes32 internal constant LIQUADITY = \"LIQUADITY\";\n    bytes32 internal constant CURRENCY = \"CURRENCY\";\n    bytes32 internal constant INDIDUAL_BONUS = \"INDIDUAL_BONUS\";\n    bytes32 internal constant VAULT = \"VAULT\";\n\n    bytes32 internal constant TAG_ALONG = \"TAG_ALONG\";\n    \n}\n\ncontract IAuctionRegistery {\n    function getAddressOf(bytes32 _contractName) external view returns (address);\n}\n\n\n",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionRegistery.sol\":\"AuctionRegisteryContracts\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionRegistery.sol\":{\"keccak256\":\"0xff227bce8f3398384dee2109b14fc8504ef990808f70a5ecde86756a94d6aa0d\",\"urls\":[\"bzzr://d7be4ea72421fd2be7c46bf28b3d558916659e7300cfc358c3a3b5d6e91d5aa0\",\"dweb:/ipfs/QmapTDW3qDBrXEv48Gj21zms1MpBLS86NsiS7tQsxjKw8f\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b50603e80601d6000396000f3fe6080604052600080fdfea265627a7a7230582052a38a1d40b1738105a1c379d1b24eb53b672341d37685da7b4fbb1892f9cad164736f6c63430005090032",
+  "deployedBytecode": "0x6080604052600080fdfea265627a7a7230582052a38a1d40b1738105a1c379d1b24eb53b672341d37685da7b4fbb1892f9cad164736f6c63430005090032",
+  "sourceMap": "25:635:0:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;25:635:0;;;;;;;",
+  "deployedSourceMap": "25:635:0:-;;;;;",
+  "source": "pragma solidity ^0.5.9;\n\ncontract AuctionRegisteryContracts{\n    \n    bytes32 internal constant MAIN_TOKEN = \"MAIN_TOKEN\";\n    bytes32 internal constant AUCTION_FORMULA = \"AUCTION_FORMULA\";\n    bytes32 internal constant DOWNSIDE_PROTECTION = \"DOWNSIDE_PROTECTION\";\n    \n    bytes32 internal constant WHITE_LIST = \"WHITE_LIST\";\n    bytes32 internal constant AUCTION = \"AUCTION\";\n    bytes32 internal constant LIQUADITY = \"LIQUADITY\";\n    bytes32 internal constant CURRENCY = \"CURRENCY\";\n    bytes32 internal constant INDIDUAL_BONUS = \"INDIDUAL_BONUS\";\n    bytes32 internal constant VAULT = \"VAULT\";\n\n    bytes32 internal constant TAG_ALONG = \"TAG_ALONG\";\n    \n}\n\ncontract IAuctionRegistery {\n    function getAddressOf(bytes32 _contractName) external view returns (address);\n}\n\n\n",
   "sourcePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionRegistery.sol",
   "ast": {
     "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionRegistery.sol",
@@ -25,11 +25,12 @@
         "id": 1,
         "literals": [
           "solidity",
+          "^",
           "0.5",
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:22:0"
+        "src": "0:23:0"
       },
       {
         "baseContracts": [],
@@ -50,7 +51,7 @@
             "name": "MAIN_TOKEN",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "69:51:0",
+            "src": "70:51:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -61,7 +62,7 @@
               "id": 2,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "69:7:0",
+              "src": "70:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -77,7 +78,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "108:12:0",
+              "src": "109:12:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_155af7911d119cc7437861d1fdef227768928d772ae2450ad865b0aeb0d1f812",
@@ -93,7 +94,7 @@
             "name": "AUCTION_FORMULA",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "126:61:0",
+            "src": "127:61:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -104,7 +105,7 @@
               "id": 5,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "126:7:0",
+              "src": "127:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -120,7 +121,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "170:17:0",
+              "src": "171:17:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_90c175aba01f1b423ad61521206b4da926528fccc35ea049b56674997f61e5d3",
@@ -136,7 +137,7 @@
             "name": "DOWNSIDE_PROTECTION",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "193:69:0",
+            "src": "194:69:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -147,7 +148,7 @@
               "id": 8,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "193:7:0",
+              "src": "194:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -163,7 +164,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "241:21:0",
+              "src": "242:21:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_9556feb7e436e98f859d72f08258b9c97ccb03fb536cf7c7149642feccb04a0a",
@@ -179,7 +180,7 @@
             "name": "WHITE_LIST",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "273:51:0",
+            "src": "274:51:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -190,7 +191,7 @@
               "id": 11,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "273:7:0",
+              "src": "274:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -206,7 +207,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "312:12:0",
+              "src": "313:12:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_55c152c9a5853c3d40c3526c5658b385c26370d280a2f3e4fc70692fdc363497",
@@ -222,7 +223,7 @@
             "name": "AUCTION",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "330:45:0",
+            "src": "331:45:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -233,7 +234,7 @@
               "id": 14,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "330:7:0",
+              "src": "331:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -249,7 +250,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "366:9:0",
+              "src": "367:9:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_2a86bfecab7c1dc1a00b694d14a5a3c91a3ce748c12f853f875c4c7b4b254eb7",
@@ -265,7 +266,7 @@
             "name": "LIQUADITY",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "381:49:0",
+            "src": "382:49:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -276,7 +277,7 @@
               "id": 17,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "381:7:0",
+              "src": "382:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -292,7 +293,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "419:11:0",
+              "src": "420:11:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_b01c5cbe9c80f4ec0318b70720550067a3bd22355075beba13c2b562d5590e7a",
@@ -308,7 +309,7 @@
             "name": "CURRENCY",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "436:47:0",
+            "src": "437:47:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -319,7 +320,7 @@
               "id": 20,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "436:7:0",
+              "src": "437:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -335,7 +336,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "473:10:0",
+              "src": "474:10:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_4e8e254edb01426b6143b7bc645e83d15690c4c05223fa236535e12cb103e884",
@@ -351,7 +352,7 @@
             "name": "INDIDUAL_BONUS",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "489:59:0",
+            "src": "490:59:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -362,7 +363,7 @@
               "id": 23,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "489:7:0",
+              "src": "490:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -378,7 +379,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "532:16:0",
+              "src": "533:16:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_feb37b9cf9c9114adbcc11c4297bca73aa14c58ea6a05a792fd99c17df891f40",
@@ -394,7 +395,7 @@
             "name": "VAULT",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "554:41:0",
+            "src": "555:41:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -405,7 +406,7 @@
               "id": 26,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "554:7:0",
+              "src": "555:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -421,7 +422,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "588:7:0",
+              "src": "589:7:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_68fc488efe30251cadb6ac88bdeef3f1a5e6048808baf387258d1d78e986720c",
@@ -437,7 +438,7 @@
             "name": "TAG_ALONG",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "602:49:0",
+            "src": "603:49:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -448,7 +449,7 @@
               "id": 29,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "602:7:0",
+              "src": "603:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -464,7 +465,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "640:11:0",
+              "src": "641:11:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_3d1e441406b638f19e10a321f47a88fa6b5f8fddd264578c333196c5ca44db61",
@@ -476,7 +477,7 @@
           }
         ],
         "scope": 41,
-        "src": "24:635:0"
+        "src": "25:635:0"
       },
       {
         "baseContracts": [],
@@ -510,7 +511,7 @@
                   "name": "_contractName",
                   "nodeType": "VariableDeclaration",
                   "scope": 39,
-                  "src": "716:21:0",
+                  "src": "717:21:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -521,7 +522,7 @@
                     "id": 33,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "716:7:0",
+                    "src": "717:7:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -531,7 +532,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "715:23:0"
+              "src": "716:23:0"
             },
             "returnParameters": {
               "id": 38,
@@ -543,7 +544,7 @@
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "scope": 39,
-                  "src": "762:7:0",
+                  "src": "763:7:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -554,7 +555,7 @@
                     "id": 36,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "762:7:0",
+                    "src": "763:7:0",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -565,20 +566,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "761:9:0"
+              "src": "762:9:0"
             },
             "scope": 40,
-            "src": "694:77:0",
+            "src": "695:77:0",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
           }
         ],
         "scope": 41,
-        "src": "661:112:0"
+        "src": "662:112:0"
       }
     ],
-    "src": "0:776:0"
+    "src": "0:777:0"
   },
   "legacyAST": {
     "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionRegistery.sol",
@@ -597,11 +598,12 @@
         "id": 1,
         "literals": [
           "solidity",
+          "^",
           "0.5",
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:22:0"
+        "src": "0:23:0"
       },
       {
         "baseContracts": [],
@@ -622,7 +624,7 @@
             "name": "MAIN_TOKEN",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "69:51:0",
+            "src": "70:51:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -633,7 +635,7 @@
               "id": 2,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "69:7:0",
+              "src": "70:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -649,7 +651,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "108:12:0",
+              "src": "109:12:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_155af7911d119cc7437861d1fdef227768928d772ae2450ad865b0aeb0d1f812",
@@ -665,7 +667,7 @@
             "name": "AUCTION_FORMULA",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "126:61:0",
+            "src": "127:61:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -676,7 +678,7 @@
               "id": 5,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "126:7:0",
+              "src": "127:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -692,7 +694,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "170:17:0",
+              "src": "171:17:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_90c175aba01f1b423ad61521206b4da926528fccc35ea049b56674997f61e5d3",
@@ -708,7 +710,7 @@
             "name": "DOWNSIDE_PROTECTION",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "193:69:0",
+            "src": "194:69:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -719,7 +721,7 @@
               "id": 8,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "193:7:0",
+              "src": "194:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -735,7 +737,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "241:21:0",
+              "src": "242:21:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_9556feb7e436e98f859d72f08258b9c97ccb03fb536cf7c7149642feccb04a0a",
@@ -751,7 +753,7 @@
             "name": "WHITE_LIST",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "273:51:0",
+            "src": "274:51:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -762,7 +764,7 @@
               "id": 11,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "273:7:0",
+              "src": "274:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -778,7 +780,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "312:12:0",
+              "src": "313:12:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_55c152c9a5853c3d40c3526c5658b385c26370d280a2f3e4fc70692fdc363497",
@@ -794,7 +796,7 @@
             "name": "AUCTION",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "330:45:0",
+            "src": "331:45:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -805,7 +807,7 @@
               "id": 14,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "330:7:0",
+              "src": "331:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -821,7 +823,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "366:9:0",
+              "src": "367:9:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_2a86bfecab7c1dc1a00b694d14a5a3c91a3ce748c12f853f875c4c7b4b254eb7",
@@ -837,7 +839,7 @@
             "name": "LIQUADITY",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "381:49:0",
+            "src": "382:49:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -848,7 +850,7 @@
               "id": 17,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "381:7:0",
+              "src": "382:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -864,7 +866,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "419:11:0",
+              "src": "420:11:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_b01c5cbe9c80f4ec0318b70720550067a3bd22355075beba13c2b562d5590e7a",
@@ -880,7 +882,7 @@
             "name": "CURRENCY",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "436:47:0",
+            "src": "437:47:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -891,7 +893,7 @@
               "id": 20,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "436:7:0",
+              "src": "437:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -907,7 +909,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "473:10:0",
+              "src": "474:10:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_4e8e254edb01426b6143b7bc645e83d15690c4c05223fa236535e12cb103e884",
@@ -923,7 +925,7 @@
             "name": "INDIDUAL_BONUS",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "489:59:0",
+            "src": "490:59:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -934,7 +936,7 @@
               "id": 23,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "489:7:0",
+              "src": "490:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -950,7 +952,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "532:16:0",
+              "src": "533:16:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_feb37b9cf9c9114adbcc11c4297bca73aa14c58ea6a05a792fd99c17df891f40",
@@ -966,7 +968,7 @@
             "name": "VAULT",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "554:41:0",
+            "src": "555:41:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -977,7 +979,7 @@
               "id": 26,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "554:7:0",
+              "src": "555:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -993,7 +995,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "588:7:0",
+              "src": "589:7:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_68fc488efe30251cadb6ac88bdeef3f1a5e6048808baf387258d1d78e986720c",
@@ -1009,7 +1011,7 @@
             "name": "TAG_ALONG",
             "nodeType": "VariableDeclaration",
             "scope": 32,
-            "src": "602:49:0",
+            "src": "603:49:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -1020,7 +1022,7 @@
               "id": 29,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "602:7:0",
+              "src": "603:7:0",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -1036,7 +1038,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "640:11:0",
+              "src": "641:11:0",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_3d1e441406b638f19e10a321f47a88fa6b5f8fddd264578c333196c5ca44db61",
@@ -1048,7 +1050,7 @@
           }
         ],
         "scope": 41,
-        "src": "24:635:0"
+        "src": "25:635:0"
       },
       {
         "baseContracts": [],
@@ -1082,7 +1084,7 @@
                   "name": "_contractName",
                   "nodeType": "VariableDeclaration",
                   "scope": 39,
-                  "src": "716:21:0",
+                  "src": "717:21:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1093,7 +1095,7 @@
                     "id": 33,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "716:7:0",
+                    "src": "717:7:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1103,7 +1105,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "715:23:0"
+              "src": "716:23:0"
             },
             "returnParameters": {
               "id": 38,
@@ -1115,7 +1117,7 @@
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "scope": 39,
-                  "src": "762:7:0",
+                  "src": "763:7:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1126,7 +1128,7 @@
                     "id": 36,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "762:7:0",
+                    "src": "763:7:0",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -1137,20 +1139,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "761:9:0"
+              "src": "762:9:0"
             },
             "scope": 40,
-            "src": "694:77:0",
+            "src": "695:77:0",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
           }
         ],
         "scope": 41,
-        "src": "661:112:0"
+        "src": "662:112:0"
       }
     ],
-    "src": "0:776:0"
+    "src": "0:777:0"
   },
   "compiler": {
     "name": "solc",
@@ -1158,7 +1160,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.16",
-  "updatedAt": "2020-04-22T14:52:56.306Z",
+  "updatedAt": "2020-04-27T13:53:30.266Z",
   "devdoc": {
     "methods": {}
   },

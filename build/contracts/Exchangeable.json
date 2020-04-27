@@ -1,5 +1,5 @@
 {
-  "contractName": "ForceSwap",
+  "contractName": "Exchangeable",
   "abi": [
     {
       "constant": false,
@@ -69,6 +69,25 @@
       ],
       "payable": false,
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_which",
+          "type": "address"
+        }
+      ],
+      "name": "setReturnToken",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -246,6 +265,25 @@
       "constant": true,
       "inputs": [
         {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "allowedTokens",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
           "name": "_who",
           "type": "address"
         }
@@ -265,6 +303,25 @@
       "constant": true,
       "inputs": [],
       "name": "tokenPrice",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "allowedTokensIndex",
       "outputs": [
         {
           "name": "",
@@ -437,6 +494,29 @@
       ],
       "payable": false,
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_which",
+          "type": "address"
+        },
+        {
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "forceSwap",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -630,11 +710,38 @@
       "constant": false,
       "inputs": [
         {
-          "name": "_which",
+          "name": "_fromToken",
           "type": "address"
+        },
+        {
+          "name": "_amount",
+          "type": "uint256"
         }
       ],
-      "name": "setReturnToken",
+      "name": "buyTokens",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_toToken",
+          "type": "address"
+        },
+        {
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "swapTokens",
       "outputs": [
         {
           "name": "",
@@ -651,13 +758,9 @@
         {
           "name": "_which",
           "type": "address"
-        },
-        {
-          "name": "_amount",
-          "type": "uint256"
         }
       ],
-      "name": "forceSwap",
+      "name": "addAllowedToken",
       "outputs": [
         {
           "name": "",
@@ -669,7 +772,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"changeSystemAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"name\":\"ok\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"newAuthorityAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"setReturnToken\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isTokenMature\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"acceptAuthorityAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"returnToken\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"decimals\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"authorityAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_currentValue\",\"type\":\"uint256\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"name\":\"ok\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tokenMaturityDays\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_who\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tokenPrice\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tokenSaleStartDate\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"primaryOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"changeAuthorityAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"symbol\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tokenHoldBackDays\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"name\":\"ok\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"updateRegistery\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isHoldbackDaysOver\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"changePrimaryOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"systemAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"},{\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"forceSwap\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"contractsRegistry\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_returnToken\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Mint\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Burn\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"spender\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_to\",\"type\":\"address\"}],\"name\":\"TransferFrom\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"ownerType\",\"type\":\"string\"},{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"AuthorityAddressChnageCall\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"spender\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"}],\"devdoc\":{\"methods\":{\"allowance(address,address)\":{\"details\":\"to check allowed token for transferFrom\",\"params\":{\"_owner\":\"The address of the account owning tokens\",\"_spender\":\"The address of the account able to transfer the tokens\"},\"return\":\"Amount of remaining tokens allowed to spent\"},\"approve(address,uint256)\":{\"details\":\"`msg.sender` approves `spender` to spend `value` tokens\",\"params\":{\"_spender\":\"The address of the account able to transfer the tokens\",\"_value\":\"The amount of wei to be approved for transfer\"},\"return\":\"Whether the approval was successful or not\"},\"approve(address,uint256,uint256)\":{\"details\":\"`msg.sender` approves `spender` to spend `value` tokensalthough all Dpp work with two argument approve method but we provide this method to ensure user from double spend\",\"params\":{\"_currentValue\":\"the amount user already apporved\",\"_spender\":\"The address of the account able to transfer the tokens\",\"_value\":\"The amount of wei to be approved for transfer\"},\"return\":\"Whether the approval was successful or not\"},\"balanceOf(address)\":{\"details\":\"Gets the balance of the specified address.\",\"params\":{\"_who\":\"The address to query the the balance of.\"},\"return\":\"An uint256 representing the amount owned by the passed address.\"},\"burn(uint256)\":{\"details\":\"burn token from this address\",\"params\":{\"_value\":\"uint256 the amount of tokens to be burned\"}},\"changeAuthorityAddress(address)\":{\"details\":\"change system address\",\"params\":{\"_which\":\"The address to which is new Authority address\"}},\"changePrimaryOwner(address)\":{\"details\":\"change primary ownership\",\"params\":{\"_which\":\"The address to which is new owner address\"}},\"changeSystemAddress(address)\":{\"details\":\"change system address\",\"params\":{\"_which\":\"The address to which is new system address\"}},\"transfer(address,uint256)\":{\"details\":\"transfer token for a specified address\",\"params\":{\"_to\":\"The address to transfer to.\",\"_value\":\"The amount to be transferred.\"}},\"transferFrom(address,address,uint256)\":{\"details\":\"Transfer tokens from one address to another\",\"params\":{\"_from\":\"address The address which you want to send tokens from\",\"_to\":\"address The address which you want to transfer tokens\",\"_value\":\"uint256 the amount of tokens to be transferred\"}}}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Tokens/SwapbleToken.sol\":\"ForceSwap\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionRegistery.sol\":{\"keccak256\":\"0xff227bce8f3398384dee2109b14fc8504ef990808f70a5ecde86756a94d6aa0d\",\"urls\":[\"bzzr://d7be4ea72421fd2be7c46bf28b3d558916659e7300cfc358c3a3b5d6e91d5aa0\",\"dweb:/ipfs/QmapTDW3qDBrXEv48Gj21zms1MpBLS86NsiS7tQsxjKw8f\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol\":{\"keccak256\":\"0x8efa07d065fbce3b70d4fdfa57749e246a5d7b09da678fa6822db07c27024d94\",\"urls\":[\"bzzr://9df00d48a4f10a0d029600f360184a428a555d661602410534aeb90ec50f42cc\",\"dweb:/ipfs/QmUQJnbg5zSFbNCHSHPUaWhhn4pH61xcaq5SNS5RnB2ePn\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ITokenVault.sol\":{\"keccak256\":\"0xf9935a49fea2163d50a65813d5159bac232fe9878cc9511653b12f320f72bfe2\",\"urls\":[\"bzzr://4d13f2330939a90832f9d50a0f502499a9aa859372e1fbf8fa1bee5a6037ca22\",\"dweb:/ipfs/QmaSubzVF6JgGgh7iHzp9Gxk9Nn37C1StcvaLQWjcGLUEB\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IWhiteList.sol\":{\"keccak256\":\"0xe17ca571e86c37f2cba98106f7a6b4b8c30f5c5584fd00c2ab74cf4fc1932ebc\",\"urls\":[\"bzzr://beef8f1f2b577c454e28956a04ac995eb5d99c18413df94ab28214a7e761ccf7\",\"dweb:/ipfs/QmcpV8EgAmS2GMFRfL4m7sqgGRPV3D9WrYuGz2xYcjTB3h\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Tokens/ERC20.sol\":{\"keccak256\":\"0x70be806f88cd39a05846213c316897ec4d412a22dfb3136da1d939b7aadb6eef\",\"urls\":[\"bzzr://e4cce95ab6b95b79e9dc1f5a42974e250a068f82816d538a2d2589e939353203\",\"dweb:/ipfs/QmZaCPigvwKcGBQhEnSqGWDS1H2RFe7h9DmGkc2zZkXYY6\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Tokens/StandardToken.sol\":{\"keccak256\":\"0x78c8363d9788157a1e62000629b3593d009d06b1a864fca91a6cffb44ea190b2\",\"urls\":[\"bzzr://72b65eae2723cac169cb9eafcc63b4bd9fac99ae2a9ddac61d4f82fc6bc83ddd\",\"dweb:/ipfs/QmaMn46MZGFLjAk6TaxyCSeei4mxcznJSHqHVoRsiJQxF4\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Tokens/SwapbleToken.sol\":{\"keccak256\":\"0x918f664f5537676d1d069511a544a7a21440f7b3fd03d16f781aaccd13358136\",\"urls\":[\"bzzr://70355c7098772b3ff00a5fba42325c0e39419025d3990da56f1ca09240d08781\",\"dweb:/ipfs/QmTrRW8ZoykhEpEDbyHyPULUJhiaUGao9LWCihtip4ZNkT\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Tokens/TokenUtils.sol\":{\"keccak256\":\"0x065aa0bdc63e5e6b34123b14f94cfb35d45493f7a72f695ec437b988a46a681f\",\"urls\":[\"bzzr://8ed6477dc854a23717e9c15def9dcd1639b690cb9a953a479922eaa49e9da600\",\"dweb:/ipfs/QmSKfpAoLNZys2F4rdigQiFCyGgNHRzWxJUdPRnCXph2pV\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/common/Constant.sol\":{\"keccak256\":\"0xac59de5c6ee3ddcffa6fac3ac162fb393577a5bc644706be3d71f7a70641934f\",\"urls\":[\"bzzr://43b4f9ed1af57afb23f21e1dd0544e96d70a99c70e4412bf4e0f0e333180cbe1\",\"dweb:/ipfs/QmXXwt3dH5xfdeCNLzWK8SuztRCeVPNbovziR8YHAxB5zN\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/common/Ownable.sol\":{\"keccak256\":\"0xaa6fb42c7872abf82696c7550873e4a25f96d6a7f41f42129d754dfd037183a5\",\"urls\":[\"bzzr://17260ae7e318c4dbbce3d6aeb046455f65b76aa8ef8c934a68a96ed7ced162f1\",\"dweb:/ipfs/QmX5r2mkKMw586hez8YaAnAKakXGh644gw3qad9o8HPF6E\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/common/SafeMath.sol\":{\"keccak256\":\"0xf97bb88e1bf9f800c2d1c0afd5a0620d783457345236aaac43415e046963cb0b\",\"urls\":[\"bzzr://4edc8aa2e72045658aba3b73bde7fbccb3ebac729898e84446777323554535e5\",\"dweb:/ipfs/QmWoZRUFisqZa7Tua8N5qsvyjQY8n6bhkv9B4Kcoxk77aT\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"changeSystemAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_fromToken\",\"type\":\"address\"},{\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"buyTokens\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"name\":\"ok\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"newAuthorityAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"setReturnToken\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isTokenMature\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"acceptAuthorityAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"returnToken\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"decimals\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"authorityAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"addAllowedToken\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_currentValue\",\"type\":\"uint256\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"name\":\"ok\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tokenMaturityDays\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"allowedTokens\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_who\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tokenPrice\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"allowedTokensIndex\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tokenSaleStartDate\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"primaryOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"changeAuthorityAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"symbol\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tokenHoldBackDays\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_toToken\",\"type\":\"address\"},{\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"swapTokens\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"name\":\"ok\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"updateRegistery\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isHoldbackDaysOver\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"changePrimaryOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"systemAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"},{\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"forceSwap\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"contractsRegistry\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_returnToken\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Mint\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Burn\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"spender\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_to\",\"type\":\"address\"}],\"name\":\"TransferFrom\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"ownerType\",\"type\":\"string\"},{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"AuthorityAddressChnageCall\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"spender\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"}],\"devdoc\":{\"methods\":{\"allowance(address,address)\":{\"details\":\"to check allowed token for transferFrom\",\"params\":{\"_owner\":\"The address of the account owning tokens\",\"_spender\":\"The address of the account able to transfer the tokens\"},\"return\":\"Amount of remaining tokens allowed to spent\"},\"approve(address,uint256)\":{\"details\":\"`msg.sender` approves `spender` to spend `value` tokens\",\"params\":{\"_spender\":\"The address of the account able to transfer the tokens\",\"_value\":\"The amount of wei to be approved for transfer\"},\"return\":\"Whether the approval was successful or not\"},\"approve(address,uint256,uint256)\":{\"details\":\"`msg.sender` approves `spender` to spend `value` tokensalthough all Dpp work with two argument approve method but we provide this method to ensure user from double spend\",\"params\":{\"_currentValue\":\"the amount user already apporved\",\"_spender\":\"The address of the account able to transfer the tokens\",\"_value\":\"The amount of wei to be approved for transfer\"},\"return\":\"Whether the approval was successful or not\"},\"balanceOf(address)\":{\"details\":\"Gets the balance of the specified address.\",\"params\":{\"_who\":\"The address to query the the balance of.\"},\"return\":\"An uint256 representing the amount owned by the passed address.\"},\"burn(uint256)\":{\"details\":\"burn token from this address\",\"params\":{\"_value\":\"uint256 the amount of tokens to be burned\"}},\"changeAuthorityAddress(address)\":{\"details\":\"change system address\",\"params\":{\"_which\":\"The address to which is new Authority address\"}},\"changePrimaryOwner(address)\":{\"details\":\"change primary ownership\",\"params\":{\"_which\":\"The address to which is new owner address\"}},\"changeSystemAddress(address)\":{\"details\":\"change system address\",\"params\":{\"_which\":\"The address to which is new system address\"}},\"transfer(address,uint256)\":{\"details\":\"transfer token for a specified address\",\"params\":{\"_to\":\"The address to transfer to.\",\"_value\":\"The amount to be transferred.\"}},\"transferFrom(address,address,uint256)\":{\"details\":\"Transfer tokens from one address to another\",\"params\":{\"_from\":\"address The address which you want to send tokens from\",\"_to\":\"address The address which you want to transfer tokens\",\"_value\":\"uint256 the amount of tokens to be transferred\"}}}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Tokens/SwapbleToken.sol\":\"Exchangeable\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionRegistery.sol\":{\"keccak256\":\"0xff227bce8f3398384dee2109b14fc8504ef990808f70a5ecde86756a94d6aa0d\",\"urls\":[\"bzzr://d7be4ea72421fd2be7c46bf28b3d558916659e7300cfc358c3a3b5d6e91d5aa0\",\"dweb:/ipfs/QmapTDW3qDBrXEv48Gj21zms1MpBLS86NsiS7tQsxjKw8f\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol\":{\"keccak256\":\"0x8efa07d065fbce3b70d4fdfa57749e246a5d7b09da678fa6822db07c27024d94\",\"urls\":[\"bzzr://9df00d48a4f10a0d029600f360184a428a555d661602410534aeb90ec50f42cc\",\"dweb:/ipfs/QmUQJnbg5zSFbNCHSHPUaWhhn4pH61xcaq5SNS5RnB2ePn\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ITokenVault.sol\":{\"keccak256\":\"0xf9935a49fea2163d50a65813d5159bac232fe9878cc9511653b12f320f72bfe2\",\"urls\":[\"bzzr://4d13f2330939a90832f9d50a0f502499a9aa859372e1fbf8fa1bee5a6037ca22\",\"dweb:/ipfs/QmaSubzVF6JgGgh7iHzp9Gxk9Nn37C1StcvaLQWjcGLUEB\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IWhiteList.sol\":{\"keccak256\":\"0xe17ca571e86c37f2cba98106f7a6b4b8c30f5c5584fd00c2ab74cf4fc1932ebc\",\"urls\":[\"bzzr://beef8f1f2b577c454e28956a04ac995eb5d99c18413df94ab28214a7e761ccf7\",\"dweb:/ipfs/QmcpV8EgAmS2GMFRfL4m7sqgGRPV3D9WrYuGz2xYcjTB3h\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Tokens/ERC20.sol\":{\"keccak256\":\"0x70be806f88cd39a05846213c316897ec4d412a22dfb3136da1d939b7aadb6eef\",\"urls\":[\"bzzr://e4cce95ab6b95b79e9dc1f5a42974e250a068f82816d538a2d2589e939353203\",\"dweb:/ipfs/QmZaCPigvwKcGBQhEnSqGWDS1H2RFe7h9DmGkc2zZkXYY6\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Tokens/StandardToken.sol\":{\"keccak256\":\"0x78c8363d9788157a1e62000629b3593d009d06b1a864fca91a6cffb44ea190b2\",\"urls\":[\"bzzr://72b65eae2723cac169cb9eafcc63b4bd9fac99ae2a9ddac61d4f82fc6bc83ddd\",\"dweb:/ipfs/QmaMn46MZGFLjAk6TaxyCSeei4mxcznJSHqHVoRsiJQxF4\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Tokens/SwapbleToken.sol\":{\"keccak256\":\"0x918f664f5537676d1d069511a544a7a21440f7b3fd03d16f781aaccd13358136\",\"urls\":[\"bzzr://70355c7098772b3ff00a5fba42325c0e39419025d3990da56f1ca09240d08781\",\"dweb:/ipfs/QmTrRW8ZoykhEpEDbyHyPULUJhiaUGao9LWCihtip4ZNkT\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Tokens/TokenUtils.sol\":{\"keccak256\":\"0x065aa0bdc63e5e6b34123b14f94cfb35d45493f7a72f695ec437b988a46a681f\",\"urls\":[\"bzzr://8ed6477dc854a23717e9c15def9dcd1639b690cb9a953a479922eaa49e9da600\",\"dweb:/ipfs/QmSKfpAoLNZys2F4rdigQiFCyGgNHRzWxJUdPRnCXph2pV\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/common/Constant.sol\":{\"keccak256\":\"0xac59de5c6ee3ddcffa6fac3ac162fb393577a5bc644706be3d71f7a70641934f\",\"urls\":[\"bzzr://43b4f9ed1af57afb23f21e1dd0544e96d70a99c70e4412bf4e0f0e333180cbe1\",\"dweb:/ipfs/QmXXwt3dH5xfdeCNLzWK8SuztRCeVPNbovziR8YHAxB5zN\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/common/Ownable.sol\":{\"keccak256\":\"0xaa6fb42c7872abf82696c7550873e4a25f96d6a7f41f42129d754dfd037183a5\",\"urls\":[\"bzzr://17260ae7e318c4dbbce3d6aeb046455f65b76aa8ef8c934a68a96ed7ced162f1\",\"dweb:/ipfs/QmX5r2mkKMw586hez8YaAnAKakXGh644gw3qad9o8HPF6E\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/common/SafeMath.sol\":{\"keccak256\":\"0xf97bb88e1bf9f800c2d1c0afd5a0620d783457345236aaac43415e046963cb0b\",\"urls\":[\"bzzr://4edc8aa2e72045658aba3b73bde7fbccb3ebac729898e84446777323554535e5\",\"dweb:/ipfs/QmWoZRUFisqZa7Tua8N5qsvyjQY8n6bhkv9B4Kcoxk77aT\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
@@ -14430,7 +14533,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.16",
-  "updatedAt": "2020-04-27T13:53:30.474Z",
+  "updatedAt": "2020-04-27T13:53:30.464Z",
   "devdoc": {
     "methods": {
       "allowance(address,address)": {

@@ -29,12 +29,12 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"_tolalInvestMent\",\"type\":\"uint256\"},{\"name\":\"_userInvestMent\",\"type\":\"uint256\"},{\"name\":\"returnAmount\",\"type\":\"uint256\"}],\"name\":\"calucalteBonus\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IIndividualBonus.sol\":\"IIndividualBonus\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IIndividualBonus.sol\":{\"keccak256\":\"0x8fca9581b9caf341ee86be5c3fc9e73f37eb25a7f21bb4e1fc1e434c04a1064c\",\"urls\":[\"bzzr://2cc5d8e04295f06e01e15237b97195e04b60758d99c67ae780debfd321753a50\",\"dweb:/ipfs/QmQfXrmgTvJS3gzbrS3DJyL2qGfSNHUW8V4UhzonKdQdp9\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"_tolalInvestMent\",\"type\":\"uint256\"},{\"name\":\"_userInvestMent\",\"type\":\"uint256\"},{\"name\":\"returnAmount\",\"type\":\"uint256\"}],\"name\":\"calucalteBonus\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IIndividualBonus.sol\":\"IIndividualBonus\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IIndividualBonus.sol\":{\"keccak256\":\"0xb3a754d0c5e22e2666dc3be50e0c8582297adf5b56bc5f605a681b3b3f709a64\",\"urls\":[\"bzzr://8cea60d757601331c931b21ee212ca53c70acb8fdb110d611fa811ac1ccdcd60\",\"dweb:/ipfs/Qmd4dNGT4CB7ahWAap52nDY9L7sJLbZbQJSQBqLzMKmDKw\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity 0.5.9;\n\ncontract IIndividualBonus {\n    function calucalteBonus(\n        uint256 _tolalInvestMent,\n        uint256 _userInvestMent,\n        uint256 returnAmount\n    ) public view returns (uint256);\n}\n",
+  "source": "pragma solidity ^0.5.9;\n\ncontract IIndividualBonus {\n    function calucalteBonus(\n        uint256 _tolalInvestMent,\n        uint256 _userInvestMent,\n        uint256 returnAmount\n    ) public view returns (uint256);\n}\n",
   "sourcePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IIndividualBonus.sol",
   "ast": {
     "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IIndividualBonus.sol",
@@ -50,11 +50,12 @@
         "id": 171,
         "literals": [
           "solidity",
+          "^",
           "0.5",
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:22:5"
+        "src": "0:23:5"
       },
       {
         "baseContracts": [],
@@ -88,7 +89,7 @@
                   "name": "_tolalInvestMent",
                   "nodeType": "VariableDeclaration",
                   "scope": 182,
-                  "src": "89:24:5",
+                  "src": "90:24:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -99,7 +100,7 @@
                     "id": 172,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "89:7:5",
+                    "src": "90:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -114,7 +115,7 @@
                   "name": "_userInvestMent",
                   "nodeType": "VariableDeclaration",
                   "scope": 182,
-                  "src": "123:23:5",
+                  "src": "124:23:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -125,7 +126,7 @@
                     "id": 174,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "123:7:5",
+                    "src": "124:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -140,7 +141,7 @@
                   "name": "returnAmount",
                   "nodeType": "VariableDeclaration",
                   "scope": 182,
-                  "src": "156:20:5",
+                  "src": "157:20:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -151,7 +152,7 @@
                     "id": 176,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "156:7:5",
+                    "src": "157:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -161,7 +162,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "79:103:5"
+              "src": "80:103:5"
             },
             "returnParameters": {
               "id": 181,
@@ -173,7 +174,7 @@
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "scope": 182,
-                  "src": "204:7:5",
+                  "src": "205:7:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -184,7 +185,7 @@
                     "id": 179,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "204:7:5",
+                    "src": "205:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -194,20 +195,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "203:9:5"
+              "src": "204:9:5"
             },
             "scope": 183,
-            "src": "56:157:5",
+            "src": "57:157:5",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           }
         ],
         "scope": 184,
-        "src": "24:191:5"
+        "src": "25:191:5"
       }
     ],
-    "src": "0:216:5"
+    "src": "0:217:5"
   },
   "legacyAST": {
     "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IIndividualBonus.sol",
@@ -223,11 +224,12 @@
         "id": 171,
         "literals": [
           "solidity",
+          "^",
           "0.5",
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:22:5"
+        "src": "0:23:5"
       },
       {
         "baseContracts": [],
@@ -261,7 +263,7 @@
                   "name": "_tolalInvestMent",
                   "nodeType": "VariableDeclaration",
                   "scope": 182,
-                  "src": "89:24:5",
+                  "src": "90:24:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -272,7 +274,7 @@
                     "id": 172,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "89:7:5",
+                    "src": "90:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -287,7 +289,7 @@
                   "name": "_userInvestMent",
                   "nodeType": "VariableDeclaration",
                   "scope": 182,
-                  "src": "123:23:5",
+                  "src": "124:23:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -298,7 +300,7 @@
                     "id": 174,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "123:7:5",
+                    "src": "124:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -313,7 +315,7 @@
                   "name": "returnAmount",
                   "nodeType": "VariableDeclaration",
                   "scope": 182,
-                  "src": "156:20:5",
+                  "src": "157:20:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -324,7 +326,7 @@
                     "id": 176,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "156:7:5",
+                    "src": "157:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -334,7 +336,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "79:103:5"
+              "src": "80:103:5"
             },
             "returnParameters": {
               "id": 181,
@@ -346,7 +348,7 @@
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "scope": 182,
-                  "src": "204:7:5",
+                  "src": "205:7:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -357,7 +359,7 @@
                     "id": 179,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "204:7:5",
+                    "src": "205:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -367,20 +369,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "203:9:5"
+              "src": "204:9:5"
             },
             "scope": 183,
-            "src": "56:157:5",
+            "src": "57:157:5",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           }
         ],
         "scope": 184,
-        "src": "24:191:5"
+        "src": "25:191:5"
       }
     ],
-    "src": "0:216:5"
+    "src": "0:217:5"
   },
   "compiler": {
     "name": "solc",
@@ -388,7 +390,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.16",
-  "updatedAt": "2020-04-22T14:52:56.312Z",
+  "updatedAt": "2020-04-27T13:53:30.275Z",
   "devdoc": {
     "methods": {}
   },

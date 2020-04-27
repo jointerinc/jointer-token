@@ -21,12 +21,12 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"getCurrencyPrice\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol\":\"ICurrencyPrices\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol\":{\"keccak256\":\"0xa59add94ba5ec680bd05b138118d1c359d9fabe3b75d64369b8e48a30c3ea962\",\"urls\":[\"bzzr://cb43a270d5d56d93bb780b726ee640a210cab4212e1c4ce7ba9a1d1720660cac\",\"dweb:/ipfs/QmVs9pWax64SomEGWELApSn41RoGWgoGfQJoZEbsBZzAxK\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"getCurrencyPrice\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol\":\"ICurrencyPrices\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol\":{\"keccak256\":\"0x8efa07d065fbce3b70d4fdfa57749e246a5d7b09da678fa6822db07c27024d94\",\"urls\":[\"bzzr://9df00d48a4f10a0d029600f360184a428a555d661602410534aeb90ec50f42cc\",\"dweb:/ipfs/QmUQJnbg5zSFbNCHSHPUaWhhn4pH61xcaq5SNS5RnB2ePn\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity 0.5.9;\n\ncontract ICurrencyPrices {\n    function getCurrencyPrice(address _which) public returns (uint256);\n}\n",
+  "source": "pragma solidity ^0.5.9;\n\ncontract ICurrencyPrices {\n    function getCurrencyPrice(address _which) public returns (uint256);\n}\n",
   "sourcePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol",
   "ast": {
     "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol",
@@ -42,11 +42,12 @@
         "id": 58,
         "literals": [
           "solidity",
+          "^",
           "0.5",
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:22:2"
+        "src": "0:23:2"
       },
       {
         "baseContracts": [],
@@ -80,7 +81,7 @@
                   "name": "_which",
                   "nodeType": "VariableDeclaration",
                   "scope": 65,
-                  "src": "81:14:2",
+                  "src": "82:14:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -91,7 +92,7 @@
                     "id": 59,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "81:7:2",
+                    "src": "82:7:2",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -102,7 +103,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "80:16:2"
+              "src": "81:16:2"
             },
             "returnParameters": {
               "id": 64,
@@ -114,7 +115,7 @@
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "scope": 65,
-                  "src": "113:7:2",
+                  "src": "114:7:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -125,7 +126,7 @@
                     "id": 62,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "113:7:2",
+                    "src": "114:7:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -135,20 +136,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "112:9:2"
+              "src": "113:9:2"
             },
             "scope": 66,
-            "src": "55:67:2",
+            "src": "56:67:2",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
         "scope": 67,
-        "src": "24:100:2"
+        "src": "25:100:2"
       }
     ],
-    "src": "0:125:2"
+    "src": "0:126:2"
   },
   "legacyAST": {
     "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol",
@@ -164,11 +165,12 @@
         "id": 58,
         "literals": [
           "solidity",
+          "^",
           "0.5",
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:22:2"
+        "src": "0:23:2"
       },
       {
         "baseContracts": [],
@@ -202,7 +204,7 @@
                   "name": "_which",
                   "nodeType": "VariableDeclaration",
                   "scope": 65,
-                  "src": "81:14:2",
+                  "src": "82:14:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -213,7 +215,7 @@
                     "id": 59,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "81:7:2",
+                    "src": "82:7:2",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -224,7 +226,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "80:16:2"
+              "src": "81:16:2"
             },
             "returnParameters": {
               "id": 64,
@@ -236,7 +238,7 @@
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "scope": 65,
-                  "src": "113:7:2",
+                  "src": "114:7:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -247,7 +249,7 @@
                     "id": 62,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "113:7:2",
+                    "src": "114:7:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -257,20 +259,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "112:9:2"
+              "src": "113:9:2"
             },
             "scope": 66,
-            "src": "55:67:2",
+            "src": "56:67:2",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
         "scope": 67,
-        "src": "24:100:2"
+        "src": "25:100:2"
       }
     ],
-    "src": "0:125:2"
+    "src": "0:126:2"
   },
   "compiler": {
     "name": "solc",
@@ -278,7 +280,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.16",
-  "updatedAt": "2020-04-22T14:52:56.310Z",
+  "updatedAt": "2020-04-27T13:53:30.270Z",
   "devdoc": {
     "methods": {}
   },

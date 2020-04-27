@@ -1,4 +1,4 @@
-pragma solidity 0.5.9;
+pragma solidity ^0.5.9;
 
 
 //on ropsten : 0x59DdAdcE870827186fC0aB55d8BFA9C601c3C4C0
