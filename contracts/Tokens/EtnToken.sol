@@ -8,6 +8,7 @@ import "../InterFaces/ITokenVault.sol";
 
 
 contract ForceSwap is TokenUtils {
+    // here returnToken means with mainToken
     address public returnToken;
 
     constructor(address _returnToken) public notZeroAddress(_returnToken) {
@@ -23,6 +24,9 @@ contract ForceSwap is TokenUtils {
         returnToken = _which;
     }
 
+    //force swap
+    //company have authority to swap this token with maintoken at any moment of time
+    //URL:
     function forceSwap(address _which, uint256 _amount)
         external
         onlySystem()
@@ -72,6 +76,7 @@ contract Exchangeable is ForceSwap {
         _;
     }
 
+    //user can buy token with allowed tokens
     function buyTokens(address _fromToken, uint256 _amount)
         external
         isConversionAllowed(_fromToken)
@@ -94,6 +99,7 @@ contract Exchangeable is ForceSwap {
         return _mint(msg.sender, _assignToken);
     }
 
+    //user can swap token with allowed tokens
     function swapTokens(address _toToken, uint256 _amount)
         external
         isConversionAllowed(_toToken)
@@ -121,6 +127,7 @@ contract Exchangeable is ForceSwap {
         return true;
     }
 
+    // for allowing token conversions
     function addAllowedToken(address _which)
         external
         onlySystem()
