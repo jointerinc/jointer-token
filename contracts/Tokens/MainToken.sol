@@ -6,15 +6,22 @@ import "../InterFaces/IWhiteList.sol";
 
 
 contract TokenMinter is TokenUtils {
-    modifier onlyAuctionAddress() {
+    modifier onlyAuthorizedAddress() {
         address auctionAddress = getAddressOf(AUCTION);
-        require(msg.sender == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
+        address etnAddress = getAddressOf(ETN_TOKEN);
+        address stockAddress = getAddressOf(STOCK_TOKEN);
+        require(
+            msg.sender == auctionAddress ||
+                msg.sender == etnAddress ||
+                msg.sender == stockAddress,
+            ERR_AUTHORIZED_ADDRESS_ONLY
+        );
         _;
     }
 
     function mintTokens(uint256 _amount)
         external
-        onlyAuctionAddress()
+        onlyAuthorizedAddress()
         returns (bool)
     {
         return _mint(msg.sender, _amount);
