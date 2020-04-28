@@ -8,6 +8,7 @@ import "../InterFaces/ITokenVault.sol";
 
 
 contract ForceSwap is TokenUtils {
+    // here returnToken means with mainToken
     address public returnToken;
 
     constructor(address _returnToken) public notZeroAddress(_returnToken) {
@@ -159,7 +160,12 @@ contract StockToken is Exchangeable {
         Exchangeable(_returnToken)
     {
         require(_which.length == _amount.length, "ERR_NOT_SAME_LENGTH");
+        address whiteListAddress = getAddressOf(WHITE_LIST);
         for (uint256 tempX = 0; tempX < _which.length; tempX++) {
+            require(
+                IWhiteList(whiteListAddress).isWhiteListed(_which[tempX]),
+                "ERR_TRANSFER_CHECK_WHITELIST"
+            );
             _mint(_which[tempX], _amount[tempX]);
         }
     }
