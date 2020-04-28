@@ -4,6 +4,7 @@ import "./StandardToken.sol";
 import "./TokenUtils.sol";
 import "../InterFaces/ICurrencyPrices.sol";
 import "../InterFaces/ITokenVault.sol";
+import "../InterFaces/IToken.sol";
 
 
 contract ForceSwap is TokenUtils {
@@ -12,15 +13,6 @@ contract ForceSwap is TokenUtils {
 
     constructor(address _returnToken) public notZeroAddress(_returnToken) {
         returnToken = _returnToken;
-    }
-
-    function setReturnToken(address _which)
-        external
-        onlySystem()
-        returns (bool)
-    {
-        require(returnToken == address(0), "ERR_ACTION_NOT_ALLOWED");
-        returnToken = _which;
     }
 
     function forceSwap(address _which, uint256 _amount)
@@ -47,7 +39,16 @@ contract ForceSwap is TokenUtils {
             retunTokenPrice
         );
 
-        tokenVault.directTransfer(returnToken, _which, _assignToken);
+        uint256 _vaultBalance = ERC20(returnToken).balanceOf(returnToken);
+
+        if (_vaultBalance >= _assignToken) {
+            tokenVault.directTransfer(returnToken, _which, _assignToken);
+        } else {
+            tokenVault.directTransfer(returnToken, _which, _vaultBalance);
+            _assignToken = safeSub(_assignToken, _vaultBalance);
+            IToken(returnToken).mintTokens(_assignToken);
+            ERC20(returnToken).transfer(_which, _assignToken);
+        }
 
         return true;
     }
@@ -55,43 +56,52 @@ contract ForceSwap is TokenUtils {
 
 
 contract Exchangeable is ForceSwap {
-    mapping(address => bool) allowedToken;
-    mapping(address => uint256) public allowedTokensIndex;
-    address[] public allowedTokens;
+    address public exchangeableToken;
 
-    constructor(address _returnToken)
-        public
-        notZeroAddress(_returnToken)
-        ForceSwap(_returnToken)
+    function setExchangeableToken(address _which)
+        external
+        onlySystem()
+        returns (bool)
     {
-        addAllowedTokenInternal(_returnToken);
+        require(exchangeableToken == address(0), "ERR_ACTION_NOT_ALLOWED");
+        exchangeableToken = _which;
     }
 
     modifier isConversionAllowed(address _which) {
-        require(allowedToken[_which], "ERR_TOKEN_IS_NOT_IN_LIST");
+        require(
+            _which == exchangeableToken || _which == returnToken,
+            "ERR_TOKEN_IS_NOT_IN_LIST"
+        );
         _;
     }
 
     function buyTokens(address _fromToken, uint256 _amount)
         external
         isConversionAllowed(_fromToken)
-        returns (bool)
+        returns (uint256)
     {
         ICurrencyPrices currencyPrice = ICurrencyPrices(getAddressOf(CURRENCY));
+
         uint256 fromTokenPrice = currencyPrice.getCurrencyPrice(_fromToken);
+
         uint256 currentTokenPrice = currencyPrice.getCurrencyPrice(
             address(this)
         );
+
         uint256 _assignToken = safeDiv(
             safeMul(_amount, fromTokenPrice),
             currentTokenPrice
         );
+
         ERC20(_fromToken).transferFrom(
             msg.sender,
             getAddressOf(VAULT),
             _amount
         );
-        return _mint(msg.sender, _assignToken);
+
+        _mint(msg.sender, _assignToken);
+
+        return _assignToken;
     }
 
     function swapTokens(address _toToken, uint256 _amount)
@@ -100,8 +110,11 @@ contract Exchangeable is ForceSwap {
         returns (bool)
     {
         ICurrencyPrices currencyPrice = ICurrencyPrices(getAddressOf(CURRENCY));
+
         ITokenVault tokenVault = ITokenVault(getAddressOf(VAULT));
+
         uint256 toTokenPrice = currencyPrice.getCurrencyPrice(_toToken);
+
         uint256 currentTokenPrice = currencyPrice.getCurrencyPrice(
             address(this)
         );
@@ -109,23 +122,29 @@ contract Exchangeable is ForceSwap {
             safeMul(_amount, currentTokenPrice),
             toTokenPrice
         );
+
+        uint256 _vaultBalance = ERC20(returnToken).balanceOf(_toToken);
+
         _burn(msg.sender, _amount);
-        return tokenVault.directTransfer(_toToken, msg.sender, _assignToken);
-    }
 
-    function addAllowedTokenInternal(address _which) internal returns (bool) {
-        require(!allowedToken[_which], ERR_AUTHORIZED_ADDRESS_ONLY);
-        allowedToken[_which] = true;
-        allowedTokensIndex[_which] = allowedTokens.length;
-        allowedTokens.push(_which);
+        if (_vaultBalance >= _assignToken) {
+            tokenVault.directTransfer(_toToken, msg.sender, _assignToken);
+        } else {
+            tokenVault.directTransfer(_toToken, msg.sender, _vaultBalance);
+            _assignToken = safeSub(_assignToken, _vaultBalance);
+            if (_toToken == returnToken) {
+                IToken(_toToken).mintTokens(_assignToken);
+                ERC20(_toToken).transfer(msg.sender, _assignToken);
+            } else if (_toToken == exchangeableToken) {
+                _mint(address(this), _assignToken);
+                ERC20(address(this)).approve(_toToken, _assignToken);
+                uint256 transferBalance = IToken(_toToken).buyTokens(
+                    address(this),
+                    _assignToken
+                );
+                ERC20(_toToken).transfer(msg.sender, transferBalance);
+            }
+        }
         return true;
-    }
-
-    function addAllowedToken(address _which)
-        external
-        onlySystem()
-        returns (bool)
-    {
-        return addAllowedTokenInternal(_which);
     }
 }
