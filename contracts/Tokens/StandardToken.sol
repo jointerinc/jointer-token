@@ -6,22 +6,22 @@ import "../common/Ownable.sol";
 
 
 contract StandardToken is ERC20, SafeMath, Ownable {
+    
     string public name;
 
     string public symbol;
-
+ 
     uint256 public constant decimals = 18;
 
     mapping(address => uint256) balances;
 
     mapping(address => mapping(address => uint256)) allowed;
-
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        address _systemAddress,
-        address _authorityAddress
-    ) public Ownable(_systemAddress, _authorityAddress) {
+    
+    constructor(string memory _name,
+                string memory _symbol,
+                address _systemAddress,
+                address _authorityAddress) public Ownable(_systemAddress,_authorityAddress)  {
+                    
         require(bytes(_name).length > 0 && bytes(_symbol).length > 0);
         name = _name;
         symbol = _symbol;
@@ -34,7 +34,7 @@ contract StandardToken is ERC20, SafeMath, Ownable {
         address indexed _from,
         address indexed _to
     );
-
+    
     function _transfer(address _from, address _to, uint256 _value)
         internal
         returns (bool)
@@ -47,7 +47,7 @@ contract StandardToken is ERC20, SafeMath, Ownable {
         emit Transfer(_from, _to, _value);
         return true;
     }
-
+    
     function _burn(address _from, uint256 _value) internal returns (bool) {
         uint256 senderBalance = balances[_from];
         require(senderBalance >= _value, "ERR_NOT_ENOUGH_BALANCE");
@@ -58,7 +58,7 @@ contract StandardToken is ERC20, SafeMath, Ownable {
         emit Transfer(_from, address(0), _value);
         return true;
     }
-
+    
     function _mint(address _to, uint256 _value) internal returns (bool) {
         balances[_to] = safeAdd(balances[_to], _value);
         totalSupply = safeAdd(totalSupply, _value);
@@ -66,7 +66,6 @@ contract StandardToken is ERC20, SafeMath, Ownable {
         emit Transfer(address(0), _to, _value);
         return true;
     }
-
     /**
      * @dev Gets the balance of the specified address.
      * @param _who The address to query the the balance of.
@@ -75,7 +74,7 @@ contract StandardToken is ERC20, SafeMath, Ownable {
     function balanceOf(address _who) public view returns (uint256 balance) {
         return balances[_who];
     }
-
+    
     /**
      * @dev transfer token for a specified address
      * @param _to The address to transfer to.
@@ -89,7 +88,7 @@ contract StandardToken is ERC20, SafeMath, Ownable {
     {
         return _transfer(msg.sender, _to, _value);
     }
-
+        
     /**
      * @dev `msg.sender` approves `spender` to spend `value` tokens
      * @param _spender The address of the account able to transfer the tokens
@@ -127,7 +126,7 @@ contract StandardToken is ERC20, SafeMath, Ownable {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-
+    
     /**
      * @dev to check allowed token for transferFrom
      * @param _owner The address of the account owning tokens

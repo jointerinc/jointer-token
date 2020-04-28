@@ -6,20 +6,10 @@ import "../InterFaces/IWhiteList.sol";
 
 
 contract TokenMinter is TokenUtils {
-    address public auctionAddress;
-
     modifier onlyAuctionAddress() {
+        address auctionAddress = getAddressOf(AUCTION);
         require(msg.sender == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
         _;
-    }
-
-    function changeAuctionAddress(address _which)
-        external
-        onlyAuthorized()
-        returns (bool)
-    {
-        auctionAddress = _which;
-        return true;
     }
 
     function mintTokens(uint256 _amount)
@@ -32,7 +22,7 @@ contract TokenMinter is TokenUtils {
 }
 
 
-contract Token is TokenMinter, AuctionRegistery {
+contract MainToken is TokenMinter {
     constructor(
         string memory _name,
         string memory _symbol,
@@ -46,9 +36,16 @@ contract Token is TokenMinter, AuctionRegistery {
         uint256[] memory _amount
     )
         public
-        StandardToken(_name, _symbol, _systemAddress, _authorityAddress)
-        TokenUtils(_tokenPrice, _tokenMaturityDays, _tokenHoldBackDays)
-        AuctionRegistery(_registeryAddress)
+        TokenUtils(
+            _name,
+            _symbol,
+            _systemAddress,
+            _authorityAddress,
+            _tokenPrice,
+            _tokenMaturityDays,
+            _tokenHoldBackDays,
+            _registeryAddress
+        )
     {
         require(_which.length == _amount.length, "ERR_NOT_SAME_LENGTH");
         for (uint256 tempX = 0; tempX < _which.length; tempX++) {
