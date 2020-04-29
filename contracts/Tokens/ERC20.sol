@@ -10,20 +10,20 @@ pragma solidity ^0.5.9;
 contract ERC20 {
     uint256 public totalSupply;
 
-    function balanceOf(address _who) public view returns (uint256);
+    function balanceOf(address _who) external view returns (uint256);
 
     function allowance(address _owner, address _spender)
-        public
+        external
         view
         returns (uint256);
 
-    function transfer(address _to, uint256 _value) public returns (bool);
+    function transfer(address _to, uint256 _value) external returns (bool);
 
     function transferFrom(address _from, address _to, uint256 _value)
-        public
+        external
         returns (bool);
 
-    function approve(address _spender, uint256 _value) public returns (bool);
+    function approve(address _spender, uint256 _value) external returns (bool);
 
     event Transfer(address indexed from, address indexed to, uint256 value);
 

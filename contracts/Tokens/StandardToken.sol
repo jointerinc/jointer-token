@@ -35,6 +35,12 @@ contract StandardToken is ERC20, SafeMath, Ownable {
         address indexed _to
     );
 
+    /**
+     * @dev transfer token for a specified address
+     * @param _from The address from token transfer.
+     * @param _to The address to transfer to.
+     * @param _value The amount to be transferred.
+     */
     function _transfer(address _from, address _to, uint256 _value)
         internal
         returns (bool)
@@ -46,6 +52,36 @@ contract StandardToken is ERC20, SafeMath, Ownable {
         balances[_to] = safeAdd(balances[_to], _value);
         emit Transfer(_from, _to, _value);
         return true;
+    }
+
+    /**
+     * @dev Transfer tokens from one address to another
+     * @param _from address The address which you want to send tokens from
+     * @param _to address The address which you want to transfer tokens
+     * @param _value uint256 the amount of tokens to be transferred
+     */
+    function _transferFrom(address _from, address _to, uint256 _value)
+        internal
+        notThisAddress(_to)
+        notZeroAddress(_to)
+        returns (bool)
+    {
+        require(allowed[_from][msg.sender] >= _value, "ERR_NOT_ENOUGH_BALANCE");
+        require(_transfer(_from, _to, _value));
+        allowed[_from][msg.sender] = safeSub(
+            allowed[_from][msg.sender],
+            _value
+        );
+        emit TransferFrom(msg.sender, _from, _to);
+        return true;
+    }
+
+    function _approve(address owner, address spender, uint256 amount)
+        internal
+        notZeroAddress(spender)
+    {
+        allowed[owner][spender] = amount;
+        emit Approval(owner, spender, amount);
     }
 
     function _burn(address _from, uint256 _value) internal returns (bool) {
@@ -77,54 +113,48 @@ contract StandardToken is ERC20, SafeMath, Ownable {
     }
 
     /**
-     * @dev transfer token for a specified address
-     * @param _to The address to transfer to.
-     * @param _value The amount to be transferred.
-     */
-    function transfer(address _to, uint256 _value)
-        public
-        notThisAddress(_to)
-        notZeroAddress(_to)
-        returns (bool ok)
-    {
-        return _transfer(msg.sender, _to, _value);
-    }
-
-    /**
      * @dev `msg.sender` approves `spender` to spend `value` tokens
      * @param _spender The address of the account able to transfer the tokens
      * @param _value The amount of wei to be approved for transfer
      * @return Whether the approval was successful or not
      */
     function approve(address _spender, uint256 _value)
-        public
+        external
         notZeroAddress(_spender)
         returns (bool ok)
     {
-        allowed[msg.sender][_spender] = _value;
-        emit Approval(msg.sender, _spender, _value);
+        _approve(msg.sender, _spender, _value);
         return true;
     }
 
     /**
-     * @dev `msg.sender` approves `spender` to spend `value` tokens
-     * @dev although all Dpp work with two argument approve method but we provide this method to ensure user from double spend
+     * @dev `msg.sender` approves `spender` to increase spend `value` tokens
      * @param _spender The address of the account able to transfer the tokens
      * @param _value The amount of wei to be approved for transfer
-     * @param _currentValue the amount user already apporved
      * @return Whether the approval was successful or not
      */
-    function approve(address _spender, uint256 _currentValue, uint256 _value)
-        public
-        notZeroAddress(_spender)
-        returns (bool ok)
+    function increaseAllowance(address _spender, uint256 _value)
+        external
+        returns (bool)
     {
-        require(
-            allowed[msg.sender][_spender] == _currentValue,
-            "ERR_ACTION_NOT_ALLOWED"
-        );
-        allowed[msg.sender][_spender] = _value;
-        emit Approval(msg.sender, _spender, _value);
+        uint256 currentAllowed = allowed[msg.sender][_spender];
+        _approve(msg.sender, _spender, safeAdd(currentAllowed, _value));
+        return true;
+    }
+
+    /**
+     * @dev `msg.sender` approves `spender` to decrease spend `value` tokens
+     * @param _spender The address of the account able to transfer the tokens
+     * @param _value The amount of wei to be approved for transfer
+     * @return Whether the approval was successful or not
+     */
+    function decreaseAllowance(address _spender, uint256 _value)
+        external
+        returns (bool)
+    {
+        uint256 currentAllowed = allowed[msg.sender][_spender];
+        require(currentAllowed >= _value, "ERR_ALLOWENCE");
+        _approve(msg.sender, _spender, safeSub(currentAllowed, _value));
         return true;
     }
 
@@ -135,7 +165,7 @@ contract StandardToken is ERC20, SafeMath, Ownable {
      * @return Amount of remaining tokens allowed to spent
      */
     function allowance(address _owner, address _spender)
-        public
+        external
         view
         returns (uint256)
     {
@@ -143,32 +173,10 @@ contract StandardToken is ERC20, SafeMath, Ownable {
     }
 
     /**
-     * @dev Transfer tokens from one address to another
-     * @param _from address The address which you want to send tokens from
-     * @param _to address The address which you want to transfer tokens
-     * @param _value uint256 the amount of tokens to be transferred
-     */
-    function transferFrom(address _from, address _to, uint256 _value)
-        public
-        notThisAddress(_to)
-        notZeroAddress(_to)
-        returns (bool)
-    {
-        require(allowed[_from][msg.sender] >= _value, "ERR_NOT_ENOUGH_BALANCE");
-        require(_transfer(_from, _to, _value));
-        allowed[_from][msg.sender] = safeSub(
-            allowed[_from][msg.sender],
-            _value
-        );
-        emit TransferFrom(msg.sender, _from, _to);
-        return true;
-    }
-
-    /**
      * @dev burn token from this address
      * @param _value uint256 the amount of tokens to be burned
      */
-    function burn(uint256 _value) public returns (bool) {
+    function burn(uint256 _value) external returns (bool) {
         return _burn(msg.sender, _value);
     }
 }
