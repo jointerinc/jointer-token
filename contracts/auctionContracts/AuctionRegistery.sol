@@ -1,9 +1,9 @@
 pragma solidity ^0.5.9;
 
-import "../common/RegisteryOwnable.sol";
+import "../common/Ownable.sol";
 import "../common/SafeMath.sol";
 
-contract AuctionRegistery is RegisteryOwnable,SafeMath {
+contract AuctionRegistery is Ownable,SafeMath {
     
     
     mapping(bytes32 => address) private contractAddress;
@@ -20,7 +20,7 @@ contract AuctionRegistery is RegisteryOwnable,SafeMath {
 
     constructor(address _systemAddess, address _multisig)
         public
-        RegisteryOwnable(_systemAddess, _multisig)
+        Ownable(_systemAddess, _multisig)
     {
         
     }
