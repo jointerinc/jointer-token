@@ -192,9 +192,15 @@ contract LiquadityUtils is BancorConverter,AuctionRegistery {
 
     mapping(address => bool) public allowedAddress;
 
+    mapping(uint256 => uint256) public dayWiseBaseTokenSupply;
+    
+    mapping(uint256 => uint256) public dayWiseMainTokenSupply;
+    
     uint256 public sideReseverRatio = 90;
 
     uint256 public appreciationLimit = 120;
+    
+    uint256 public reductionStartDay = 14;
 
     modifier allowedAddressOnly(address _which) {
         require(allowedAddress[_which], ERR_AUTHORIZED_ADDRESS_ONLY);
@@ -263,6 +269,7 @@ contract Liquadity is LiquadityUtils {
         address _relayToken,
         address _systemAddress,
         address _multisigAddress,
+        address _registeryAddress,
         IERC20Token[] memory _contributionPath,
         IERC20Token[] memory _redempationPath
     )
@@ -270,13 +277,16 @@ contract Liquadity is LiquadityUtils {
         notZeroAddress(_systemAddress)
         BancorConverter(_converter, _baseToken, _mainToken, _relayToken)
         Ownable(_systemAddress, _multisigAddress)
-    {
+    {   
+        contractsRegistry = IAuctionRegistery(_registeryAddress);
         contributionPath = _contributionPath;
         redempationPath = _redempationPath;
     }
 
     event Contribution(address _token, uint256 _amount, uint256 returnAmount);
-
+    
+    event RecoverPrice(uint256 _oldPrice , uint256 _newPrice);
+    
     event Redemption(
         address _token,
         uint256 _amount,
@@ -326,19 +336,21 @@ contract Liquadity is LiquadityUtils {
     }
     
     
-    function redempationFromReserve(uint256 value)
+    function redempation(uint256 value)
         internal
         returns (uint256)
     {
         
         
         approveTransferFrom(IERC20Token(mainToken),converter,value);
+        
         uint256 returnAmount = IBancorConverter(converter).quickConvert2.value(
             value
         )(redempationPath, value, 1, address(0), 0);
         
         
         emit Redemption(address(0), value, returnAmount);
+        
         return returnAmount;
     }
     
@@ -371,15 +383,6 @@ contract Liquadity is LiquadityUtils {
     }
     
     
-    //this need to develped i am workin on it 
-    function recoverMarketPrice(uint256 _recovrPrice,uint256 _amount) internal{
-        
-        // contributeWithEther(value)
-        
-        
-    }
-
-
     function checkAppeciationLimit()
         internal
         returns (bool _isRedemptionReqiured)
@@ -444,7 +447,7 @@ contract Liquadity is LiquadityUtils {
             if(newReserverBalance > _mainTokenBalance){
                 uint256 _reverseBalance = safeSub(newReserverBalance,_mainTokenBalance);
                 ITokenVault(addressOf(VAULT)).directTransfer(address(mainToken),address(this),_reverseBalance);
-                redempationFromReserve(_reverseBalance);
+                redempation(_reverseBalance);
             }
             
         }
@@ -460,12 +463,33 @@ contract Liquadity is LiquadityUtils {
     {
         uint256 _amount = msg.value;
         
-        //_amount = s()
+        _amount = IAuctionTagAlong(getAddressOf(TAG_ALONG)).contributeTowardLiquadity(_amount);
         
-        uint256 sideReseverAmount = safeDiv(
-            safeMul(_amount, sideReseverRatio),
+        uint256 sideReseverAmount = safeDiv(safeMul(_amount, sideReseverRatio),
             100
         );
+        
+        IAuction auction = IAuction(getAddressOf(AUCTION));
+        
+        uint256 auctionDay = auction.auctionDay();
+
+        if(auctionDay > reductionStartDay){
+            
+            uint256 _yesterDayPrice = auction.dayWiseMarketPrice(safeSub(auctionDay,1));
+            
+            uint256 _dayBeforePrice = auction.dayWiseMarketPrice(safeSub(auctionDay,2));
+            
+            uint256 _yesterDayContribution = auction.dayWiseContribution(safeSub(auctionDay,1));
+            
+            uint256 _yesterDayBaseToken = dayWiseBaseTokenSupply[safeSub(auctionDay,1)];
+            
+            uint256 _baseTokenPrice = ICurrencyPrices(getAddressOf(CURRENCY)).getCurrencyPrice(address(baseToken));
+             
+             
+            uint256 reduction = IAuctionFormula(getAddressOf(AUCTION_FORMULA)).calculateLiquadityReduction(_yesterDayPrice,_dayBeforePrice,_yesterDayContribution,_yesterDayBaseToken,_baseTokenPrice);
+            sideReseverAmount = safeDiv(sideReseverAmount,reduction);
+        }
+        
         uint256 _newAmount = safeSub(_amount, sideReseverAmount);
         contributeWithEther(_newAmount);
         return getCurrentMarketPrice();
@@ -482,6 +506,15 @@ contract Liquadity is LiquadityUtils {
         return getCurrentMarketPrice();
     }
     
+    function contributionSystem(uint256 _amount) external onlySystem() returns (bool){
+        contributeWithEther(_amount);
+        return true;
+    }
+    
+    function redemptionSystem(uint256 _amount) external onlySystem() returns (bool){
+       redempation(_amount);
+       return true;
+    }
     
     
     function redemption(IERC20Token[] memory _path, uint256 _amount)
@@ -516,19 +549,27 @@ contract Liquadity is LiquadityUtils {
                 returnAmount
             );
 
-
-        recoverMarketPrice(marketPrice,_amount);
-        
         emit Redemption(
             address(_path[safeSub(_path.length, 1)]),
             _amount,
             returnAmount
         );
-        
+        emit RecoverPrice(marketPrice,getCurrentMarketPrice());
         return true;
 
     }
 
+    function auctionEnded(uint256 aucyionDayId) external returns(bool){
+        require(msg.sender == getAddressOf(AUCTION));
+        (
+            uint256 _baseTokenBalance,
+            uint256 _mainTokenBalance
+        ) = getTokensReserveBalance();
+        
+        dayWiseMainTokenSupply[aucyionDayId] = _mainTokenBalance;
+        dayWiseBaseTokenSupply[aucyionDayId] = _baseTokenBalance;
+        return true;
+    }
 
 
 

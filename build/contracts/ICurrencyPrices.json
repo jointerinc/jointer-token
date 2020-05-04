@@ -2,7 +2,7 @@
   "contractName": "ICurrencyPrices",
   "abi": [
     {
-      "constant": false,
+      "constant": true,
       "inputs": [
         {
           "name": "_which",
@@ -17,29 +17,29 @@
         }
       ],
       "payable": false,
-      "stateMutability": "nonpayable",
+      "stateMutability": "view",
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"getCurrencyPrice\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol\":\"ICurrencyPrices\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol\":{\"keccak256\":\"0x8efa07d065fbce3b70d4fdfa57749e246a5d7b09da678fa6822db07c27024d94\",\"urls\":[\"bzzr://9df00d48a4f10a0d029600f360184a428a555d661602410534aeb90ec50f42cc\",\"dweb:/ipfs/QmUQJnbg5zSFbNCHSHPUaWhhn4pH61xcaq5SNS5RnB2ePn\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"getCurrencyPrice\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol\":\"ICurrencyPrices\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol\":{\"keccak256\":\"0x3094a527af372691740bb6538d20aa09390b9eccbb10261350cca5964cfb5c31\",\"urls\":[\"bzzr://f1f186741797eab94adde214481e1b02dc659f856bbd88d01bf6a4f46604353e\",\"dweb:/ipfs/QmYCEEM3Lr31YMogYFTJFCZ1mFu36Rwi7R9eH665kMTqAc\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.5.9;\n\ncontract ICurrencyPrices {\n    function getCurrencyPrice(address _which) public returns (uint256);\n}\n",
+  "source": "pragma solidity ^0.5.9;\n\ncontract ICurrencyPrices {\n    function getCurrencyPrice(address _which) public view returns (uint256);\n}\n",
   "sourcePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol",
   "ast": {
     "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol",
     "exportedSymbols": {
       "ICurrencyPrices": [
-        66
+        278
       ]
     },
-    "id": 67,
+    "id": 279,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 58,
+        "id": 270,
         "literals": [
           "solidity",
           "^",
@@ -47,7 +47,7 @@
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:2"
+        "src": "0:23:6"
       },
       {
         "baseContracts": [],
@@ -55,9 +55,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 66,
+        "id": 278,
         "linearizedBaseContracts": [
-          66
+          278
         ],
         "name": "ICurrencyPrices",
         "nodeType": "ContractDefinition",
@@ -65,23 +65,23 @@
           {
             "body": null,
             "documentation": null,
-            "id": 65,
+            "id": 277,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getCurrencyPrice",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 61,
+              "id": 273,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 60,
+                  "id": 272,
                   "name": "_which",
                   "nodeType": "VariableDeclaration",
-                  "scope": 65,
-                  "src": "82:14:2",
+                  "scope": 277,
+                  "src": "82:14:6",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -89,10 +89,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 59,
+                    "id": 271,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "82:7:2",
+                    "src": "82:7:6",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -103,19 +103,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "81:16:2"
+              "src": "81:16:6"
             },
             "returnParameters": {
-              "id": 64,
+              "id": 276,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 63,
+                  "id": 275,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 65,
-                  "src": "114:7:2",
+                  "scope": 277,
+                  "src": "119:7:6",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -123,10 +123,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 62,
+                    "id": 274,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "114:7:2",
+                    "src": "119:7:6",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -136,33 +136,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "113:9:2"
+              "src": "118:9:6"
             },
-            "scope": 66,
-            "src": "56:67:2",
-            "stateMutability": "nonpayable",
+            "scope": 278,
+            "src": "56:72:6",
+            "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 67,
-        "src": "25:100:2"
+        "scope": 279,
+        "src": "25:105:6"
       }
     ],
-    "src": "0:126:2"
+    "src": "0:131:6"
   },
   "legacyAST": {
     "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol",
     "exportedSymbols": {
       "ICurrencyPrices": [
-        66
+        278
       ]
     },
-    "id": 67,
+    "id": 279,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 58,
+        "id": 270,
         "literals": [
           "solidity",
           "^",
@@ -170,7 +170,7 @@
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:2"
+        "src": "0:23:6"
       },
       {
         "baseContracts": [],
@@ -178,9 +178,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 66,
+        "id": 278,
         "linearizedBaseContracts": [
-          66
+          278
         ],
         "name": "ICurrencyPrices",
         "nodeType": "ContractDefinition",
@@ -188,23 +188,23 @@
           {
             "body": null,
             "documentation": null,
-            "id": 65,
+            "id": 277,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getCurrencyPrice",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 61,
+              "id": 273,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 60,
+                  "id": 272,
                   "name": "_which",
                   "nodeType": "VariableDeclaration",
-                  "scope": 65,
-                  "src": "82:14:2",
+                  "scope": 277,
+                  "src": "82:14:6",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -212,10 +212,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 59,
+                    "id": 271,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "82:7:2",
+                    "src": "82:7:6",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -226,19 +226,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "81:16:2"
+              "src": "81:16:6"
             },
             "returnParameters": {
-              "id": 64,
+              "id": 276,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 63,
+                  "id": 275,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 65,
-                  "src": "114:7:2",
+                  "scope": 277,
+                  "src": "119:7:6",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -246,10 +246,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 62,
+                    "id": 274,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "114:7:2",
+                    "src": "119:7:6",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -259,20 +259,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "113:9:2"
+              "src": "118:9:6"
             },
-            "scope": 66,
-            "src": "56:67:2",
-            "stateMutability": "nonpayable",
+            "scope": 278,
+            "src": "56:72:6",
+            "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 67,
-        "src": "25:100:2"
+        "scope": 279,
+        "src": "25:105:6"
       }
     ],
-    "src": "0:126:2"
+    "src": "0:131:6"
   },
   "compiler": {
     "name": "solc",
@@ -280,7 +280,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.16",
-  "updatedAt": "2020-04-27T13:53:30.270Z",
+  "updatedAt": "2020-05-04T15:22:10.420Z",
   "devdoc": {
     "methods": {}
   },

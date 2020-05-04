@@ -2,6 +2,16 @@ pragma solidity ^0.5.9;
 
 contract IAuctionFormula {
    
+   function calculateLiquadityReduction(uint256 yesterdayPrice, 
+    uint256 dayBeforyesterdayPrice,
+    uint256 yesterDaycontibution,
+    uint256 reserveSupplyBaseToken,
+    uint256 _baseTokenPrice
+    )
+        external
+        pure
+        returns (uint256);
+        
    function calculateTokenPrice(
         uint256 _reserveBaseTokenBalance,
         uint256 _reserveBaseTokenRatio,
