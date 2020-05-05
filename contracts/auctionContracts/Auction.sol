@@ -474,7 +474,7 @@ contract Auction is AuctionFundCollector {
             
             for (uint32 tempX = 1; tempX <= _avgDays; tempX++) {
                 uint256 _tempDay = safeSub(auctionDay, tempX);
-                _avgInvestment = safeSub(
+                _avgInvestment = safeAdd(
                     _avgInvestment,
                     dayWiseContribution[_tempDay]
                 );
@@ -524,8 +524,15 @@ contract Auction is AuctionFundCollector {
         yesterdayContribution = todayContribution;
 
         tokenAuctionEndPrice = _tokenMarketPrice;
-
+    
+        
+        IAuctionLiquadity(getAddressOf(LIQUADITY)).auctionEnded(auctionDay);
+        
+        
         auctionDay = safeAdd(auctionDay, 1);
+        
+        
+        
         todayContribution = 0;
 
         emit AuctionEnded(
