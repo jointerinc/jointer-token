@@ -258,7 +258,7 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
         );
     }
 
-    function contributeWithEther(uint256 _value, address _from)
+    function _contributeWithEther(uint256 _value, address _from)
         internal
         returns (bool)
     {
@@ -291,7 +291,7 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
         fundAdded(address(0), _value, 18, _from, currentMarketPrice);
     }
 
-    function contributeWithToken(
+    function _contributeWithToken(
         IERC20Token _token,
         uint256 _value,
         address _from
@@ -359,7 +359,7 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
             ),
             "CHEK_SIGN_FAIL"
         );
-        return contributeWithEther(msg.value, msg.sender);
+        return _contributeWithEther(msg.value, msg.sender);
     }
 
     function contributeWithToken(
@@ -385,7 +385,7 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
             "CHEK_SIGN_FAIL"
         );
 
-        return contributeWithToken(_token, _value, msg.sender);
+        return _contributeWithToken(_token, _value, msg.sender);
     }
 }
 
@@ -435,10 +435,10 @@ contract Auction is AuctionFundCollector {
             ) = IAuctionTagAlong(getAddressOf(TAG_ALONG))
                 .contributeTowardAuction(yesterdayContribution);
 
-            contributeWithEther(_ethAmount, getAddressOf(TAG_ALONG));
+            _contributeWithEther(_ethAmount, getAddressOf(TAG_ALONG));
 
             for (uint32 tempX = 0; tempX < _token.length; tempX++) {
-                contributeWithToken(
+                _contributeWithToken(
                     IERC20Token(_token[tempX]),
                     _amount[tempX],
                     getAddressOf(TAG_ALONG)
