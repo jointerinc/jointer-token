@@ -391,12 +391,17 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
 
 
 contract Auction is AuctionFundCollector {
-    uint256 public constant MIN_AUCTION_END_TIME = 800; //epoch
+    
+    uint256 public MIN_AUCTION_END_TIME = 0; //epoch
 
     uint256 public LAST_AUCTION_START = 0;
 
-    constructor(uint256 _startTime) public {
+    constructor(uint256 _startTime,
+                uint256 _minAuctionTime,address _registeryAddress) public {
         LAST_AUCTION_START = _startTime;
+        MIN_AUCTION_END_TIME = _minAuctionTime;
+        contractsRegistry = IAuctionRegistery(_registeryAddress);
+        
     }
 
     event AuctionEnded(
