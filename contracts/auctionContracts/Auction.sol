@@ -531,7 +531,7 @@ contract Auction is AuctionFundCollector {
         
         auctionDay = safeAdd(auctionDay, 1);
         
-        
+        LAST_AUCTION_START = now;
         
         todayContribution = 0;
 
