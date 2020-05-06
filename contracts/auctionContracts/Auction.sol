@@ -39,9 +39,9 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
 
 contract AuctionSigner is AuctionRegistery {
     mapping(address => bool) public isSigner;
-
+    
     mapping(bytes32 => bool) public signUsed;
-
+    
     mapping(address => uint256) public signNonce;
 
     function setIsSigner(address _address, bool _isSigner)
@@ -60,7 +60,8 @@ contract AuctionSigner is AuctionRegistery {
 
 
 contract AuctionUtils is AuctionSigner {
-    uint256 public maxContributionAllowed = 170;
+    
+    uint256 public maxContributionAllowed = 150;
 
     uint256 public mangmentFee = 2;
 
@@ -69,12 +70,15 @@ contract AuctionUtils is AuctionSigner {
     uint256 public fundWalletRatio = 90;
 
     uint256 public groupBonusRatio = 2;
+    
+    bool public isRatioChangble = true;
 
     function setGroupBonusRatio(uint256 _groupBonusRatio)
         external
         onlyOwner()
         returns (bool)
-    {
+    {   
+        
         groupBonusRatio = _groupBonusRatio;
         return true;
     }
@@ -94,6 +98,7 @@ contract AuctionUtils is AuctionSigner {
         returns (bool)
     {
         require(_ratio < 100, "ERR_SHOULD_BE_LESS_THAN_100");
+        require(isRatioChangble,"ERR_RATIO_CANT_BE_CHNAGED");
         downSideProtectionRatio = _ratio;
         return true;
     }
@@ -104,6 +109,7 @@ contract AuctionUtils is AuctionSigner {
         returns (bool)
     {
         require(_ratio < 100, "ERR_SHOULD_BE_LESS_THAN_100");
+        require(isRatioChangble,"ERR_RATIO_CANT_BE_CHNAGED");
         fundWalletRatio = _ratio;
         return true;
     }
@@ -155,6 +161,8 @@ contract AuctionStorage is AuctionUtils {
     uint256 public todaySupply = 50000000000000000000000;
 
     uint256 public tokenAuctionEndPrice = 10000;
+    
+    
 }
 
 
@@ -200,6 +208,7 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
         address _token,
         uint256 _amount
     ) internal returns (bool) {
+        
         bytes32 hashedParams = keccak256(
             abi.encodePacked(
                 _which,
@@ -210,7 +219,7 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
             )
         );
         require(hashedParams == _msg, "ERR_MSG_IS_NOT_SAME");
-        require(!signUsed[_msgHash], "ERR_SIGNED_MSG_USED");
+        require(!signUsed[_msgHash],"ERR_SIGNED_MSG_USED");
         address from = ecrecover(_msgHash, v, r, s);
         require(checkValidSigner(from), "ERR_NOT_VALID_SIGNER");
         signNonce[msg.sender] = safeAdd(signNonce[msg.sender], 1);
@@ -225,6 +234,10 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
         address _from,
         uint256 currentMarketPrice
     ) internal {
+        
+        if(isRatioChangble)
+           isRatioChangble = false;
+        
         uint256 _currencyPrices = ICurrencyPrices(getAddressOf(CURRENCY))
             .getCurrencyPrice(_token);
 
@@ -395,18 +408,17 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
 
 
 contract Auction is AuctionFundCollector {
+    
     uint256 public MIN_AUCTION_END_TIME = 0; //epoch
 
     uint256 public LAST_AUCTION_START = 0;
 
-    constructor(
-        uint256 _startTime,
-        uint256 _minAuctionTime,
-        address _registeryAddress
-    ) public {
+    constructor(uint256 _startTime,
+                uint256 _minAuctionTime,address _registeryAddress) public {
         LAST_AUCTION_START = _startTime;
         MIN_AUCTION_END_TIME = _minAuctionTime;
         contractsRegistry = IAuctionRegistery(_registeryAddress);
+        
     }
 
     event AuctionEnded(
@@ -422,6 +434,7 @@ contract Auction is AuctionFundCollector {
     );
 
     function auctionEnd() external onlySystem() returns (bool) {
+        
         require(
             safeAdd(LAST_AUCTION_START, MIN_AUCTION_END_TIME) > now,
             "ERR_MIN_TIME_IS_NOT_OVER"
@@ -458,6 +471,7 @@ contract Auction is AuctionFundCollector {
         );
 
         if (todayContribution > yesterdayContribution) {
+            
             uint256 _groupBonusRatio = safeMul(
                 safeDiv(
                     safeMul(todayContribution, 10**18),
@@ -470,15 +484,16 @@ contract Auction is AuctionFundCollector {
                 safeDiv(safeMul(todaySupply, _groupBonusRatio), 10**18),
                 todaySupply
             );
+            
         } else {
             uint256 _avgDays = 10;
-
+            
             uint256 _avgInvestment = 0;
-
+            
             if (auctionDay < 11) {
                 _avgDays = auctionDay;
             }
-
+            
             for (uint32 tempX = 1; tempX <= _avgDays; tempX++) {
                 uint256 _tempDay = safeSub(auctionDay, tempX);
                 _avgInvestment = safeAdd(
@@ -486,9 +501,9 @@ contract Auction is AuctionFundCollector {
                     dayWiseContribution[_tempDay]
                 );
             }
-
+            
             _avgInvestment = safeDiv(_avgInvestment, _avgDays);
-
+            
             if (_avgInvestment > allowedMaxContribution) {
                 allowedMaxContribution = _avgInvestment;
             }
@@ -518,7 +533,9 @@ contract Auction is AuctionFundCollector {
         dayWiseAuctionPrice[auctionDay] = _tokenPrice;
 
         dayWiseMarketPrice[auctionDay] = _tokenMarketPrice;
-
+    
+        isRatioChangble = true;
+        
         todaySupply = safeDiv(
             safeMul(todayContribution, 10**18),
             _tokenMarketPrice
@@ -531,13 +548,15 @@ contract Auction is AuctionFundCollector {
         yesterdayContribution = todayContribution;
 
         tokenAuctionEndPrice = _tokenMarketPrice;
-
+    
+        
         IAuctionLiquadity(getAddressOf(LIQUADITY)).auctionEnded(auctionDay);
-
+        
+        
         auctionDay = safeAdd(auctionDay, 1);
-
+        
         LAST_AUCTION_START = now;
-
+        
         todayContribution = 0;
 
         emit AuctionEnded(
@@ -565,7 +584,6 @@ contract Auction is AuctionFundCollector {
             returnToken[dayId][_which] == false,
             "ERR_ALREADY_TOKEN_DISTBUTED"
         );
-
 
             uint256 dayWiseContributionByWallet
          = walletDayWiseContribution[dayId][_which];
