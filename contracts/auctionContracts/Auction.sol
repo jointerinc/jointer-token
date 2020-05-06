@@ -40,6 +40,8 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
 contract AuctionSigner is AuctionRegistery {
     mapping(address => bool) public isSigner;
 
+    mapping(bytes32 => bool) public signUsed;
+
     mapping(address => uint256) public signNonce;
 
     function setIsSigner(address _address, bool _isSigner)
@@ -208,9 +210,11 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
             )
         );
         require(hashedParams == _msg, "ERR_MSG_IS_NOT_SAME");
+        require(!signUsed[_msgHash], "ERR_SIGNED_MSG_USED");
         address from = ecrecover(_msgHash, v, r, s);
         require(checkValidSigner(from), "ERR_NOT_VALID_SIGNER");
         signNonce[msg.sender] = safeAdd(signNonce[msg.sender], 1);
+        signUsed[_msgHash] = true;
         return true;
     }
 
@@ -391,17 +395,18 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
 
 
 contract Auction is AuctionFundCollector {
-    
     uint256 public MIN_AUCTION_END_TIME = 0; //epoch
 
     uint256 public LAST_AUCTION_START = 0;
 
-    constructor(uint256 _startTime,
-                uint256 _minAuctionTime,address _registeryAddress) public {
+    constructor(
+        uint256 _startTime,
+        uint256 _minAuctionTime,
+        address _registeryAddress
+    ) public {
         LAST_AUCTION_START = _startTime;
         MIN_AUCTION_END_TIME = _minAuctionTime;
         contractsRegistry = IAuctionRegistery(_registeryAddress);
-        
     }
 
     event AuctionEnded(
@@ -417,7 +422,6 @@ contract Auction is AuctionFundCollector {
     );
 
     function auctionEnd() external onlySystem() returns (bool) {
-        
         require(
             safeAdd(LAST_AUCTION_START, MIN_AUCTION_END_TIME) > now,
             "ERR_MIN_TIME_IS_NOT_OVER"
@@ -454,7 +458,6 @@ contract Auction is AuctionFundCollector {
         );
 
         if (todayContribution > yesterdayContribution) {
-            
             uint256 _groupBonusRatio = safeMul(
                 safeDiv(
                     safeMul(todayContribution, 10**18),
@@ -467,16 +470,15 @@ contract Auction is AuctionFundCollector {
                 safeDiv(safeMul(todaySupply, _groupBonusRatio), 10**18),
                 todaySupply
             );
-            
         } else {
             uint256 _avgDays = 10;
-            
+
             uint256 _avgInvestment = 0;
-            
+
             if (auctionDay < 11) {
                 _avgDays = auctionDay;
             }
-            
+
             for (uint32 tempX = 1; tempX <= _avgDays; tempX++) {
                 uint256 _tempDay = safeSub(auctionDay, tempX);
                 _avgInvestment = safeAdd(
@@ -484,9 +486,9 @@ contract Auction is AuctionFundCollector {
                     dayWiseContribution[_tempDay]
                 );
             }
-            
+
             _avgInvestment = safeDiv(_avgInvestment, _avgDays);
-            
+
             if (_avgInvestment > allowedMaxContribution) {
                 allowedMaxContribution = _avgInvestment;
             }
@@ -529,15 +531,13 @@ contract Auction is AuctionFundCollector {
         yesterdayContribution = todayContribution;
 
         tokenAuctionEndPrice = _tokenMarketPrice;
-    
-        
+
         IAuctionLiquadity(getAddressOf(LIQUADITY)).auctionEnded(auctionDay);
-        
-        
+
         auctionDay = safeAdd(auctionDay, 1);
-        
+
         LAST_AUCTION_START = now;
-        
+
         todayContribution = 0;
 
         emit AuctionEnded(
@@ -565,6 +565,7 @@ contract Auction is AuctionFundCollector {
             returnToken[dayId][_which] == false,
             "ERR_ALREADY_TOKEN_DISTBUTED"
         );
+
 
             uint256 dayWiseContributionByWallet
          = walletDayWiseContribution[dayId][_which];
