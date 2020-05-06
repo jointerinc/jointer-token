@@ -33,7 +33,8 @@ const stockToken = artifacts.require("StockToken");
 const etnToken = artifacts.require("EtnToken");
 const CurrencyPrices = artifacts.require("CurrencyPrices");
 const AuctionRegisty = artifacts.require("AuctionRegistery");
-const whiteListContract = artifacts.require("MockWhiteList");
+const whiteListContract = artifacts.require("WhiteList");
+const WhiteListRegistry = artifacts.require("WhiteListRegistery");
 
 contract("~System works", function (accounts) {
   var JntrToken;
@@ -45,14 +46,13 @@ contract("~System works", function (accounts) {
     systemAddress,
     authorityAddress,
     returnTokenPlaceHolder,
-    mutliSigAddressPlaceHolder,
+    multiSigPlaceHolder,
     accountA,
     accountB,
     accountC,
-    registryAddress,
     vault,
   ] = accounts;
-
+  var registryAddress;
   const etnName = "EtnToken";
   const etnSymbol = "ETN";
   const stockName = "StockToken";
@@ -67,6 +67,8 @@ contract("~System works", function (accounts) {
   const stockTokenMaturityDays = 3560;
   const tokenMaturityDays = 0;
   const tokenHoldBackDays = 90;
+
+  //can modify these
   var accountAAmountJntr = 100000;
   var accountBAmountJntr = 50000;
 
@@ -82,21 +84,30 @@ contract("~System works", function (accounts) {
 
     this.auctionRegistery = await AuctionRegisty.new(
       systemAddress,
-      mutliSigAddressPlaceHolder,
+      multiSigPlaceHolder,
       {from: primaryOwner}
     );
     //setup WhiteList
     let whiteListType = 0;
     let maxWallets = 10;
-    this.whiteList = await whiteListContract.new(registryAddress);
-    await this.whiteList.initialize(
+
+    var whiteListRegistry = await WhiteListRegistry.new(
+      systemAddress,
+      multiSigPlaceHolder
+    );
+    let tempWhiteList = await whiteListContract.new();
+    await whiteListRegistry.addVersion(1, tempWhiteList.address);
+    await whiteListRegistry.createProxy(
+      1,
       primaryOwner,
       systemAddress,
-      authorityAddress,
-      {
-        from: registryAddress,
-      }
+      authorityAddress
     );
+    let proxyAddress = await whiteListRegistry.proxyAddress();
+    this.whiteList = await whiteListContract.at(proxyAddress);
+    registryAddress = whiteListRegistry.address;
+
+    //add wallets
     await this.whiteList.addNewWallet(accountA, whiteListType, maxWallets, {
       from: systemAddress,
     });
@@ -140,7 +151,7 @@ contract("~System works", function (accounts) {
       authorityAddress,
       this.auctionRegistery.address,
       JntrTokenPrice,
-      tokenMaturityDays, //maturityDays
+      tokenMaturityDays,
       tokenHoldBackDays,
       [accountA, accountB],
       [accountAAmountJntr, accountBAmountJntr],
@@ -155,7 +166,7 @@ contract("~System works", function (accounts) {
       authorityAddress,
       this.auctionRegistery.address,
       stockTokenPrice,
-      stockTokenMaturityDays, //maturityDays
+      stockTokenMaturityDays,
       tokenHoldBackDays,
       returnTokenPlaceHolder,
       [accountA],
@@ -237,7 +248,9 @@ contract("~System works", function (accounts) {
 
       await advanceTime(86400 * tokenHoldBackDays);
 
-      let receipt = await JntrToken.transfer(accountB, 10, {from: accountA});
+      let receipt = await JntrToken.transfer(accountB, transferAmount, {
+        from: accountA,
+      });
       await expectRevert(
         JntrToken.transfer(accountC, transferAmount, {from: accountA}),
         "ERR_TRANSFER_CHECK_WHITELIST"

@@ -7,30 +7,38 @@ const {ZERO_ADDRESS} = constants;
 
 const {expect} = require("chai");
 
-const whiteListContract = artifacts.require("MockWhiteList");
+const whiteListContract = artifacts.require("WhiteList");
+const WhiteListRegistry = artifacts.require("WhiteListRegistery");
 
 contract("~WhiteList works", function (accounts) {
   const [
     primaryOwner,
     authorityAddress,
     systemAddress,
-    registryAddress,
     toBeWhiteListed,
     extraAddedWallet,
+    multiSigPlaceHolder,
     other1,
     other2,
   ] = accounts;
+  var registryAddress;
 
   beforeEach(async function () {
-    this.whiteList = await whiteListContract.new(registryAddress);
-    await this.whiteList.initialize(
+    var whiteListRegistry = await WhiteListRegistry.new(
+      systemAddress,
+      multiSigPlaceHolder
+    );
+    let tempWhiteList = await whiteListContract.new();
+    await whiteListRegistry.addVersion(1, tempWhiteList.address);
+    await whiteListRegistry.createProxy(
+      1,
       primaryOwner,
       systemAddress,
-      authorityAddress,
-      {
-        from: registryAddress,
-      }
+      authorityAddress
     );
+    let proxyAddress = await whiteListRegistry.proxyAddress();
+    this.whiteList = await whiteListContract.at(proxyAddress);
+    registryAddress = whiteListRegistry.address;
   });
   it("should initialize properly", async function () {
     expect(await this.whiteList.primaryOwner()).to.equal(primaryOwner);
