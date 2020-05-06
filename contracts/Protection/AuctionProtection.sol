@@ -19,16 +19,14 @@ interface InitializeInterface {
 
 
 contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
-    
     IAuctionRegistery public contractsRegistry;
-    
+
     function updateRegistery(address _address)
         external
         onlyAuthorized()
         notZeroAddress(_address)
         returns (bool)
     {
-        
         contractsRegistry = IAuctionRegistery(_address);
         return true;
     }
@@ -44,7 +42,6 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
 
 
 contract UtilsStorage {
-    
     mapping(address => bool) public allowedAddress;
 
     uint256 public tokenLockDuration;
@@ -53,21 +50,18 @@ contract UtilsStorage {
 
     mapping(address => bool) public tokenAllowed;
 
-
     mapping(address => bool) public unLockBlock;
-    
 }
 
 
 contract Utils is SafeMath, UtilsStorage, AuctionRegistery {
-    
     modifier allowedTokenOnly(address _which) {
-        require(tokenAllowed[_which],"ERR_ONLY_ALLOWED_TOKEN");
+        require(tokenAllowed[_which], "ERR_ONLY_ALLOWED_TOKEN");
         _;
     }
 
     modifier allowedAddressOnly(address _which) {
-        require(allowedAddress[_which],ERR_AUTHORIZED_ADDRESS_ONLY);
+        require(allowedAddress[_which], ERR_AUTHORIZED_ADDRESS_ONLY);
         _;
     }
 
@@ -114,6 +108,7 @@ contract Utils is SafeMath, UtilsStorage, AuctionRegistery {
         if (now >= tokenLockEndDay) {
             return true;
         }
+
         return false;
     }
 }
@@ -168,7 +163,7 @@ contract AuctionProtection is
         if (_from == address(this)) _token.transfer(_to, _amount);
         else _token.transferFrom(_from, _to, _amount);
         uint256 postBalance = _token.balanceOf(_to);
-        require(postBalance > prevBalance,"ERR_TRANSFER");
+        require(postBalance > prevBalance, "ERR_TRANSFER");
     }
 
     function approveTransferFrom(
@@ -216,7 +211,7 @@ contract AuctionProtection is
 
     function cancelInvestment() external returns (bool) {
         require(
-            isTokenLockEndDay(lockedOn[msg.sender]),
+            !isTokenLockEndDay(lockedOn[msg.sender]),
             "ERR_INVESTMENT_CANCEL_PERIOD_OVER"
         );
 
@@ -247,13 +242,17 @@ contract AuctionProtection is
         _tokenBalance = lockedTokens[msg.sender];
         if (_tokenBalance > 0) {
             _token = IERC20Token(getAddressOf(MAIN_TOKEN));
+
             address tagAlongAdress = getAddressOf(TAG_ALONG);
+
             approveTransferFrom(_token, tagAlongAdress, _tokenBalance);
+
             IAuctionTagAlong(tagAlongAdress).depositeToken(
                 _token,
                 address(this),
                 _tokenBalance
             );
+
             emit FundTransfer(tagAlongAdress, address(_token), _tokenBalance);
             lockedTokens[msg.sender] = 0;
         }
