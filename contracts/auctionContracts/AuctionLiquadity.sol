@@ -302,6 +302,7 @@ contract Liquadity is LiquadityUtils {
     }
 
     function _contributeWithEther(uint256 value) internal returns (uint256) {
+        
         uint256 returnAmount = IBancorConverter(converter).quickConvert2.value(
             value
         )(contributionPath, value, 1, address(0), 0);
@@ -312,8 +313,11 @@ contract Liquadity is LiquadityUtils {
             getAddressOf(VAULT),
             returnAmount
         );
+        
         emit Contribution(address(0), value, returnAmount);
+        
         checkAppeciationLimit();
+        
         return returnAmount;
     }
 
@@ -557,15 +561,15 @@ contract Liquadity is LiquadityUtils {
         return true;
     }
 
-    function auctionEnded(uint256 aucyionDayId) external returns (bool) {
+    function auctionEnded(uint256 auctionDayId) external returns (bool) {
         require(msg.sender == getAddressOf(AUCTION));
         (
             uint256 _baseTokenBalance,
             uint256 _mainTokenBalance
         ) = getTokensReserveBalance();
 
-        dayWiseMainTokenSupply[aucyionDayId] = _mainTokenBalance;
-        dayWiseBaseTokenSupply[aucyionDayId] = _baseTokenBalance;
+        dayWiseMainTokenSupply[auctionDayId] = _mainTokenBalance;
+        dayWiseBaseTokenSupply[auctionDayId] = _baseTokenBalance;
         return true;
     }
 
