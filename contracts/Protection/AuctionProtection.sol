@@ -5,6 +5,7 @@ import "../common/SafeMath.sol";
 import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IAuctionTagAlong.sol";
+import "../InterFaces/ITokenVault.sol";
 import "../InterFaces/IERC20Token.sol";
 
 
@@ -251,17 +252,17 @@ contract AuctionProtection is
         if (_tokenBalance > 0) {
             _token = IERC20Token(getAddressOf(MAIN_TOKEN));
             
-            address tagAlongAdress = getAddressOf(TAG_ALONG);
+            address vaultAddress = getAddressOf(VAULT);
             
-            approveTransferFrom(_token, tagAlongAdress, _tokenBalance);
+            approveTransferFrom(_token, vaultAddress, _tokenBalance);
             
-            IAuctionTagAlong(tagAlongAdress).depositeToken(
+            ITokenVault(vaultAddress).depositeToken(
                 _token,
                 address(this),
                 _tokenBalance
             );
             
-            emit FundTransfer(tagAlongAdress, address(_token), _tokenBalance);
+            emit FundTransfer(vaultAddress, address(_token), _tokenBalance);
             lockedTokens[msg.sender] = 0;
         }
         emit InvestMentCancelled(msg.sender);
