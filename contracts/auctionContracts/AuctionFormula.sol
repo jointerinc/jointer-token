@@ -4,65 +4,60 @@ import "../common/SafeMath.sol";
 
 
 contract AuctionFormula is SafeMath {
-    
-    
     uint16 public version = 1;
-    
-    
+
     function calcuateAuctionTokenDistrubution(
         uint256 dayWiseContributionByWallet,
         uint256 dayWiseSupplyCore,
         uint256 dayWiseSupplyBonus,
         uint256 dayWiseContribution,
-        uint256 downSideProtectionRatio)  
-        external
-        pure
-        returns (uint256, uint256)
-    {
-        
-        uint256 _dayWiseSupplyCore = safeDiv(safeMul(dayWiseSupplyCore,dayWiseContributionByWallet),dayWiseContribution);
-        
+        uint256 downSideProtectionRatio
+    ) external pure returns (uint256, uint256) {
+        uint256 _dayWiseSupplyCore = safeDiv(
+            safeMul(dayWiseSupplyCore, dayWiseContributionByWallet),
+            dayWiseContribution
+        );
+
         uint256 _dayWiseSupplyBonus = 0;
-        
-        if(dayWiseSupplyBonus > 0 )
-            _dayWiseSupplyBonus = safeDiv(safeMul(dayWiseSupplyBonus,dayWiseContributionByWallet),dayWiseContribution);
-        
-        uint256 _returnAmount = safeAdd(_dayWiseSupplyCore,_dayWiseSupplyBonus);
-        
-        // user get only 100 - downSideProtectionRatio(90) fund only other fund is locked 
-        uint256 _userAmount = safeDiv(safeMul(_dayWiseSupplyCore,safeSub(100,downSideProtectionRatio)),100);
-        
-        return(_returnAmount,_userAmount);
+
+        if (dayWiseSupplyBonus > 0)
+            _dayWiseSupplyBonus = safeDiv(
+                safeMul(dayWiseSupplyBonus, dayWiseContributionByWallet),
+                dayWiseContribution
+            );
+
+        uint256 _returnAmount = safeAdd(
+            _dayWiseSupplyCore,
+            _dayWiseSupplyBonus
+        );
+
+        // user get only 100 - downSideProtectionRatio(90) fund only other fund is locked
+        uint256 _userAmount = safeDiv(
+            safeMul(_dayWiseSupplyCore, safeSub(100, downSideProtectionRatio)),
+            100
+        );
+
+        return (_returnAmount, _userAmount);
     }
-    
-    function calcuateAuctionFundDistrubution(uint256 _value,uint256 downSideProtectionRatio,uint256 fundWalletRatio)
-        external
-        pure
-        returns (uint256, uint256, uint256)
-    {
+
+    function calcuateAuctionFundDistrubution(
+        uint256 _value,
+        uint256 downSideProtectionRatio,
+        uint256 fundWalletRatio
+    ) external pure returns (uint256, uint256, uint256) {
         uint256 _downsideAmount = safeDiv(
             safeMul(_value, downSideProtectionRatio),
             100
         );
         uint256 newvalue = safeSub(_value, _downsideAmount);
-        
-        uint256 _fundwallet = safeDiv(safeMul(newvalue, fundWalletRatio), 100);
-        
-        newvalue = safeSub(newvalue, _fundwallet);
-        
-        return (_downsideAmount, _fundwallet, newvalue);
 
+        uint256 _fundwallet = safeDiv(safeMul(newvalue, fundWalletRatio), 100);
+
+        newvalue = safeSub(newvalue, _fundwallet);
+
+        return (_downsideAmount, _fundwallet, newvalue);
     }
-    
-    
-    function calculateVirtualReserve() external pure returns (uint256) {
-        
-        
-    }
-    
-    
-    
-    
+
     function calculateApprectiation(
         uint256 _reserveBaseTokenBalance,
         uint256 _reserveBaseTokenRatio,
@@ -70,7 +65,6 @@ contract AuctionFormula is SafeMath {
         uint256 _reserveMainTokenRatio,
         uint256 _baseTokenPrice
     ) external pure returns (uint256) {
-        
         uint256 ratio = safeDiv(
             safeMul(
                 safeMul(_reserveBaseTokenBalance, _reserveMainTokenRatio),
@@ -78,7 +72,7 @@ contract AuctionFormula is SafeMath {
             ),
             safeMul(_reserveMainTokenPrice, _reserveBaseTokenRatio)
         );
-        
+
         return safeDiv(safeMul(ratio, _baseTokenPrice), safeExponent(10, 6));
     }
 
@@ -89,7 +83,6 @@ contract AuctionFormula is SafeMath {
         uint256 _reserveMainTokenRatio,
         uint256 _baseTokenPrice
     ) external pure returns (uint256) {
-        
         uint256 ratio = safeDiv(
             safeMul(
                 safeMul(_reserveBaseTokenBalance, _reserveMainTokenRatio),
@@ -97,7 +90,7 @@ contract AuctionFormula is SafeMath {
             ),
             safeMul(_reserveMainTokenBalance, _reserveBaseTokenRatio)
         );
-        
+
         return safeDiv(safeMul(ratio, _baseTokenPrice), safeExponent(10, 6));
     }
 
@@ -124,5 +117,25 @@ contract AuctionFormula is SafeMath {
         );
         uint256 _managmantFee = safeSub(_tempSupply, _supply);
         return _managmantFee;
+    }
+
+    function calculateLiquadityReduction(
+        uint256 yesterdayPrice,
+        uint256 dayBeforyesterdayPrice,
+        uint256 yesterDaycontibution,
+        uint256 reserveSupplyBaseToken,
+        uint256 _baseTokenPrice
+    ) external pure returns (uint256) {
+        uint256 _tempContrbution = safeDiv(
+            safeMul(yesterDaycontibution, safeExponent(10, 6)),
+            safeMul(_baseTokenPrice, reserveSupplyBaseToken)
+        );
+        uint256 _tempSupply = safeDiv(yesterdayPrice, dayBeforyesterdayPrice);
+
+        return
+            safeDiv(
+                safeMul(_tempContrbution, _tempSupply),
+                safeExponent(10, 6)
+            );
     }
 }
