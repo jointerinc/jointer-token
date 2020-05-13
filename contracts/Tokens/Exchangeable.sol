@@ -15,9 +15,8 @@ contract ForceSwap is RestrictedToken {
         returnToken = _returnToken;
     }
 
-    function forceSwap(address _which, uint256 _amount)
-        external
-        onlySystem()
+    function _forceSwap(address _which, uint256 _amount)
+        internal
         returns (bool)
     {
         require(returnToken != address(0), "ERR_ACTION_NOT_ALLOWED");
@@ -40,6 +39,14 @@ contract ForceSwap is RestrictedToken {
         );
 
         return tokenVault.directTransfer(returnToken, msg.sender, _assignToken);
+    }
+
+    function forceSwap(address _which, uint256 _amount)
+        external
+        onlySystem()
+        returns (bool)
+    {
+        return _forceSwap(_which, _amount);
     }
 }
 
@@ -64,11 +71,19 @@ contract Exchangeable is ForceSwap {
         _;
     }
 
+    // we are currently developing whitelist with this change
     function buyTokens(address _fromToken, uint256 _amount)
         external
         isConversionAllowed(_fromToken)
         returns (uint256)
     {
+        address whiteListAddress = getAddressOf(WHITE_LIST);
+
+        require(
+            IWhiteList(whiteListAddress).canBuyToken(address(this), msg.sender),
+            "ERR_NOT_HAVE_PERMISSION_TO_BUY"
+        );
+
         ICurrencyPrices currencyPrice = ICurrencyPrices(getAddressOf(CURRENCY));
 
         uint256 fromTokenPrice = currencyPrice.getCurrencyPrice(_fromToken);
@@ -82,39 +97,23 @@ contract Exchangeable is ForceSwap {
             currentTokenPrice
         );
 
-        ERC20(_fromToken).transferFrom(
-            msg.sender,
-            getAddressOf(VAULT),
-            _amount
-        );
+        if (_fromToken == returnToken) {
+            ERC20(_fromToken).transferFrom(
+                msg.sender,
+                getAddressOf(VAULT),
+                _amount
+            );
+        } else {
+            ERC20(_fromToken).transferFrom(msg.sender, address(this), _amount);
+            IToken(_fromToken).burn(_amount);
+        }
 
         _mint(msg.sender, _assignToken);
 
         return _assignToken;
     }
 
-    function swapTokens(address _toToken, uint256 _amount)
-        external
-        isConversionAllowed(_toToken)
-        returns (bool)
-    {
-        ICurrencyPrices currencyPrice = ICurrencyPrices(getAddressOf(CURRENCY));
-
-        ITokenVault tokenVault = ITokenVault(getAddressOf(VAULT));
-
-        uint256 toTokenPrice = currencyPrice.getCurrencyPrice(_toToken);
-
-        uint256 currentTokenPrice = currencyPrice.getCurrencyPrice(
-            address(this)
-        );
-        uint256 _assignToken = safeDiv(
-            safeMul(_amount, currentTokenPrice),
-            toTokenPrice
-        );
-
-        tokenVault.directTransfer(_toToken, msg.sender, _assignToken);
-        _burn(msg.sender, _amount);
-
-        return true;
+    function swapTokens(uint256 _amount) external returns (bool) {
+        return _forceSwap(msg.sender, _amount);
     }
 }

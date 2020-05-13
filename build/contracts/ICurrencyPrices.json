@@ -32,14 +32,14 @@
     "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol",
     "exportedSymbols": {
       "ICurrencyPrices": [
-        278
+        285
       ]
     },
-    "id": 279,
+    "id": 286,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 270,
+        "id": 277,
         "literals": [
           "solidity",
           "^",
@@ -55,9 +55,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 278,
+        "id": 285,
         "linearizedBaseContracts": [
-          278
+          285
         ],
         "name": "ICurrencyPrices",
         "nodeType": "ContractDefinition",
@@ -65,22 +65,22 @@
           {
             "body": null,
             "documentation": null,
-            "id": 277,
+            "id": 284,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getCurrencyPrice",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 273,
+              "id": 280,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 272,
+                  "id": 279,
                   "name": "_which",
                   "nodeType": "VariableDeclaration",
-                  "scope": 277,
+                  "scope": 284,
                   "src": "82:14:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -89,7 +89,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 271,
+                    "id": 278,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "82:7:6",
@@ -106,15 +106,15 @@
               "src": "81:16:6"
             },
             "returnParameters": {
-              "id": 276,
+              "id": 283,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 275,
+                  "id": 282,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 277,
+                  "scope": 284,
                   "src": "119:7:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -123,7 +123,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 274,
+                    "id": 281,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "119:7:6",
@@ -138,14 +138,14 @@
               ],
               "src": "118:9:6"
             },
-            "scope": 278,
+            "scope": 285,
             "src": "56:72:6",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 279,
+        "scope": 286,
         "src": "25:105:6"
       }
     ],
@@ -155,14 +155,14 @@
     "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol",
     "exportedSymbols": {
       "ICurrencyPrices": [
-        278
+        285
       ]
     },
-    "id": 279,
+    "id": 286,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 270,
+        "id": 277,
         "literals": [
           "solidity",
           "^",
@@ -178,9 +178,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 278,
+        "id": 285,
         "linearizedBaseContracts": [
-          278
+          285
         ],
         "name": "ICurrencyPrices",
         "nodeType": "ContractDefinition",
@@ -188,22 +188,22 @@
           {
             "body": null,
             "documentation": null,
-            "id": 277,
+            "id": 284,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getCurrencyPrice",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 273,
+              "id": 280,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 272,
+                  "id": 279,
                   "name": "_which",
                   "nodeType": "VariableDeclaration",
-                  "scope": 277,
+                  "scope": 284,
                   "src": "82:14:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -212,7 +212,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 271,
+                    "id": 278,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "82:7:6",
@@ -229,15 +229,15 @@
               "src": "81:16:6"
             },
             "returnParameters": {
-              "id": 276,
+              "id": 283,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 275,
+                  "id": 282,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 277,
+                  "scope": 284,
                   "src": "119:7:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -246,7 +246,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 274,
+                    "id": 281,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "119:7:6",
@@ -261,14 +261,14 @@
               ],
               "src": "118:9:6"
             },
-            "scope": 278,
+            "scope": 285,
             "src": "56:72:6",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 279,
+        "scope": 286,
         "src": "25:105:6"
       }
     ],
@@ -280,7 +280,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.16",
-  "updatedAt": "2020-05-04T15:22:10.420Z",
+  "updatedAt": "2020-05-07T07:18:50.687Z",
   "devdoc": {
     "methods": {}
   },

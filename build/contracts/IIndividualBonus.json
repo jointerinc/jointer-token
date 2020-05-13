@@ -5,11 +5,7 @@
       "constant": true,
       "inputs": [
         {
-          "name": "_tolalInvestMent",
-          "type": "uint256"
-        },
-        {
-          "name": "_userInvestMent",
+          "name": "_userIndex",
           "type": "uint256"
         },
         {
@@ -29,25 +25,25 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"_tolalInvestMent\",\"type\":\"uint256\"},{\"name\":\"_userInvestMent\",\"type\":\"uint256\"},{\"name\":\"returnAmount\",\"type\":\"uint256\"}],\"name\":\"calucalteBonus\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IIndividualBonus.sol\":\"IIndividualBonus\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IIndividualBonus.sol\":{\"keccak256\":\"0xb3a754d0c5e22e2666dc3be50e0c8582297adf5b56bc5f605a681b3b3f709a64\",\"urls\":[\"bzzr://8cea60d757601331c931b21ee212ca53c70acb8fdb110d611fa811ac1ccdcd60\",\"dweb:/ipfs/Qmd4dNGT4CB7ahWAap52nDY9L7sJLbZbQJSQBqLzMKmDKw\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"_userIndex\",\"type\":\"uint256\"},{\"name\":\"returnAmount\",\"type\":\"uint256\"}],\"name\":\"calucalteBonus\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IIndividualBonus.sol\":\"IIndividualBonus\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IIndividualBonus.sol\":{\"keccak256\":\"0xf996c3adc3fb45a84059636dde1386ac8a79a45dfdabf5432eeda72025523e0f\",\"urls\":[\"bzzr://553c6524b7dc4045956635c7b7a51c0e205b1a28e9f70850df142e790a944d07\",\"dweb:/ipfs/QmcZoh2CYma292mkLkzPR9up4XnvrqEAB3iYViwpyWeMV1\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.5.9;\n\ncontract IIndividualBonus {\n    function calucalteBonus(\n        uint256 _tolalInvestMent,\n        uint256 _userInvestMent,\n        uint256 returnAmount\n    ) public view returns (uint256);\n}\n",
+  "source": "pragma solidity ^0.5.9;\n\ncontract IIndividualBonus {\n    function calucalteBonus(\n        uint256 _userIndex,\n        uint256 returnAmount\n    ) public view returns (uint256);\n}\n",
   "sourcePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IIndividualBonus.sol",
   "ast": {
     "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IIndividualBonus.sol",
     "exportedSymbols": {
       "IIndividualBonus": [
-        183
+        400
       ]
     },
-    "id": 184,
+    "id": 401,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 171,
+        "id": 390,
         "literals": [
           "solidity",
           "^",
@@ -55,7 +51,7 @@
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:5"
+        "src": "0:23:9"
       },
       {
         "baseContracts": [],
@@ -63,9 +59,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 183,
+        "id": 400,
         "linearizedBaseContracts": [
-          183
+          400
         ],
         "name": "IIndividualBonus",
         "nodeType": "ContractDefinition",
@@ -73,23 +69,23 @@
           {
             "body": null,
             "documentation": null,
-            "id": 182,
+            "id": 399,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "calucalteBonus",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 178,
+              "id": 395,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 173,
-                  "name": "_tolalInvestMent",
+                  "id": 392,
+                  "name": "_userIndex",
                   "nodeType": "VariableDeclaration",
-                  "scope": 182,
-                  "src": "90:24:5",
+                  "scope": 399,
+                  "src": "90:18:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -97,10 +93,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 172,
+                    "id": 391,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "90:7:5",
+                    "src": "90:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -111,37 +107,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 175,
-                  "name": "_userInvestMent",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 182,
-                  "src": "124:23:5",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 174,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "124:7:5",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 177,
+                  "id": 394,
                   "name": "returnAmount",
                   "nodeType": "VariableDeclaration",
-                  "scope": 182,
-                  "src": "157:20:5",
+                  "scope": 399,
+                  "src": "118:20:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -149,10 +119,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 176,
+                    "id": 393,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "157:7:5",
+                    "src": "118:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -162,19 +132,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "80:103:5"
+              "src": "80:64:9"
             },
             "returnParameters": {
-              "id": 181,
+              "id": 398,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 180,
+                  "id": 397,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 182,
-                  "src": "205:7:5",
+                  "scope": 399,
+                  "src": "166:7:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -182,10 +152,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 179,
+                    "id": 396,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "205:7:5",
+                    "src": "166:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -195,33 +165,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "204:9:5"
+              "src": "165:9:9"
             },
-            "scope": 183,
-            "src": "57:157:5",
+            "scope": 400,
+            "src": "57:118:9",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 184,
-        "src": "25:191:5"
+        "scope": 401,
+        "src": "25:152:9"
       }
     ],
-    "src": "0:217:5"
+    "src": "0:178:9"
   },
   "legacyAST": {
     "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IIndividualBonus.sol",
     "exportedSymbols": {
       "IIndividualBonus": [
-        183
+        400
       ]
     },
-    "id": 184,
+    "id": 401,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 171,
+        "id": 390,
         "literals": [
           "solidity",
           "^",
@@ -229,7 +199,7 @@
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:5"
+        "src": "0:23:9"
       },
       {
         "baseContracts": [],
@@ -237,9 +207,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 183,
+        "id": 400,
         "linearizedBaseContracts": [
-          183
+          400
         ],
         "name": "IIndividualBonus",
         "nodeType": "ContractDefinition",
@@ -247,23 +217,23 @@
           {
             "body": null,
             "documentation": null,
-            "id": 182,
+            "id": 399,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "calucalteBonus",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 178,
+              "id": 395,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 173,
-                  "name": "_tolalInvestMent",
+                  "id": 392,
+                  "name": "_userIndex",
                   "nodeType": "VariableDeclaration",
-                  "scope": 182,
-                  "src": "90:24:5",
+                  "scope": 399,
+                  "src": "90:18:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -271,10 +241,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 172,
+                    "id": 391,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "90:7:5",
+                    "src": "90:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -285,37 +255,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 175,
-                  "name": "_userInvestMent",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 182,
-                  "src": "124:23:5",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 174,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "124:7:5",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 177,
+                  "id": 394,
                   "name": "returnAmount",
                   "nodeType": "VariableDeclaration",
-                  "scope": 182,
-                  "src": "157:20:5",
+                  "scope": 399,
+                  "src": "118:20:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -323,10 +267,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 176,
+                    "id": 393,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "157:7:5",
+                    "src": "118:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -336,19 +280,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "80:103:5"
+              "src": "80:64:9"
             },
             "returnParameters": {
-              "id": 181,
+              "id": 398,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 180,
+                  "id": 397,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 182,
-                  "src": "205:7:5",
+                  "scope": 399,
+                  "src": "166:7:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -356,10 +300,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 179,
+                    "id": 396,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "205:7:5",
+                    "src": "166:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -369,20 +313,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "204:9:5"
+              "src": "165:9:9"
             },
-            "scope": 183,
-            "src": "57:157:5",
+            "scope": 400,
+            "src": "57:118:9",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 184,
-        "src": "25:191:5"
+        "scope": 401,
+        "src": "25:152:9"
       }
     ],
-    "src": "0:217:5"
+    "src": "0:178:9"
   },
   "compiler": {
     "name": "solc",
@@ -390,7 +334,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.16",
-  "updatedAt": "2020-04-27T13:53:30.275Z",
+  "updatedAt": "2020-05-13T15:06:46.198Z",
   "devdoc": {
     "methods": {}
   },
