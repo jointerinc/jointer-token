@@ -11,5 +11,7 @@ contract IWhiteList {
 
     function isAddressByPassed(address _which) public view returns (bool);
     
+    function canBuyToken(address _token,address _which) public view returns (bool);
+    
     
 }

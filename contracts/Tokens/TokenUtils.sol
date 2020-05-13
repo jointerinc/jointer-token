@@ -37,9 +37,6 @@ contract AuctionRegistery is AuctionRegisteryContracts, Ownable {
 
 
 contract TokenUtils is StandardToken, AuctionRegistery {
-    //tokenPrice is only for show base line price
-    uint256 public tokenPrice;
-
     uint256 public tokenSaleStartDate;
 
     uint256 public tokenMaturityDays;
@@ -51,18 +48,15 @@ contract TokenUtils is StandardToken, AuctionRegistery {
         string memory _symbol,
         address _systemAddress,
         address _authorityAddress,
-        uint256 _tokenPrice,
         uint256 _tokenMaturityDays,
         uint256 _tokenHoldBackDays,
         address _registeryAddress
     )
         public
-        notZeroValue(_tokenPrice)
         StandardToken(_name, _symbol, _systemAddress, _authorityAddress)
         AuctionRegistery(_registeryAddress)
     {
         tokenSaleStartDate = now;
-        tokenPrice = _tokenPrice;
         tokenMaturityDays = _tokenMaturityDays;
         tokenHoldBackDays = _tokenHoldBackDays;
     }
