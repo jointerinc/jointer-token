@@ -58,6 +58,10 @@ contract UtilsStorage {
 
     mapping(address => bool) public unLockBlock;
     
+    uint256 public vaultRatio = 90;
+    
+    
+    
 }
 
 
@@ -95,7 +99,17 @@ contract Utils is SafeMath, UtilsStorage, AuctionRegistery {
         return true;
     }
 
-    function setTokenLockDuration(uint256 _tokenLockDuration)
+    function setVaultRatio(uint256 _vaultRatio)
+        external
+        onlyAuthorized()
+        returns (bool)
+    {
+        require( _vaultRatio < 100);
+        vaultRatio = _vaultRatio;
+        return true;
+    }
+    
+     function setTokenLockDuration(uint256 _tokenLockDuration)
         external
         onlyAuthorized()
         returns (bool)
@@ -268,56 +282,93 @@ contract AuctionProtection is
         emit InvestMentCancelled(msg.sender);
         return true;
     }
-
-    // user unlock tokens and funds goes to compnay wallet
-    function unLockTokens() external returns (bool) {
+    
+    
+    function _unLockTokens(address _which) internal returns(bool){
         address tagAlongAdress = getAddressOf(TAG_ALONG);
+        address vaultAddress = getAddressOf(VAULT);
+        
         uint256 _tokenBalance;
         IERC20Token _token;
+        uint256 vaultAmount;
+        uint256 tagAlongAmount;
+        
         for (uint256 tempX = 0; tempX < allowedTokens.length; tempX++) {
             _token = IERC20Token(allowedTokens[tempX]);
-            _tokenBalance = lockedFunds[msg.sender][address(_token)];
+            _tokenBalance = lockedFunds[_which][address(_token)];
             if (_tokenBalance > 0) {
-                approveTransferFrom(_token, tagAlongAdress, _tokenBalance);
+                
+                vaultAmount = safeDiv(safeMul(_tokenBalance,vaultRatio),100);
+                tagAlongAmount = safeSub(_tokenBalance,vaultAmount);
+                
+                approveTransferFrom(_token, tagAlongAdress, tagAlongAmount);
+                
                 IAuctionTagAlong(tagAlongAdress).depositeToken(
                     _token,
                     address(this),
-                    _tokenBalance
+                    tagAlongAmount
                 );
-                lockedFunds[msg.sender][address(_token)] = 0;
+                
+                approveTransferFrom(_token, vaultAddress, vaultAmount);
+                
+                ITokenVault(vaultAddress).depositeToken(
+                    _token,
+                    address(this),
+                    vaultAmount
+                );
+            
                 emit FundTransfer(
                     tagAlongAdress,
                     address(_token),
-                    _tokenBalance
+                    tagAlongAmount
                 );
+                emit FundTransfer(
+                    vaultAddress,
+                    address(_token),
+                    vaultAmount
+                );
+                lockedFunds[_which][address(_token)] = 0;
             }
         }
-
-        _tokenBalance = lockedFunds[msg.sender][address(0)];
-
+        _tokenBalance = lockedFunds[_which][address(0)];
+        
         if (_tokenBalance > 0) {
+            vaultAmount = safeDiv(safeMul(_tokenBalance,vaultRatio),100);
+            tagAlongAmount = safeSub(_tokenBalance,vaultAmount);
+                
             IAuctionTagAlong(tagAlongAdress).depositeEther.value(
-                _tokenBalance
+                tagAlongAmount
             )();
-            emit FundTransfer(tagAlongAdress, address(0), _tokenBalance);
-            lockedFunds[msg.sender][address(0)] = 0;
+            
+            
+            ITokenVault(vaultAddress).depositeEther.value(
+            vaultAmount
+            )();
+            emit FundTransfer(tagAlongAdress, address(0), tagAlongAmount);
+            emit FundTransfer(vaultAddress, address(0), vaultAmount);
+            lockedFunds[_which][address(0)] = 0;
         }
-
-        _tokenBalance = lockedTokens[msg.sender];
+        
+        _tokenBalance = lockedTokens[_which];
+         
         if (_tokenBalance > 0) {
             _token = IERC20Token(getAddressOf(MAIN_TOKEN));
             ensureTransferFrom(
                 _token,
                 address(this),
-                msg.sender,
+                _which,
                 _tokenBalance
             );
-            emit FundTransfer(msg.sender, address(_token), _tokenBalance);
-            lockedTokens[msg.sender] = 0;
+            emit FundTransfer(_which, address(_token), _tokenBalance);
+            lockedTokens[_which] = 0;
         }
 
-        emit TokenUnLocked(msg.sender);
-        return true;
+        emit TokenUnLocked(_which);
+    }
+    
+    // user unlock tokens and funds goes to compnay wallet
+    function unLockTokens() external returns (bool) {
+        return _unLockTokens(msg.sender);
     }
 
     function unLockFundByAdmin(address _which)
@@ -326,49 +377,7 @@ contract AuctionProtection is
         returns (bool)
     {
         require(isTokenLockEndDay(lockedOn[_which]),"ERR_ADMIN_CANT_UNLOCK_FUND");
-
-        address tagAlongAdress = getAddressOf(TAG_ALONG);
-        uint256 _tokenBalance;
-        IERC20Token _token;
-
-        for (uint256 tempX = 0; tempX < allowedTokens.length; tempX++) {
-            _token = IERC20Token(allowedTokens[tempX]);
-            _tokenBalance = lockedFunds[_which][address(_token)];
-            if (_tokenBalance > 0) {
-                approveTransferFrom(_token, tagAlongAdress, _tokenBalance);
-                IAuctionTagAlong(tagAlongAdress).depositeToken(
-                    _token,
-                    address(this),
-                    _tokenBalance
-                );
-                lockedFunds[_which][address(_token)] = 0;
-                emit FundTransfer(
-                    tagAlongAdress,
-                    address(_token),
-                    _tokenBalance
-                );
-            }
-        }
-
-        _tokenBalance = lockedFunds[_which][address(0)];
-        if (_tokenBalance > 0) {
-            IAuctionTagAlong(tagAlongAdress).depositeEther.value(
-                _tokenBalance
-            )();
-            emit FundTransfer(tagAlongAdress, address(0), _tokenBalance);
-            lockedFunds[_which][address(0)] = 0;
-        }
-
-        _tokenBalance = lockedTokens[_which];
-        if (_tokenBalance > 0) {
-            _token = IERC20Token(getAddressOf(MAIN_TOKEN));
-            ensureTransferFrom(_token, address(this), _which, _tokenBalance);
-            emit FundTransfer(_which, address(_token), _tokenBalance);
-            lockedTokens[_which] = 0;
-        }
-
-        emit TokenUnLocked(_which);
-        return true;
+        return _unLockTokens(_which);
     }
 
     function depositToken(address _from, address _which, uint256 _amount)
