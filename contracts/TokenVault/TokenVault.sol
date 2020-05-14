@@ -75,7 +75,6 @@ contract TokenSpenders is AuctionRegistery, SafeMath {
         returns (bool)
     {
         require(isSpender[_which], ERR_AUTHORIZED_ADDRESS_ONLY);
-
         uint256 _spenderIndex = spenderIndex[_which];
         address _lastAdress = spenders[safeSub(spenders.length, 1)];
         spenders[_spenderIndex] = _lastAdress;
@@ -96,7 +95,7 @@ contract TokenVault is Upgradeable, TokenSpenders, InitializeInterface {
         uint256 amount
     );
 
-    event FundAdded(address indexed _by, address _token, uint256 amount);
+    event FundDeposited(address _token, address _from, uint256 _amount);
 
     function initialize(
         address _primaryOwner,
@@ -105,7 +104,9 @@ contract TokenVault is Upgradeable, TokenSpenders, InitializeInterface {
         address _registeryAddress
     ) public {
         super.initialize();
+
         contractsRegistry = IAuctionRegistery(_registeryAddress);
+
         ProxyOwnable.initializeOwner(
             _primaryOwner,
             _systemAddress,
@@ -135,15 +136,17 @@ contract TokenVault is Upgradeable, TokenSpenders, InitializeInterface {
     }
 
     function depositeEther() external payable returns (bool) {
-        emit FundAdded(msg.sender, address(0), msg.value);
+        emit FundDeposited(address(0), msg.sender, msg.value);
+        return true;
     }
 
-    function depositeToken(address _token, address _from, uint256 amount)
+    function depositeToken(IERC20Token _token, address _from, uint256 _amount)
         external
         returns (bool)
     {
-        emit FundAdded(_from, _token, amount);
-        ensureTransferFrom(IERC20Token(_token), _from, address(this), amount);
+        ensureTransferFrom(_token, _from, address(this), _amount);
+        emit FundDeposited(address(0), _from, _amount);
+        return true;
     }
 
     function directTransfer(address _token, address _to, uint256 amount)
@@ -152,6 +155,17 @@ contract TokenVault is Upgradeable, TokenSpenders, InitializeInterface {
         returns (bool)
     {
         ensureTransferFrom(IERC20Token(_token), address(this), _to, amount);
+        emit FundTransfer(msg.sender, _to, _token, amount);
+        return true;
+    }
+
+    function transferEther(address payable _to, uint256 amount)
+        external
+        onlySpender()
+        returns (bool)
+    {
+        _to.transfer(amount);
+        emit FundTransfer(msg.sender, _to, address(0), amount);
         return true;
     }
 }

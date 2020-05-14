@@ -6,7 +6,7 @@ import "../common/SafeMath.sol";
 contract AuctionRegistery is Ownable,SafeMath {
     
     
-    mapping(bytes32 => address) private contractAddress;
+    mapping(bytes32 => address payable) private contractAddress;
 
     mapping(bytes32 => uint256) public contractIndex;
 
@@ -29,7 +29,7 @@ contract AuctionRegistery is Ownable,SafeMath {
         return contracts.length;
     }
 
-    function getAddressOf(bytes32 _contractName) external view returns (address) {
+    function getAddressOf(bytes32 _contractName) external view returns (address payable) {
         return contractAddress[_contractName];
     }
     
@@ -38,7 +38,7 @@ contract AuctionRegistery is Ownable,SafeMath {
       * @dev add new contarct address to the registery 
       * @return bool
     */
-    function registerContractAddress(bytes32 _contractName, address _contractAddress)
+    function registerContractAddress(bytes32 _contractName, address payable _contractAddress)
         external
         onlyOneOfOnwer()
         notZeroValue(_contractName.length)
@@ -65,7 +65,7 @@ contract AuctionRegistery is Ownable,SafeMath {
       * note that we dont need to update contractAddress index we just update contract addres only
       * @return bool
     */
-    function updateContractAddress(bytes32 _contractName, address _contractAddress) 
+    function updateContractAddress(bytes32 _contractName, address payable _contractAddress) 
         external
         onlyAuthorized()
         notZeroValue(_contractName.length)
