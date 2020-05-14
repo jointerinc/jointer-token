@@ -26,10 +26,14 @@ contract AuctionRegisteryContracts{
 
     bytes32 internal constant TAG_ALONG = "TAG_ALONG";
     
+    bytes32 internal constant COMPANY_FUND_WALLET = "COMPANY_FUND_WALLET";
+    
+    
+    
 }
 
 contract IAuctionRegistery {
-    function getAddressOf(bytes32 _contractName) external view returns (address);
+    function getAddressOf(bytes32 _contractName) external view returns (address payable);
 }
 
 

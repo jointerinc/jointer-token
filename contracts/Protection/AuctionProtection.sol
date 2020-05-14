@@ -37,7 +37,7 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     function getAddressOf(bytes32 _contractName)
         internal
         view
-        returns (address)
+        returns (address payable)
     {
         return contractsRegistry.getAddressOf(_contractName);
     }
@@ -286,11 +286,11 @@ contract AuctionProtection is
     
     function _unLockTokens(address _which) internal returns(bool){
         address tagAlongAdress = getAddressOf(TAG_ALONG);
-        address vaultAddress = getAddressOf(VAULT);
+        address payable fundWallet = getAddressOf(COMPANY_FUND_WALLET);
         
         uint256 _tokenBalance;
         IERC20Token _token;
-        uint256 vaultAmount;
+        uint256 walletAmount;
         uint256 tagAlongAmount;
         
         for (uint256 tempX = 0; tempX < allowedTokens.length; tempX++) {
@@ -298,8 +298,8 @@ contract AuctionProtection is
             _tokenBalance = lockedFunds[_which][address(_token)];
             if (_tokenBalance > 0) {
                 
-                vaultAmount = safeDiv(safeMul(_tokenBalance,vaultRatio),100);
-                tagAlongAmount = safeSub(_tokenBalance,vaultAmount);
+                walletAmount = safeDiv(safeMul(_tokenBalance,vaultRatio),100);
+                tagAlongAmount = safeSub(_tokenBalance,walletAmount);
                 
                 approveTransferFrom(_token, tagAlongAdress, tagAlongAmount);
                 
@@ -309,23 +309,17 @@ contract AuctionProtection is
                     tagAlongAmount
                 );
                 
-                approveTransferFrom(_token, vaultAddress, vaultAmount);
+                ensureTransferFrom(_token,address(this),fundWallet,walletAmount);
                 
-                ITokenVault(vaultAddress).depositeToken(
-                    _token,
-                    address(this),
-                    vaultAmount
-                );
-            
                 emit FundTransfer(
                     tagAlongAdress,
                     address(_token),
                     tagAlongAmount
                 );
                 emit FundTransfer(
-                    vaultAddress,
+                    fundWallet,
                     address(_token),
-                    vaultAmount
+                    walletAmount
                 );
                 lockedFunds[_which][address(_token)] = 0;
             }
@@ -333,19 +327,17 @@ contract AuctionProtection is
         _tokenBalance = lockedFunds[_which][address(0)];
         
         if (_tokenBalance > 0) {
-            vaultAmount = safeDiv(safeMul(_tokenBalance,vaultRatio),100);
-            tagAlongAmount = safeSub(_tokenBalance,vaultAmount);
+            walletAmount = safeDiv(safeMul(_tokenBalance,vaultRatio),100);
+            tagAlongAmount = safeSub(_tokenBalance,walletAmount);
                 
             IAuctionTagAlong(tagAlongAdress).depositeEther.value(
                 tagAlongAmount
             )();
             
+            fundWallet.transfer(walletAmount);
             
-            ITokenVault(vaultAddress).depositeEther.value(
-            vaultAmount
-            )();
             emit FundTransfer(tagAlongAdress, address(0), tagAlongAmount);
-            emit FundTransfer(vaultAddress, address(0), vaultAmount);
+            emit FundTransfer(fundWallet, address(0), walletAmount);
             lockedFunds[_which][address(0)] = 0;
         }
         
@@ -379,6 +371,7 @@ contract AuctionProtection is
         require(isTokenLockEndDay(lockedOn[_which]),"ERR_ADMIN_CANT_UNLOCK_FUND");
         return _unLockTokens(_which);
     }
+
 
     function depositToken(address _from, address _which, uint256 _amount)
         external
@@ -415,4 +408,5 @@ contract AuctionProtection is
         emit FundLocked(address(token), _which, _amount);
         return true;
     }
+    
 }
