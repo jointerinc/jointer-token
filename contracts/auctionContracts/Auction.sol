@@ -512,12 +512,12 @@ contract Auction is AuctionFundCollector {
         address token = getAddressOf(MAIN_TOKEN);
         IToken(token).mintTokens(fee);
         
-        address payable fundWallet = getAddressOf(COMPANY_FUND_WALLET);
+        address payable companyMainTokenWallet = getAddressOf(COMPANY_MAIN_TOKEN_WALLET);
         
         ensureTransferFrom(
             IERC20Token(token),
             address(this),
-            fundWallet,
+            companyMainTokenWallet,
             fee
         );
 
