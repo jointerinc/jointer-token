@@ -80,7 +80,10 @@ contract Exchangeable is ForceSwap {
         address whiteListAddress = getAddressOf(WHITE_LIST);
 
         require(
-            IWhiteList(whiteListAddress).canBuyToken(address(this), msg.sender),
+            IWhiteList(whiteListAddress).hasPermission(
+                msg.sender,
+                address(this)
+            ),
             "ERR_NOT_HAVE_PERMISSION_TO_BUY"
         );
 

@@ -299,6 +299,11 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         assert(nextConstant < 4294967296);
     }
 
+    function isRestrictedAddress(address _which) public view returns (bool) {
+        if (isAllowedAddressConstant[_which] == 0) return false;
+        return true;
+    }
+
     // This function will allow us to restric trading with 55 more Restrictions
     function addRestrictedAddress(address _which, uint64 _associatedConstant)
         public
@@ -381,17 +386,15 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         return _hasPermission(_from, _to);
     }
 
-    function isAllowedWithType(address _from, address _to)
+    function isTransferAllowed(address _from, address _to)
         public
         view
         returns (bool)
     {
         uint64 toInvestorType = getInvestorType(_to);
-
         if (toInvestorType == 1) {
             return _hasPermission(_from, _to);
         }
-
         address associatedAddress = investorTypeAddress[toInvestorType];
         return _hasPermission(_from, associatedAddress);
     }
