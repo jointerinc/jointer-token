@@ -241,7 +241,7 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
             
             uint256 _tokenAmount = safeDiv(safeMul(safeDiv(safeMul(_tokenBalance,mainTokenRatio),100), _mainTokenPrice),safeExponent(10,_tokenDecimal));
             
-            require(_tokenAmount >= safeAdd(userTotalFund[_from],_contributedAmount),"ERR_USER_DONT_HAVE_ENOUGH_TOKEN");
+            require(_tokenAmount >= safeAdd(walletDayWiseContribution[auctionDay][_from],_contributedAmount),"ERR_USER_DONT_HAVE_ENOUGH_TOKEN");
             
         }
      
