@@ -204,7 +204,7 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
         view
         returns (bool)
     {
-        require(_auctionDayId == auctionDay, "ERR_AUCTION_DAY");
+        require(_auctionDayId == auctionDay, "ERR_AUCTION_DAY_CHANGED");
         require(
             IWhiteList(getAddressOf(WHITE_LIST)).isWhiteListed(_from),
             "ERR_WHITELIST_CHECK"
@@ -418,8 +418,10 @@ contract Auction is AuctionFundCollector {
     constructor(
         uint256 _startTime,
         uint256 _minAuctionTime,
+        address _systemAddress,
+        address _multisigAddress,
         address _registeryAddress
-    ) public {
+    ) public Ownable(_systemAddress, _multisigAddress) {
         LAST_AUCTION_START = _startTime;
         MIN_AUCTION_END_TIME = _minAuctionTime;
         contractsRegistry = IAuctionRegistery(_registeryAddress);
@@ -462,22 +464,31 @@ contract Auction is AuctionFundCollector {
                 1
             )];
 
-            // (
-            //     uint256 _ethAmount,
-            //     address[] memory _token,
-            //     uint256[] memory _amount
-            // ) = IAuctionTagAlong(getAddressOf(TAG_ALONG))
-            //     .contributeTowardAuction(yesterdayContribution);
+            uint256 _currencyPrices = ICurrencyPrices(getAddressOf(CURRENCY))
+                .getCurrencyPrice(address(0));
 
-            // _contributeWithEther(_ethAmount, getAddressOf(TAG_ALONG));
+            uint256 _ethAmount = safeDiv(
+                safeMul(dayWiseContribution[auctionDay], safeExponent(10, 18)),
+                _currencyPrices
+            );
 
-            // for (uint32 tempX = 0; tempX < _token.length; tempX++) {
-            //     _contributeWithToken(
-            //         IERC20Token(_token[tempX]),
-            //         _amount[tempX],
-            //         getAddressOf(TAG_ALONG)
-            //     );
-            // }
+            (
+                uint256 downSideAmount,
+                uint256 fundWalletamount,
+                uint256 reserveAmount
+            ) = formula.calcuateAuctionFundDistrubution(
+                _ethAmount,
+                dayWiseDownSideProtectionRatio[auctionDay],
+                fundWalletRatio
+            );
+
+            delete downSideAmount;
+            delete fundWalletamount;
+
+            IAuctionLiquadity(getAddressOf(LIQUADITY))
+                .contributeTowardMainReserve(reserveAmount);
+
+            disturbuteTokenInternal(auctionDay, vault);
         }
 
         uint256 bonusSupply = 0;
@@ -606,8 +617,6 @@ contract Auction is AuctionFundCollector {
         internal
         returns (bool)
     {
-        require(dayId < auctionDay, "ERR_AUCTION_DAY");
-
         require(
             returnToken[dayId][_which] == false,
             "ERR_ALREADY_TOKEN_DISTBUTED"
@@ -664,6 +673,7 @@ contract Auction is AuctionFundCollector {
         onlySystem()
         returns (bool)
     {
+        require(dayId < auctionDay, "ERR_AUCTION_DAY");
         for (uint256 tempX = 0; tempX < _which.length; tempX++) {
             if (returnToken[dayId][_which[tempX]] == false)
                 disturbuteTokenInternal(dayId, _which[tempX]);
@@ -672,6 +682,7 @@ contract Auction is AuctionFundCollector {
     }
 
     function disturbuteTokens(uint256 dayId) external returns (bool) {
+        require(dayId < auctionDay, "ERR_AUCTION_DAY");
         disturbuteTokenInternal(dayId, msg.sender);
     }
 
