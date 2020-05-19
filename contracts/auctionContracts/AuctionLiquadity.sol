@@ -302,7 +302,6 @@ contract Liquadity is LiquadityUtils {
     }
 
     function _contributeWithEther(uint256 value) internal returns (uint256) {
-        
         uint256 returnAmount = IBancorConverter(converter).quickConvert2.value(
             value
         )(contributionPath, value, 1, address(0), 0);
@@ -313,11 +312,11 @@ contract Liquadity is LiquadityUtils {
             getAddressOf(VAULT),
             returnAmount
         );
-        
+
         emit Contribution(address(0), value, returnAmount);
-        
+
         checkAppeciationLimit();
-        
+
         return returnAmount;
     }
 
@@ -333,7 +332,7 @@ contract Liquadity is LiquadityUtils {
         return returnAmount;
     }
 
-    function getCurrentMarketPrice() public view returns (uint256) {
+    function _getCurrentMarketPrice() internal view returns (uint256) {
         (
             uint256 _baseTokenBalance,
             uint256 _mainTokenBalance
@@ -489,7 +488,7 @@ contract Liquadity is LiquadityUtils {
 
         uint256 _newAmount = safeSub(_amount, sideReseverAmount);
         _contributeWithEther(_newAmount);
-        return getCurrentMarketPrice();
+        return _getCurrentMarketPrice();
     }
 
     // contribution with Token is not avilable for bancor bacnor dont have stable coin base conversion
@@ -499,7 +498,7 @@ contract Liquadity is LiquadityUtils {
         uint256 _amount
     ) public allowedAddressOnly(msg.sender) returns (uint256) {
         ensureTransferFrom(_token, _from, address(this), _amount);
-        return getCurrentMarketPrice();
+        return _getCurrentMarketPrice();
     }
 
     function contributionSystem(uint256 _amount)
@@ -529,14 +528,14 @@ contract Liquadity is LiquadityUtils {
             "Redemption Only With MainToken"
         );
 
-        uint256 marketPrice = getCurrentMarketPrice();
+        uint256 marketPrice = _getCurrentMarketPrice();
 
         ensureTransferFrom(_path[0], msg.sender, address(this), _amount);
 
         approveTransferFrom(_path[0], converter, _amount);
 
         uint256 returnAmount = IBancorConverter(converter).quickConvert2.value(
-            _amount
+            0
         )(_path, _amount, 1, address(0), 0);
 
         if (
@@ -557,7 +556,7 @@ contract Liquadity is LiquadityUtils {
             _amount,
             returnAmount
         );
-        emit RecoverPrice(marketPrice, getCurrentMarketPrice());
+        emit RecoverPrice(marketPrice, _getCurrentMarketPrice());
         return true;
     }
 
@@ -571,6 +570,10 @@ contract Liquadity is LiquadityUtils {
         dayWiseMainTokenSupply[auctionDayId] = _mainTokenBalance;
         dayWiseBaseTokenSupply[auctionDayId] = _baseTokenBalance;
         return true;
+    }
+
+    function getCurrencyPrice() public view returns (uint256) {
+        return _getCurrentMarketPrice();
     }
 
     function depositeEther() external payable returns (bool) {
