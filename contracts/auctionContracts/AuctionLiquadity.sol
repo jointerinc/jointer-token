@@ -304,10 +304,7 @@ contract Liquadity is LiquadityUtils {
         _token.approve(_spender, _amount);
     }
 
-    function _contributeWithEther(uint256 value, bool _systemCall)
-        internal
-        returns (uint256)
-    {
+    function _contributeWithEther(uint256 value) internal returns (uint256) {
         uint256 returnAmount = IBancorConverter(converter).quickConvert2.value(
             value
         )(contributionPath, value, 1, address(0), 0);
@@ -322,13 +319,6 @@ contract Liquadity is LiquadityUtils {
         emit Contribution(address(0), value, returnAmount);
 
         checkAppeciationLimit();
-
-        if (_systemCall) {
-            //recover side reserve  after Redemption done by system
-            IAuctionTagAlong(getAddressOf(TAG_ALONG)).contributeTowardLiquadity(
-                value
-            );
-        }
 
         return returnAmount;
     }
@@ -459,7 +449,7 @@ contract Liquadity is LiquadityUtils {
         uint256 mainReserverAmount = safeSub(_amount, sideReseverAmount);
         mainReserverAmount = IAuctionTagAlong(getAddressOf(TAG_ALONG))
             .contributeTowardLiquadity(mainReserverAmount);
-        _contributeWithEther(mainReserverAmount, false);
+        _contributeWithEther(mainReserverAmount);
         return _getCurrentMarketPrice();
     }
 
@@ -477,11 +467,6 @@ contract Liquadity is LiquadityUtils {
         );
 
         uint256 mainReserverAmount = safeSub(_amount, sideReseverAmount);
-
-        uint256 tagAlongContribution = IAuctionTagAlong(getAddressOf(TAG_ALONG))
-            .contributeTowardLiquadity(mainReserverAmount);
-
-        mainReserverAmount = safeAdd(tagAlongContribution, mainReserverAmount);
 
         IAuction auction = IAuction(getAddressOf(AUCTION));
 
@@ -518,8 +503,12 @@ contract Liquadity is LiquadityUtils {
                 mainReserverAmount
             );
         }
+        uint256 tagAlongContribution = IAuctionTagAlong(getAddressOf(TAG_ALONG))
+            .contributeTowardLiquadity(mainReserverAmount);
 
-        _contributeWithEther(mainReserverAmount, false);
+        mainReserverAmount = safeAdd(tagAlongContribution, mainReserverAmount);
+
+        _contributeWithEther(mainReserverAmount);
         return _getCurrentMarketPrice();
     }
 
@@ -540,7 +529,12 @@ contract Liquadity is LiquadityUtils {
         onlySystem()
         returns (bool)
     {
-        _contributeWithEther(_amount, true);
+        if (address(this).balance < _amount) {
+            IAuctionTagAlong(getAddressOf(TAG_ALONG)).contributeTowardLiquadity(
+                _amount
+            );
+        }
+        _contributeWithEther(_amount);
         return true;
     }
 
