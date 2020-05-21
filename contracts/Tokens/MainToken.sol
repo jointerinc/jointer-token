@@ -88,6 +88,7 @@ contract MainToken is TokenMinter {
     // if user invest before token distrubution we dont change anything
     // ex ->user invest  at 11:35 and token distrubution happened at 11:40
     // if in between user invest we dont unlock user token we keep as it as
+    // to unlock token set _amount = 0
     function lockToken(address _which, uint256 _amount, uint256 _locktime)
         external
         returns (bool)
@@ -100,6 +101,18 @@ contract MainToken is TokenMinter {
             lockedToken[_which] = _amount;
             lastLock[_which] = _locktime;
         }
+        return true;
+    }
+
+    // user can unlock their token after 1 day of locking
+    // user dont need to call this function as conatcrt set 0 after token distrubution
+    // It is failsafe function for user that their token not locked all the time if AUCTION distrubution dont happened
+    function unlockToken() external returns (bool) {
+        require(
+            safeAdd(lastLock[msg.sender], 86400) > now,
+            "ERR_TOKEN_UNLCOK_AFTER_DAY"
+        );
+        lockedToken[msg.sender] = 0;
         return true;
     }
 
