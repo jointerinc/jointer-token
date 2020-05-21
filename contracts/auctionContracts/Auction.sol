@@ -460,10 +460,6 @@ contract Auction is AuctionFundCollector {
         
         //working on it
         if (todayContribution == 0) {
-        
-            dayWiseContribution[auctionDay] = dayWiseContribution[safeSub(auctionDay,1)];
-            todayContribution = dayWiseContribution[safeSub(auctionDay,1)];
-            walletDayWiseContribution[auctionDay][vault] = dayWiseContribution[safeSub(auctionDay,1)];
             
             
             uint256 _currencyPrices = ICurrencyPrices(getAddressOf(CURRENCY))
@@ -484,10 +480,16 @@ contract Auction is AuctionFundCollector {
             delete downSideAmount;
             delete fundWalletamount;
         
-            IAuctionLiquadity(getAddressOf(LIQUADITY)).contributeTowardMainReserve(reserveAmount);
+            uint256 mainReserveAmount = IAuctionLiquadity(getAddressOf(LIQUADITY)).contributeTowardMainReserve(reserveAmount);
+            mainReserveAmount = safeDiv(safeMul(mainReserveAmount,_currencyPrices),safeExponent(10,18));
+        
+            dayWiseContribution[auctionDay] = mainReserveAmount;
+            
+            todayContribution = mainReserveAmount;
+            
+            walletDayWiseContribution[auctionDay][vault] = mainReserveAmount;
             
             disturbuteTokenInternal(auctionDay,vault);
-            
         }
 
         uint256 bonusSupply = 0;
@@ -497,7 +499,7 @@ contract Auction is AuctionFundCollector {
             100
         );
 
-        if (todayContribution > yesterdayContribution) {
+        if (todayContribution >= yesterdayContribution) {
             
             uint256 _groupBonusRatio = safeMul(
                 safeDiv(
@@ -513,8 +515,9 @@ contract Auction is AuctionFundCollector {
             );
             
         } else {
-            uint256 _avgDays = 10;
             
+            uint256 _avgDays = 10;
+    
             uint256 _avgInvestment = 0;
             
             if (auctionDay < 11) {
