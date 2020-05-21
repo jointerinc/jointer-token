@@ -52,8 +52,6 @@ contract AuctionUtils is AuctionRegistery {
     
     uint256 public mainTokenRatio = 100;
     
-    uint256 public bufferLimit = 105;
-    
     bool public mainTokencheckOn = false;
     
     
@@ -74,15 +72,6 @@ contract AuctionUtils is AuctionRegistery {
         returns (bool)
     {
         mangmentFee = _mangmentFee;
-        return true;
-    }
-    
-    function setBufferLimit(uint256 _bufferLimit)
-        external
-        onlyOwner()
-        returns (bool)
-    {
-        bufferLimit = _bufferLimit;
         return true;
     }
 
@@ -179,7 +168,7 @@ contract AuctionStorage is AuctionUtils {
 
     uint256 public tokenAuctionEndPrice = 10000;
     
-    bool public auctionSoldOut = false;
+    //bool 
     
     
 }
@@ -234,9 +223,8 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
         address _from,
         uint256 currentMarketPrice
     ) internal {
-            
-        require(auctionSoldOut == false,"AUCTION_SOLD_OUT");
-        uint256 _currencyPrices = ICurrencyPrices(getAddressOf(CURRENCY))
+        
+         uint256 _currencyPrices = ICurrencyPrices(getAddressOf(CURRENCY))
             .getCurrencyPrice(_token);
         
         
@@ -256,27 +244,18 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
             uint256 _mainTokenPrice = ICurrencyPrices(getAddressOf(CURRENCY))
             .getCurrencyPrice(address(mainToken));
             
-            uint256 _tokenAmount = safeDiv(safeMul(safeDiv(safeMul(_tokenBalance,mainTokenRatio),100), _mainTokenPrice),safeExponent(10,_tokenDecimal));
             
-            require(_tokenAmount >= safeAdd(walletDayWiseContribution[auctionDay][_from],_contributedAmount),"ERR_USER_DONT_HAVE_ENOUGH_TOKEN");
+            uint256 lockToken = safeDiv(safeMul(safeAdd(walletDayWiseContribution[auctionDay][_from],_contributedAmount),safeExponent(10,_tokenDecimal)),_mainTokenPrice);
             
-            uint256 lockToken = safeDiv(safeAdd(walletDayWiseContribution[auctionDay][_from],_contributedAmount),_mainTokenPrice);
+            require(lockToken <= safeDiv(safeMul(_tokenBalance,mainTokenRatio),100),"ERR_USER_DONT_HAVE_ENOUGH_TOKEN");
             
             IToken(address(mainToken)).lockToken(_from,lockToken,now);
-        }
-        
-        // allow five percent more for buffer 
-        // Allow five percent more because of volatility in ether price 
-        if(allowedMaxContribution >= safeAdd(todayContribution, _contributedAmount)){
-           
-            require(safeDiv(safeMul(allowedMaxContribution,bufferLimit),100) >= safeAdd(todayContribution, _contributedAmount),
-            "ERR_CONTRIBUTION_LIMIT_REACH"
-        );
-
-            auctionSoldOut = true;
             
-        }   
-    
+            
+        }
+     
+       
+
         require(
             allowedMaxContribution >=
                 safeAdd(todayContribution, _contributedAmount),
@@ -610,8 +589,6 @@ contract Auction is AuctionFundCollector {
         dayWiseDownSideProtectionRatio[auctionDay] = downSideProtectionRatio;
         
         LAST_AUCTION_START = now;
-        
-        auctionSoldOut = false; 
         
         todayContribution = 0;
 
