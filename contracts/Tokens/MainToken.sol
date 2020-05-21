@@ -22,6 +22,9 @@ contract TokenMinter is RestrictedToken {
 
 
 contract MainToken is TokenMinter {
+    mapping(address => uint256) lockedToken;
+    mapping(address => uint256) lastLock;
+
     constructor(
         string memory _name,
         string memory _symbol,
@@ -55,6 +58,49 @@ contract MainToken is TokenMinter {
             );
             _mint(_which[tempX], _amount[tempX]);
         }
+    }
+
+    function transfer(address _to, uint256 _value) external returns (bool ok) {
+        uint256 senderBalance = safeSub(
+            balances[msg.sender],
+            lockedToken[msg.sender]
+        );
+        require(senderBalance >= _value, "ERR_NOT_ENOUGH_BALANCE");
+        require(checkBeforeTransfer(msg.sender, _to));
+        return _transfer(msg.sender, _to, _value);
+    }
+
+    function transferFrom(address _from, address _to, uint256 _value)
+        external
+        returns (bool)
+    {
+        uint256 senderBalance = safeSub(
+            balances[msg.sender],
+            lockedToken[msg.sender]
+        );
+        require(senderBalance >= _value, "ERR_NOT_ENOUGH_BALANCE");
+        require(checkBeforeTransfer(_from, _to));
+        return _transferFrom(_from, _to, _value);
+    }
+
+    // we need lock time
+    // becuse we can check if user invest after new auction start
+    // if user invest before token distrubution we dont change anything
+    // ex ->user invest  at 11:35 and token distrubution happened at 11:40
+    // if in between user invest we dont unlock user token we keep as it as
+    function lockToken(address _which, uint256 _amount, uint256 _locktime)
+        external
+        returns (bool)
+    {
+        require(
+            msg.sender == getAddressOf(AUCTION),
+            ERR_AUTHORIZED_ADDRESS_ONLY
+        );
+        if (_locktime > lastLock[_which]) {
+            lockedToken[_which] = _amount;
+            lastLock[_which] = _locktime;
+        }
+        return true;
     }
 
     function() external payable {
