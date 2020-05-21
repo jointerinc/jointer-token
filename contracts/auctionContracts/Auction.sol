@@ -52,6 +52,8 @@ contract AuctionUtils is AuctionRegistery {
     
     uint256 public mainTokenRatio = 100;
     
+    uint256 public bufferLimit = 105;
+    
     bool public mainTokencheckOn = false;
     
     
@@ -72,6 +74,15 @@ contract AuctionUtils is AuctionRegistery {
         returns (bool)
     {
         mangmentFee = _mangmentFee;
+        return true;
+    }
+    
+    function setBufferLimit(uint256 _bufferLimit)
+        external
+        onlyOwner()
+        returns (bool)
+    {
+        bufferLimit = _bufferLimit;
         return true;
     }
 
@@ -168,7 +179,7 @@ contract AuctionStorage is AuctionUtils {
 
     uint256 public tokenAuctionEndPrice = 10000;
     
-    //bool 
+    bool public auctionSoldOut = false;
     
     
 }
@@ -223,8 +234,9 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
         address _from,
         uint256 currentMarketPrice
     ) internal {
-        
-         uint256 _currencyPrices = ICurrencyPrices(getAddressOf(CURRENCY))
+            
+        require(auctionSoldOut == false,"AUCTION_SOLD_OUT");
+        uint256 _currencyPrices = ICurrencyPrices(getAddressOf(CURRENCY))
             .getCurrencyPrice(_token);
         
         
@@ -252,9 +264,19 @@ contract AuctionFundCollector is AuctionStorage, SafeMath {
             
             IToken(address(mainToken)).lockToken(_from,lockToken,now);
         }
-     
-       
+        
+        // allow five percent more for buffer 
+        // Allow five percent more because of volatility in ether price 
+        if(allowedMaxContribution >= safeAdd(todayContribution, _contributedAmount)){
+           
+            require(safeDiv(safeMul(allowedMaxContribution,bufferLimit),100) >= safeAdd(todayContribution, _contributedAmount),
+            "ERR_CONTRIBUTION_LIMIT_REACH"
+        );
 
+            auctionSoldOut = true;
+            
+        }   
+    
         require(
             allowedMaxContribution >=
                 safeAdd(todayContribution, _contributedAmount),
@@ -588,6 +610,8 @@ contract Auction is AuctionFundCollector {
         dayWiseDownSideProtectionRatio[auctionDay] = downSideProtectionRatio;
         
         LAST_AUCTION_START = now;
+        
+        auctionSoldOut = false; 
         
         todayContribution = 0;
 
