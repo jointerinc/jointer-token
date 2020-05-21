@@ -566,7 +566,7 @@ contract Liquadity is LiquadityUtils {
         
         uint256 auctionDay = IAuction(getAddressOf(AUCTION)).auctionDay();
 
-        require(auctionDay > lastReedeeDay[msg.sender],"ERR_WALLET_ALREADY_REDEEM");
+        require(auctionDay > lastReedeeDay[primaryWallet],"ERR_WALLET_ALREADY_REDEEM");
 
         uint256 marketPrice = _getCurrentMarketPrice();
 
