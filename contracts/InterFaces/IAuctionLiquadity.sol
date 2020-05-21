@@ -7,7 +7,9 @@ contract IAuctionLiquadity {
 
     function auctionEnded(uint256 auctionDayId) public returns (bool);
 
-    function contributeTowardMainReserve(uint256 _amount) public returns (bool);
+    function contributeTowardMainReserve(uint256 _amount)
+        public
+        returns (uint256);
 
     function contributeWithToken(
         IERC20Token _token,
