@@ -30,25 +30,25 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"implementation\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"registry\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"This contract holds all the necessary state variables to support the upgrade functionality\",\"methods\":{\"implementation()\":{\"details\":\"Tells the address of the current implementation\",\"return\":\"address of the current implementation\"}},\"title\":\"UpgradeabilityStorage\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/UpgradeabilityStorage.sol\":\"UpgradeabilityStorage\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/IRegistry.sol\":{\"keccak256\":\"0x4046702de6033eac80487702f5a808005efdb7fd1154e589db40c8a1f42217c4\",\"urls\":[\"bzzr://4ad3e0b9d3ad8097be6704cd9e86d5cf7ec02a9024f743c5078724cb44485b23\",\"dweb:/ipfs/QmXzkfV2DNFVTe6Mx4eP7VzDKXPeanEjXeyJoo8pvDEUiJ\"]},\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/UpgradeabilityStorage.sol\":{\"keccak256\":\"0x9bd4c0a689ff1715b2c59c7f2eed242b45c1b2b9692ee2c224c8769cbc578097\",\"urls\":[\"bzzr://66cfb3544d2e98885e1945faa49c005c47e7b87f5dcf6a9c8175c3b9539c7914\",\"dweb:/ipfs/QmcsUSeTXhy9zpjAkx7YvEDUmgpmT8gzkh3xJqsqHZCoY9\"]}},\"version\":1}",
-  "bytecode": "0x6080604052348015600f57600080fd5b5060b28061001e6000396000f3fe6080604052348015600f57600080fd5b506004361060325760003560e01c80635c60da1b1460375780637b103999146059575b600080fd5b603d605f565b604080516001600160a01b039092168252519081900360200190f35b603d606e565b6001546001600160a01b031690565b6000546001600160a01b03168156fea265627a7a72305820fd3db736fee9dd8efcea7e1112d6b4fb502d08fad7d81c9b3113e9dff36c5ae064736f6c63430005090032",
-  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060325760003560e01c80635c60da1b1460375780637b103999146059575b600080fd5b603d605f565b604080516001600160a01b039092168252519081900360200190f35b603d606e565b6001546001600160a01b031690565b6000546001600160a01b03168156fea265627a7a72305820fd3db736fee9dd8efcea7e1112d6b4fb502d08fad7d81c9b3113e9dff36c5ae064736f6c63430005090032",
-  "sourceMap": "191:404:19:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;191:404:19;;;;;;;",
-  "deployedSourceMap": "191:404:19:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;191:404:19;;;;;;;;;;;;;;;;;;;;;;;;498:95;;;:::i;:::-;;;;-1:-1:-1;;;;;498:95:19;;;;;;;;;;;;;;253:25;;;:::i;498:95::-;571:15;;-1:-1:-1;;;;;571:15:19;498:95;:::o;253:25::-;;;-1:-1:-1;;;;;253:25:19;;:::o",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"implementation\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"registry\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"This contract holds all the necessary state variables to support the upgrade functionality\",\"methods\":{\"implementation()\":{\"details\":\"Tells the address of the current implementation\",\"return\":\"address of the current implementation\"}},\"title\":\"UpgradeabilityStorage\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/safu/minddeft/jointerInc/jointer-token/contracts/Proxy/UpgradeabilityStorage.sol\":\"UpgradeabilityStorage\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/safu/minddeft/jointerInc/jointer-token/contracts/Proxy/IRegistry.sol\":{\"keccak256\":\"0x4046702de6033eac80487702f5a808005efdb7fd1154e589db40c8a1f42217c4\",\"urls\":[\"bzzr://4ad3e0b9d3ad8097be6704cd9e86d5cf7ec02a9024f743c5078724cb44485b23\",\"dweb:/ipfs/QmXzkfV2DNFVTe6Mx4eP7VzDKXPeanEjXeyJoo8pvDEUiJ\"]},\"/home/safu/minddeft/jointerInc/jointer-token/contracts/Proxy/UpgradeabilityStorage.sol\":{\"keccak256\":\"0x9bd4c0a689ff1715b2c59c7f2eed242b45c1b2b9692ee2c224c8769cbc578097\",\"urls\":[\"bzzr://66cfb3544d2e98885e1945faa49c005c47e7b87f5dcf6a9c8175c3b9539c7914\",\"dweb:/ipfs/QmcsUSeTXhy9zpjAkx7YvEDUmgpmT8gzkh3xJqsqHZCoY9\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b5060b28061001e6000396000f3fe6080604052348015600f57600080fd5b506004361060325760003560e01c80635c60da1b1460375780637b103999146059575b600080fd5b603d605f565b604080516001600160a01b039092168252519081900360200190f35b603d606e565b6001546001600160a01b031690565b6000546001600160a01b03168156fea265627a7a723058207d2119d0113d3e70865895f0db589dae4342bab40b54582f7d7cd416dae82c0264736f6c63430005090032",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060325760003560e01c80635c60da1b1460375780637b103999146059575b600080fd5b603d605f565b604080516001600160a01b039092168252519081900360200190f35b603d606e565b6001546001600160a01b031690565b6000546001600160a01b03168156fea265627a7a723058207d2119d0113d3e70865895f0db589dae4342bab40b54582f7d7cd416dae82c0264736f6c63430005090032",
+  "sourceMap": "191:404:22:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;191:404:22;;;;;;;",
+  "deployedSourceMap": "191:404:22:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;191:404:22;;;;;;;;;;;;;;;;;;;;;;;;498:95;;;:::i;:::-;;;;-1:-1:-1;;;;;498:95:22;;;;;;;;;;;;;;253:25;;;:::i;498:95::-;571:15;;-1:-1:-1;;;;;571:15:22;498:95;:::o;253:25::-;;;-1:-1:-1;;;;;253:25:22;;:::o",
   "source": "pragma solidity ^0.5.9;\n\nimport './IRegistry.sol';\n\n/**\n * @title UpgradeabilityStorage\n * @dev This contract holds all the necessary state variables to support the upgrade functionality\n */\ncontract UpgradeabilityStorage {\n    // Versions registry\n    IRegistry public registry;\n\n    // Address of the current implementation\n    address internal _implementation;\n\n    /**\n     * @dev Tells the address of the current implementation\n     * @return address of the current implementation\n     */\n    function implementation() public view returns (address) {\n        return _implementation;\n    }\n}\n",
-  "sourcePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/UpgradeabilityStorage.sol",
+  "sourcePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/Proxy/UpgradeabilityStorage.sol",
   "ast": {
-    "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/UpgradeabilityStorage.sol",
+    "absolutePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/Proxy/UpgradeabilityStorage.sol",
     "exportedSymbols": {
       "UpgradeabilityStorage": [
-        2046
+        8682
       ]
     },
-    "id": 2047,
+    "id": 8683,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2032,
+        "id": 8668,
         "literals": [
           "solidity",
           "^",
@@ -56,16 +56,16 @@
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:19"
+        "src": "0:23:22"
       },
       {
-        "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/IRegistry.sol",
+        "absolutePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/Proxy/IRegistry.sol",
         "file": "./IRegistry.sol",
-        "id": 2033,
+        "id": 8669,
         "nodeType": "ImportDirective",
-        "scope": 2047,
-        "sourceUnit": 1954,
-        "src": "25:25:19",
+        "scope": 8683,
+        "sourceUnit": 8590,
+        "src": "25:25:22",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -75,35 +75,35 @@
         "contractKind": "contract",
         "documentation": "@title UpgradeabilityStorage\n@dev This contract holds all the necessary state variables to support the upgrade functionality",
         "fullyImplemented": true,
-        "id": 2046,
+        "id": 8682,
         "linearizedBaseContracts": [
-          2046
+          8682
         ],
         "name": "UpgradeabilityStorage",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": false,
-            "id": 2035,
+            "id": 8671,
             "name": "registry",
             "nodeType": "VariableDeclaration",
-            "scope": 2046,
-            "src": "253:25:19",
+            "scope": 8682,
+            "src": "253:25:22",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IRegistry_$1953",
+              "typeIdentifier": "t_contract$_IRegistry_$8589",
               "typeString": "contract IRegistry"
             },
             "typeName": {
               "contractScope": null,
-              "id": 2034,
+              "id": 8670,
               "name": "IRegistry",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1953,
-              "src": "253:9:19",
+              "referencedDeclaration": 8589,
+              "src": "253:9:22",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IRegistry_$1953",
+                "typeIdentifier": "t_contract$_IRegistry_$8589",
                 "typeString": "contract IRegistry"
               }
             },
@@ -112,11 +112,11 @@
           },
           {
             "constant": false,
-            "id": 2037,
+            "id": 8673,
             "name": "_implementation",
             "nodeType": "VariableDeclaration",
-            "scope": 2046,
-            "src": "330:32:19",
+            "scope": 8682,
+            "src": "330:32:22",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -124,10 +124,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 2036,
+              "id": 8672,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "330:7:19",
+              "src": "330:7:22",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
@@ -139,55 +139,55 @@
           },
           {
             "body": {
-              "id": 2044,
+              "id": 8680,
               "nodeType": "Block",
-              "src": "554:39:19",
+              "src": "554:39:22",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 2042,
+                    "id": 8678,
                     "name": "_implementation",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 2037,
-                    "src": "571:15:19",
+                    "referencedDeclaration": 8673,
+                    "src": "571:15:22",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
-                  "functionReturnParameters": 2041,
-                  "id": 2043,
+                  "functionReturnParameters": 8677,
+                  "id": 8679,
                   "nodeType": "Return",
-                  "src": "564:22:19"
+                  "src": "564:22:22"
                 }
               ]
             },
             "documentation": "@dev Tells the address of the current implementation\n@return address of the current implementation",
-            "id": 2045,
+            "id": 8681,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "implementation",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2038,
+              "id": 8674,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "521:2:19"
+              "src": "521:2:22"
             },
             "returnParameters": {
-              "id": 2041,
+              "id": 8677,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2040,
+                  "id": 8676,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2045,
-                  "src": "545:7:19",
+                  "scope": 8681,
+                  "src": "545:7:22",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -195,10 +195,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2039,
+                    "id": 8675,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "545:7:19",
+                    "src": "545:7:22",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -209,33 +209,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "544:9:19"
+              "src": "544:9:22"
             },
-            "scope": 2046,
-            "src": "498:95:19",
+            "scope": 8682,
+            "src": "498:95:22",
             "stateMutability": "view",
-            "superFunction": 1960,
+            "superFunction": 8596,
             "visibility": "public"
           }
         ],
-        "scope": 2047,
-        "src": "191:404:19"
+        "scope": 8683,
+        "src": "191:404:22"
       }
     ],
-    "src": "0:596:19"
+    "src": "0:596:22"
   },
   "legacyAST": {
-    "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/UpgradeabilityStorage.sol",
+    "absolutePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/Proxy/UpgradeabilityStorage.sol",
     "exportedSymbols": {
       "UpgradeabilityStorage": [
-        2046
+        8682
       ]
     },
-    "id": 2047,
+    "id": 8683,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2032,
+        "id": 8668,
         "literals": [
           "solidity",
           "^",
@@ -243,16 +243,16 @@
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:19"
+        "src": "0:23:22"
       },
       {
-        "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/IRegistry.sol",
+        "absolutePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/Proxy/IRegistry.sol",
         "file": "./IRegistry.sol",
-        "id": 2033,
+        "id": 8669,
         "nodeType": "ImportDirective",
-        "scope": 2047,
-        "sourceUnit": 1954,
-        "src": "25:25:19",
+        "scope": 8683,
+        "sourceUnit": 8590,
+        "src": "25:25:22",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -262,35 +262,35 @@
         "contractKind": "contract",
         "documentation": "@title UpgradeabilityStorage\n@dev This contract holds all the necessary state variables to support the upgrade functionality",
         "fullyImplemented": true,
-        "id": 2046,
+        "id": 8682,
         "linearizedBaseContracts": [
-          2046
+          8682
         ],
         "name": "UpgradeabilityStorage",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": false,
-            "id": 2035,
+            "id": 8671,
             "name": "registry",
             "nodeType": "VariableDeclaration",
-            "scope": 2046,
-            "src": "253:25:19",
+            "scope": 8682,
+            "src": "253:25:22",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IRegistry_$1953",
+              "typeIdentifier": "t_contract$_IRegistry_$8589",
               "typeString": "contract IRegistry"
             },
             "typeName": {
               "contractScope": null,
-              "id": 2034,
+              "id": 8670,
               "name": "IRegistry",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1953,
-              "src": "253:9:19",
+              "referencedDeclaration": 8589,
+              "src": "253:9:22",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IRegistry_$1953",
+                "typeIdentifier": "t_contract$_IRegistry_$8589",
                 "typeString": "contract IRegistry"
               }
             },
@@ -299,11 +299,11 @@
           },
           {
             "constant": false,
-            "id": 2037,
+            "id": 8673,
             "name": "_implementation",
             "nodeType": "VariableDeclaration",
-            "scope": 2046,
-            "src": "330:32:19",
+            "scope": 8682,
+            "src": "330:32:22",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -311,10 +311,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 2036,
+              "id": 8672,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "330:7:19",
+              "src": "330:7:22",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
@@ -326,55 +326,55 @@
           },
           {
             "body": {
-              "id": 2044,
+              "id": 8680,
               "nodeType": "Block",
-              "src": "554:39:19",
+              "src": "554:39:22",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 2042,
+                    "id": 8678,
                     "name": "_implementation",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 2037,
-                    "src": "571:15:19",
+                    "referencedDeclaration": 8673,
+                    "src": "571:15:22",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
-                  "functionReturnParameters": 2041,
-                  "id": 2043,
+                  "functionReturnParameters": 8677,
+                  "id": 8679,
                   "nodeType": "Return",
-                  "src": "564:22:19"
+                  "src": "564:22:22"
                 }
               ]
             },
             "documentation": "@dev Tells the address of the current implementation\n@return address of the current implementation",
-            "id": 2045,
+            "id": 8681,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "implementation",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2038,
+              "id": 8674,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "521:2:19"
+              "src": "521:2:22"
             },
             "returnParameters": {
-              "id": 2041,
+              "id": 8677,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2040,
+                  "id": 8676,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2045,
-                  "src": "545:7:19",
+                  "scope": 8681,
+                  "src": "545:7:22",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -382,10 +382,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2039,
+                    "id": 8675,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "545:7:19",
+                    "src": "545:7:22",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -396,28 +396,28 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "544:9:19"
+              "src": "544:9:22"
             },
-            "scope": 2046,
-            "src": "498:95:19",
+            "scope": 8682,
+            "src": "498:95:22",
             "stateMutability": "view",
-            "superFunction": 1960,
+            "superFunction": 8596,
             "visibility": "public"
           }
         ],
-        "scope": 2047,
-        "src": "191:404:19"
+        "scope": 8683,
+        "src": "191:404:22"
       }
     ],
-    "src": "0:596:19"
+    "src": "0:596:22"
   },
   "compiler": {
     "name": "solc",
     "version": "0.5.9+commit.e560f70d.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.0.16",
-  "updatedAt": "2020-05-07T07:18:50.785Z",
+  "schemaVersion": "3.1.0",
+  "updatedAt": "2020-05-22T11:44:27.818Z",
   "devdoc": {
     "details": "This contract holds all the necessary state variables to support the upgrade functionality",
     "methods": {

@@ -17,15 +17,11 @@
           "type": "uint256"
         },
         {
-          "name": "reserveSupplyBaseToken",
-          "type": "uint256"
-        },
-        {
-          "name": "_baseTokenPrice",
+          "name": "yesterdayMainReserv",
           "type": "uint256"
         }
       ],
-      "name": "calculateLiquadityReduction",
+      "name": "calculateLiquadityMainReserve",
       "outputs": [
         {
           "name": "",
@@ -204,21 +200,21 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"_reserveBaseTokenBalance\",\"type\":\"uint256\"},{\"name\":\"_reserveBaseTokenRatio\",\"type\":\"uint256\"},{\"name\":\"_reserveMainTokenBalance\",\"type\":\"uint256\"},{\"name\":\"_reserveMainTokenRatio\",\"type\":\"uint256\"},{\"name\":\"_baseTokenPrice\",\"type\":\"uint256\"}],\"name\":\"calculateTokenPrice\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_reserveBaseTokenBalance\",\"type\":\"uint256\"},{\"name\":\"_reserveBaseTokenRatio\",\"type\":\"uint256\"},{\"name\":\"_reserveMainTokenPrice\",\"type\":\"uint256\"},{\"name\":\"_reserveMainTokenRatio\",\"type\":\"uint256\"},{\"name\":\"_baseTokenPrice\",\"type\":\"uint256\"}],\"name\":\"calculateApprectiation\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_value\",\"type\":\"uint256\"},{\"name\":\"downSideProtectionRatio\",\"type\":\"uint256\"},{\"name\":\"fundWalletRatio\",\"type\":\"uint256\"}],\"name\":\"calcuateAuctionFundDistrubution\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_supply\",\"type\":\"uint256\"},{\"name\":\"_percent\",\"type\":\"uint256\"}],\"name\":\"calculateMangmentFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"dayWiseContributionByWallet\",\"type\":\"uint256\"},{\"name\":\"dayWiseSupplyCore\",\"type\":\"uint256\"},{\"name\":\"dayWiseSupplyBonus\",\"type\":\"uint256\"},{\"name\":\"dayWiseContribution\",\"type\":\"uint256\"},{\"name\":\"downSideProtectionRatio\",\"type\":\"uint256\"}],\"name\":\"calcuateAuctionTokenDistrubution\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"yesterdayPrice\",\"type\":\"uint256\"},{\"name\":\"dayBeforyesterdayPrice\",\"type\":\"uint256\"},{\"name\":\"yesterDaycontibution\",\"type\":\"uint256\"},{\"name\":\"reserveSupplyBaseToken\",\"type\":\"uint256\"},{\"name\":\"_baseTokenPrice\",\"type\":\"uint256\"}],\"name\":\"calculateLiquadityReduction\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionFormula.sol\":\"IAuctionFormula\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionFormula.sol\":{\"keccak256\":\"0x6fca94db1abd9449e4f53bbc8c02ae60dd770e861dca05cfd51ba3cdfb655ca6\",\"urls\":[\"bzzr://5084827c871f2b2e621878df50f090e26712134a87df7ba4331c97e80000a9b0\",\"dweb:/ipfs/QmW3LzyWnDFcJsqXrbZbtPg9dFG1g7s98VgbqFCq7jsk4f\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"_reserveBaseTokenBalance\",\"type\":\"uint256\"},{\"name\":\"_reserveBaseTokenRatio\",\"type\":\"uint256\"},{\"name\":\"_reserveMainTokenBalance\",\"type\":\"uint256\"},{\"name\":\"_reserveMainTokenRatio\",\"type\":\"uint256\"},{\"name\":\"_baseTokenPrice\",\"type\":\"uint256\"}],\"name\":\"calculateTokenPrice\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_reserveBaseTokenBalance\",\"type\":\"uint256\"},{\"name\":\"_reserveBaseTokenRatio\",\"type\":\"uint256\"},{\"name\":\"_reserveMainTokenPrice\",\"type\":\"uint256\"},{\"name\":\"_reserveMainTokenRatio\",\"type\":\"uint256\"},{\"name\":\"_baseTokenPrice\",\"type\":\"uint256\"}],\"name\":\"calculateApprectiation\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"yesterdayPrice\",\"type\":\"uint256\"},{\"name\":\"dayBeforyesterdayPrice\",\"type\":\"uint256\"},{\"name\":\"yesterDaycontibution\",\"type\":\"uint256\"},{\"name\":\"yesterdayMainReserv\",\"type\":\"uint256\"}],\"name\":\"calculateLiquadityMainReserve\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_value\",\"type\":\"uint256\"},{\"name\":\"downSideProtectionRatio\",\"type\":\"uint256\"},{\"name\":\"fundWalletRatio\",\"type\":\"uint256\"}],\"name\":\"calcuateAuctionFundDistrubution\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_supply\",\"type\":\"uint256\"},{\"name\":\"_percent\",\"type\":\"uint256\"}],\"name\":\"calculateMangmentFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"dayWiseContributionByWallet\",\"type\":\"uint256\"},{\"name\":\"dayWiseSupplyCore\",\"type\":\"uint256\"},{\"name\":\"dayWiseSupplyBonus\",\"type\":\"uint256\"},{\"name\":\"dayWiseContribution\",\"type\":\"uint256\"},{\"name\":\"downSideProtectionRatio\",\"type\":\"uint256\"}],\"name\":\"calcuateAuctionTokenDistrubution\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuctionFormula.sol\":\"IAuctionFormula\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuctionFormula.sol\":{\"keccak256\":\"0xfa90a8ed91aa71eb27d7b039b5cb7c188985ab911f9c5e591244a1870ff99e33\",\"urls\":[\"bzzr://6d93ceb65dcb594b7433b42ef59ba0fb993f53d27dd35dcfe39ca9580c774575\",\"dweb:/ipfs/QmZ9E2fvmRCFM8Nf9V6oMr1AXLo5ezV94J9FW3af8hwXKe\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.5.9;\n\n\ncontract IAuctionFormula {\n    function calculateLiquadityReduction(\n        uint256 yesterdayPrice,\n        uint256 dayBeforyesterdayPrice,\n        uint256 yesterDaycontibution,\n        uint256 reserveSupplyBaseToken,\n        uint256 _baseTokenPrice\n    ) external pure returns (uint256);\n\n    function calculateTokenPrice(\n        uint256 _reserveBaseTokenBalance,\n        uint256 _reserveBaseTokenRatio,\n        uint256 _reserveMainTokenBalance,\n        uint256 _reserveMainTokenRatio,\n        uint256 _baseTokenPrice\n    ) public pure returns (uint256);\n\n    function calculateApprectiation(\n        uint256 _reserveBaseTokenBalance,\n        uint256 _reserveBaseTokenRatio,\n        uint256 _reserveMainTokenPrice,\n        uint256 _reserveMainTokenRatio,\n        uint256 _baseTokenPrice\n    ) public pure returns (uint256);\n\n    function calcuateAuctionFundDistrubution(\n        uint256 _value,\n        uint256 downSideProtectionRatio,\n        uint256 fundWalletRatio\n    ) public pure returns (uint256, uint256, uint256);\n\n    function calculateMangmentFee(uint256 _supply, uint256 _percent)\n        external\n        pure\n        returns (uint256);\n\n    function calcuateAuctionTokenDistrubution(\n        uint256 dayWiseContributionByWallet,\n        uint256 dayWiseSupplyCore,\n        uint256 dayWiseSupplyBonus,\n        uint256 dayWiseContribution,\n        uint256 downSideProtectionRatio\n    ) external pure returns (uint256, uint256);\n}\n",
-  "sourcePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionFormula.sol",
+  "source": "pragma solidity ^0.5.9;\n\n\ncontract IAuctionFormula {\n    function calculateLiquadityMainReserve(\n        uint256 yesterdayPrice,\n        uint256 dayBeforyesterdayPrice,\n        uint256 yesterDaycontibution,\n        uint256 yesterdayMainReserv\n    ) external pure returns (uint256);\n\n    function calculateTokenPrice(\n        uint256 _reserveBaseTokenBalance,\n        uint256 _reserveBaseTokenRatio,\n        uint256 _reserveMainTokenBalance,\n        uint256 _reserveMainTokenRatio,\n        uint256 _baseTokenPrice\n    ) public pure returns (uint256);\n\n    function calculateApprectiation(\n        uint256 _reserveBaseTokenBalance,\n        uint256 _reserveBaseTokenRatio,\n        uint256 _reserveMainTokenPrice,\n        uint256 _reserveMainTokenRatio,\n        uint256 _baseTokenPrice\n    ) public pure returns (uint256);\n\n    function calcuateAuctionFundDistrubution(\n        uint256 _value,\n        uint256 downSideProtectionRatio,\n        uint256 fundWalletRatio\n    ) public pure returns (uint256, uint256, uint256);\n\n    function calculateMangmentFee(uint256 _supply, uint256 _percent)\n        external\n        pure\n        returns (uint256);\n\n    function calcuateAuctionTokenDistrubution(\n        uint256 dayWiseContributionByWallet,\n        uint256 dayWiseSupplyCore,\n        uint256 dayWiseSupplyBonus,\n        uint256 dayWiseContribution,\n        uint256 downSideProtectionRatio\n    ) external pure returns (uint256, uint256);\n}\n",
+  "sourcePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuctionFormula.sol",
   "ast": {
-    "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionFormula.sol",
+    "absolutePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuctionFormula.sol",
     "exportedSymbols": {
       "IAuctionFormula": [
-        115
+        113
       ]
     },
-    "id": 116,
+    "id": 114,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -238,9 +234,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 115,
+        "id": 113,
         "linearizedBaseContracts": [
-          115
+          113
         ],
         "name": "IAuctionFormula",
         "nodeType": "ContractDefinition",
@@ -248,14 +244,14 @@
           {
             "body": null,
             "documentation": null,
-            "id": 43,
+            "id": 41,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
-            "name": "calculateLiquadityReduction",
+            "name": "calculateLiquadityMainReserve",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 39,
+              "id": 37,
               "nodeType": "ParameterList",
               "parameters": [
                 {
@@ -263,8 +259,8 @@
                   "id": 30,
                   "name": "yesterdayPrice",
                   "nodeType": "VariableDeclaration",
-                  "scope": 43,
-                  "src": "103:22:1",
+                  "scope": 41,
+                  "src": "105:22:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -275,7 +271,7 @@
                     "id": 29,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "103:7:1",
+                    "src": "105:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -289,8 +285,8 @@
                   "id": 32,
                   "name": "dayBeforyesterdayPrice",
                   "nodeType": "VariableDeclaration",
-                  "scope": 43,
-                  "src": "135:30:1",
+                  "scope": 41,
+                  "src": "137:30:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -301,7 +297,7 @@
                     "id": 31,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "135:7:1",
+                    "src": "137:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -315,8 +311,8 @@
                   "id": 34,
                   "name": "yesterDaycontibution",
                   "nodeType": "VariableDeclaration",
-                  "scope": 43,
-                  "src": "175:28:1",
+                  "scope": 41,
+                  "src": "177:28:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -327,7 +323,7 @@
                     "id": 33,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "175:7:1",
+                    "src": "177:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -339,10 +335,10 @@
                 {
                   "constant": false,
                   "id": 36,
-                  "name": "reserveSupplyBaseToken",
+                  "name": "yesterdayMainReserv",
                   "nodeType": "VariableDeclaration",
-                  "scope": 43,
-                  "src": "213:30:1",
+                  "scope": 41,
+                  "src": "215:27:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -353,7 +349,88 @@
                     "id": 35,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "213:7:1",
+                    "src": "215:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "95:153:1"
+            },
+            "returnParameters": {
+              "id": 40,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 39,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 41,
+                  "src": "272:7:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 38,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "272:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "271:9:1"
+            },
+            "scope": 113,
+            "src": "57:224:1",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 56,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "calculateTokenPrice",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 52,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 43,
+                  "name": "_reserveBaseTokenBalance",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 56,
+                  "src": "325:32:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 42,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "325:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -364,92 +441,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 38,
-                  "name": "_baseTokenPrice",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 43,
-                  "src": "253:23:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 37,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "253:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "93:189:1"
-            },
-            "returnParameters": {
-              "id": 42,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 41,
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 43,
-                  "src": "306:7:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 40,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "306:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "305:9:1"
-            },
-            "scope": 115,
-            "src": "57:258:1",
-            "stateMutability": "pure",
-            "superFunction": null,
-            "visibility": "external"
-          },
-          {
-            "body": null,
-            "documentation": null,
-            "id": 58,
-            "implemented": false,
-            "kind": "function",
-            "modifiers": [],
-            "name": "calculateTokenPrice",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 54,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
                   "id": 45,
-                  "name": "_reserveBaseTokenBalance",
+                  "name": "_reserveBaseTokenRatio",
                   "nodeType": "VariableDeclaration",
-                  "scope": 58,
-                  "src": "359:32:1",
+                  "scope": 56,
+                  "src": "367:30:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -460,7 +456,7 @@
                     "id": 44,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "359:7:1",
+                    "src": "367:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -472,10 +468,10 @@
                 {
                   "constant": false,
                   "id": 47,
-                  "name": "_reserveBaseTokenRatio",
+                  "name": "_reserveMainTokenBalance",
                   "nodeType": "VariableDeclaration",
-                  "scope": 58,
-                  "src": "401:30:1",
+                  "scope": 56,
+                  "src": "407:32:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -486,7 +482,7 @@
                     "id": 46,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "401:7:1",
+                    "src": "407:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -498,10 +494,10 @@
                 {
                   "constant": false,
                   "id": 49,
-                  "name": "_reserveMainTokenBalance",
+                  "name": "_reserveMainTokenRatio",
                   "nodeType": "VariableDeclaration",
-                  "scope": 58,
-                  "src": "441:32:1",
+                  "scope": 56,
+                  "src": "449:30:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -512,7 +508,7 @@
                     "id": 48,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "441:7:1",
+                    "src": "449:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -524,10 +520,10 @@
                 {
                   "constant": false,
                   "id": 51,
-                  "name": "_reserveMainTokenRatio",
+                  "name": "_baseTokenPrice",
                   "nodeType": "VariableDeclaration",
-                  "scope": 58,
-                  "src": "483:30:1",
+                  "scope": 56,
+                  "src": "489:23:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -538,7 +534,88 @@
                     "id": 50,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "483:7:1",
+                    "src": "489:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "315:203:1"
+            },
+            "returnParameters": {
+              "id": 55,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 54,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 56,
+                  "src": "540:7:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 53,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "540:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "539:9:1"
+            },
+            "scope": 113,
+            "src": "287:262:1",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 71,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "calculateApprectiation",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 67,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 58,
+                  "name": "_reserveBaseTokenBalance",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 71,
+                  "src": "596:32:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 57,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "596:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -549,92 +626,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 53,
-                  "name": "_baseTokenPrice",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 58,
-                  "src": "523:23:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 52,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "523:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "349:203:1"
-            },
-            "returnParameters": {
-              "id": 57,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 56,
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 58,
-                  "src": "574:7:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 55,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "574:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "573:9:1"
-            },
-            "scope": 115,
-            "src": "321:262:1",
-            "stateMutability": "pure",
-            "superFunction": null,
-            "visibility": "public"
-          },
-          {
-            "body": null,
-            "documentation": null,
-            "id": 73,
-            "implemented": false,
-            "kind": "function",
-            "modifiers": [],
-            "name": "calculateApprectiation",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 69,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
                   "id": 60,
-                  "name": "_reserveBaseTokenBalance",
+                  "name": "_reserveBaseTokenRatio",
                   "nodeType": "VariableDeclaration",
-                  "scope": 73,
-                  "src": "630:32:1",
+                  "scope": 71,
+                  "src": "638:30:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -645,7 +641,7 @@
                     "id": 59,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "630:7:1",
+                    "src": "638:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -657,10 +653,10 @@
                 {
                   "constant": false,
                   "id": 62,
-                  "name": "_reserveBaseTokenRatio",
+                  "name": "_reserveMainTokenPrice",
                   "nodeType": "VariableDeclaration",
-                  "scope": 73,
-                  "src": "672:30:1",
+                  "scope": 71,
+                  "src": "678:30:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -671,7 +667,7 @@
                     "id": 61,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "672:7:1",
+                    "src": "678:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -683,10 +679,10 @@
                 {
                   "constant": false,
                   "id": 64,
-                  "name": "_reserveMainTokenPrice",
+                  "name": "_reserveMainTokenRatio",
                   "nodeType": "VariableDeclaration",
-                  "scope": 73,
-                  "src": "712:30:1",
+                  "scope": 71,
+                  "src": "718:30:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -697,7 +693,7 @@
                     "id": 63,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "712:7:1",
+                    "src": "718:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -709,10 +705,10 @@
                 {
                   "constant": false,
                   "id": 66,
-                  "name": "_reserveMainTokenRatio",
+                  "name": "_baseTokenPrice",
                   "nodeType": "VariableDeclaration",
-                  "scope": 73,
-                  "src": "752:30:1",
+                  "scope": 71,
+                  "src": "758:23:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -723,7 +719,88 @@
                     "id": 65,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "752:7:1",
+                    "src": "758:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "586:201:1"
+            },
+            "returnParameters": {
+              "id": 70,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 69,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 71,
+                  "src": "809:7:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 68,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "809:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "808:9:1"
+            },
+            "scope": 113,
+            "src": "555:263:1",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 86,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "calcuateAuctionFundDistrubution",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 78,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 73,
+                  "name": "_value",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 86,
+                  "src": "874:14:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 72,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "874:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -734,92 +811,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 68,
-                  "name": "_baseTokenPrice",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 73,
-                  "src": "792:23:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 67,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "792:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "620:201:1"
-            },
-            "returnParameters": {
-              "id": 72,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 71,
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 73,
-                  "src": "843:7:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 70,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "843:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "842:9:1"
-            },
-            "scope": 115,
-            "src": "589:263:1",
-            "stateMutability": "pure",
-            "superFunction": null,
-            "visibility": "public"
-          },
-          {
-            "body": null,
-            "documentation": null,
-            "id": 88,
-            "implemented": false,
-            "kind": "function",
-            "modifiers": [],
-            "name": "calcuateAuctionFundDistrubution",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 80,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
                   "id": 75,
-                  "name": "_value",
+                  "name": "downSideProtectionRatio",
                   "nodeType": "VariableDeclaration",
-                  "scope": 88,
-                  "src": "908:14:1",
+                  "scope": 86,
+                  "src": "898:31:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -830,7 +826,7 @@
                     "id": 74,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "908:7:1",
+                    "src": "898:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -842,10 +838,10 @@
                 {
                   "constant": false,
                   "id": 77,
-                  "name": "downSideProtectionRatio",
+                  "name": "fundWalletRatio",
                   "nodeType": "VariableDeclaration",
-                  "scope": 88,
-                  "src": "932:31:1",
+                  "scope": 86,
+                  "src": "939:23:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -856,7 +852,40 @@
                     "id": 76,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "932:7:1",
+                    "src": "939:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "864:104:1"
+            },
+            "returnParameters": {
+              "id": 85,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 80,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 86,
+                  "src": "990:7:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 79,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "990:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -867,44 +896,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 79,
-                  "name": "fundWalletRatio",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 88,
-                  "src": "973:23:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 78,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "973:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "898:104:1"
-            },
-            "returnParameters": {
-              "id": 87,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
                   "id": 82,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 88,
-                  "src": "1024:7:1",
+                  "scope": 86,
+                  "src": "999:7:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -915,7 +911,7 @@
                     "id": 81,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1024:7:1",
+                    "src": "999:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -929,8 +925,8 @@
                   "id": 84,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 88,
-                  "src": "1033:7:1",
+                  "scope": 86,
+                  "src": "1008:7:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -941,7 +937,55 @@
                     "id": 83,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1033:7:1",
+                    "src": "1008:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "989:27:1"
+            },
+            "scope": 113,
+            "src": "824:193:1",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 95,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "calculateMangmentFee",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 91,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 88,
+                  "name": "_supply",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 95,
+                  "src": "1053:15:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 87,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1053:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -952,59 +996,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 86,
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 88,
-                  "src": "1042:7:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 85,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1042:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "1023:27:1"
-            },
-            "scope": 115,
-            "src": "858:193:1",
-            "stateMutability": "pure",
-            "superFunction": null,
-            "visibility": "public"
-          },
-          {
-            "body": null,
-            "documentation": null,
-            "id": 97,
-            "implemented": false,
-            "kind": "function",
-            "modifiers": [],
-            "name": "calculateMangmentFee",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 93,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
                   "id": 90,
-                  "name": "_supply",
+                  "name": "_percent",
                   "nodeType": "VariableDeclaration",
-                  "scope": 97,
-                  "src": "1087:15:1",
+                  "scope": 95,
+                  "src": "1070:16:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1015,7 +1011,88 @@
                     "id": 89,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1087:7:1",
+                    "src": "1070:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1052:35:1"
+            },
+            "returnParameters": {
+              "id": 94,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 93,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 95,
+                  "src": "1135:7:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 92,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1135:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1134:9:1"
+            },
+            "scope": 113,
+            "src": "1023:121:1",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 112,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "calcuateAuctionTokenDistrubution",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 106,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 97,
+                  "name": "dayWiseContributionByWallet",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 112,
+                  "src": "1201:35:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 96,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1201:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1026,92 +1103,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 92,
-                  "name": "_percent",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 97,
-                  "src": "1104:16:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 91,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1104:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "1086:35:1"
-            },
-            "returnParameters": {
-              "id": 96,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 95,
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 97,
-                  "src": "1169:7:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 94,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1169:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "1168:9:1"
-            },
-            "scope": 115,
-            "src": "1057:121:1",
-            "stateMutability": "pure",
-            "superFunction": null,
-            "visibility": "external"
-          },
-          {
-            "body": null,
-            "documentation": null,
-            "id": 114,
-            "implemented": false,
-            "kind": "function",
-            "modifiers": [],
-            "name": "calcuateAuctionTokenDistrubution",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 108,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
                   "id": 99,
-                  "name": "dayWiseContributionByWallet",
+                  "name": "dayWiseSupplyCore",
                   "nodeType": "VariableDeclaration",
-                  "scope": 114,
-                  "src": "1235:35:1",
+                  "scope": 112,
+                  "src": "1246:25:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1122,7 +1118,7 @@
                     "id": 98,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1235:7:1",
+                    "src": "1246:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1134,10 +1130,10 @@
                 {
                   "constant": false,
                   "id": 101,
-                  "name": "dayWiseSupplyCore",
+                  "name": "dayWiseSupplyBonus",
                   "nodeType": "VariableDeclaration",
-                  "scope": 114,
-                  "src": "1280:25:1",
+                  "scope": 112,
+                  "src": "1281:26:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1148,7 +1144,7 @@
                     "id": 100,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1280:7:1",
+                    "src": "1281:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1160,10 +1156,10 @@
                 {
                   "constant": false,
                   "id": 103,
-                  "name": "dayWiseSupplyBonus",
+                  "name": "dayWiseContribution",
                   "nodeType": "VariableDeclaration",
-                  "scope": 114,
-                  "src": "1315:26:1",
+                  "scope": 112,
+                  "src": "1317:27:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1174,7 +1170,7 @@
                     "id": 102,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1315:7:1",
+                    "src": "1317:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1186,10 +1182,10 @@
                 {
                   "constant": false,
                   "id": 105,
-                  "name": "dayWiseContribution",
+                  "name": "downSideProtectionRatio",
                   "nodeType": "VariableDeclaration",
-                  "scope": 114,
-                  "src": "1351:27:1",
+                  "scope": 112,
+                  "src": "1354:31:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1200,7 +1196,40 @@
                     "id": 104,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1351:7:1",
+                    "src": "1354:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1191:200:1"
+            },
+            "returnParameters": {
+              "id": 111,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 108,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 112,
+                  "src": "1415:7:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 107,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1415:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1211,44 +1240,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 107,
-                  "name": "downSideProtectionRatio",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 114,
-                  "src": "1388:31:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 106,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1388:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "1225:200:1"
-            },
-            "returnParameters": {
-              "id": 113,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
                   "id": 110,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 114,
-                  "src": "1449:7:1",
+                  "scope": 112,
+                  "src": "1424:7:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1259,33 +1255,7 @@
                     "id": 109,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1449:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 112,
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 114,
-                  "src": "1458:7:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 111,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1458:7:1",
+                    "src": "1424:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1295,29 +1265,29 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1448:18:1"
+              "src": "1414:18:1"
             },
-            "scope": 115,
-            "src": "1184:283:1",
+            "scope": 113,
+            "src": "1150:283:1",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 116,
-        "src": "26:1443:1"
+        "scope": 114,
+        "src": "26:1409:1"
       }
     ],
-    "src": "0:1470:1"
+    "src": "0:1436:1"
   },
   "legacyAST": {
-    "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionFormula.sol",
+    "absolutePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuctionFormula.sol",
     "exportedSymbols": {
       "IAuctionFormula": [
-        115
+        113
       ]
     },
-    "id": 116,
+    "id": 114,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -1337,9 +1307,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 115,
+        "id": 113,
         "linearizedBaseContracts": [
-          115
+          113
         ],
         "name": "IAuctionFormula",
         "nodeType": "ContractDefinition",
@@ -1347,14 +1317,14 @@
           {
             "body": null,
             "documentation": null,
-            "id": 43,
+            "id": 41,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
-            "name": "calculateLiquadityReduction",
+            "name": "calculateLiquadityMainReserve",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 39,
+              "id": 37,
               "nodeType": "ParameterList",
               "parameters": [
                 {
@@ -1362,8 +1332,8 @@
                   "id": 30,
                   "name": "yesterdayPrice",
                   "nodeType": "VariableDeclaration",
-                  "scope": 43,
-                  "src": "103:22:1",
+                  "scope": 41,
+                  "src": "105:22:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1374,7 +1344,7 @@
                     "id": 29,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "103:7:1",
+                    "src": "105:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1388,8 +1358,8 @@
                   "id": 32,
                   "name": "dayBeforyesterdayPrice",
                   "nodeType": "VariableDeclaration",
-                  "scope": 43,
-                  "src": "135:30:1",
+                  "scope": 41,
+                  "src": "137:30:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1400,7 +1370,7 @@
                     "id": 31,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "135:7:1",
+                    "src": "137:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1414,8 +1384,8 @@
                   "id": 34,
                   "name": "yesterDaycontibution",
                   "nodeType": "VariableDeclaration",
-                  "scope": 43,
-                  "src": "175:28:1",
+                  "scope": 41,
+                  "src": "177:28:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1426,7 +1396,7 @@
                     "id": 33,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "175:7:1",
+                    "src": "177:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1438,10 +1408,10 @@
                 {
                   "constant": false,
                   "id": 36,
-                  "name": "reserveSupplyBaseToken",
+                  "name": "yesterdayMainReserv",
                   "nodeType": "VariableDeclaration",
-                  "scope": 43,
-                  "src": "213:30:1",
+                  "scope": 41,
+                  "src": "215:27:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1452,7 +1422,88 @@
                     "id": 35,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "213:7:1",
+                    "src": "215:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "95:153:1"
+            },
+            "returnParameters": {
+              "id": 40,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 39,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 41,
+                  "src": "272:7:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 38,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "272:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "271:9:1"
+            },
+            "scope": 113,
+            "src": "57:224:1",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 56,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "calculateTokenPrice",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 52,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 43,
+                  "name": "_reserveBaseTokenBalance",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 56,
+                  "src": "325:32:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 42,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "325:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1463,92 +1514,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 38,
-                  "name": "_baseTokenPrice",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 43,
-                  "src": "253:23:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 37,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "253:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "93:189:1"
-            },
-            "returnParameters": {
-              "id": 42,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 41,
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 43,
-                  "src": "306:7:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 40,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "306:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "305:9:1"
-            },
-            "scope": 115,
-            "src": "57:258:1",
-            "stateMutability": "pure",
-            "superFunction": null,
-            "visibility": "external"
-          },
-          {
-            "body": null,
-            "documentation": null,
-            "id": 58,
-            "implemented": false,
-            "kind": "function",
-            "modifiers": [],
-            "name": "calculateTokenPrice",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 54,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
                   "id": 45,
-                  "name": "_reserveBaseTokenBalance",
+                  "name": "_reserveBaseTokenRatio",
                   "nodeType": "VariableDeclaration",
-                  "scope": 58,
-                  "src": "359:32:1",
+                  "scope": 56,
+                  "src": "367:30:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1559,7 +1529,7 @@
                     "id": 44,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "359:7:1",
+                    "src": "367:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1571,10 +1541,10 @@
                 {
                   "constant": false,
                   "id": 47,
-                  "name": "_reserveBaseTokenRatio",
+                  "name": "_reserveMainTokenBalance",
                   "nodeType": "VariableDeclaration",
-                  "scope": 58,
-                  "src": "401:30:1",
+                  "scope": 56,
+                  "src": "407:32:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1585,7 +1555,7 @@
                     "id": 46,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "401:7:1",
+                    "src": "407:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1597,10 +1567,10 @@
                 {
                   "constant": false,
                   "id": 49,
-                  "name": "_reserveMainTokenBalance",
+                  "name": "_reserveMainTokenRatio",
                   "nodeType": "VariableDeclaration",
-                  "scope": 58,
-                  "src": "441:32:1",
+                  "scope": 56,
+                  "src": "449:30:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1611,7 +1581,7 @@
                     "id": 48,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "441:7:1",
+                    "src": "449:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1623,10 +1593,10 @@
                 {
                   "constant": false,
                   "id": 51,
-                  "name": "_reserveMainTokenRatio",
+                  "name": "_baseTokenPrice",
                   "nodeType": "VariableDeclaration",
-                  "scope": 58,
-                  "src": "483:30:1",
+                  "scope": 56,
+                  "src": "489:23:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1637,7 +1607,88 @@
                     "id": 50,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "483:7:1",
+                    "src": "489:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "315:203:1"
+            },
+            "returnParameters": {
+              "id": 55,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 54,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 56,
+                  "src": "540:7:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 53,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "540:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "539:9:1"
+            },
+            "scope": 113,
+            "src": "287:262:1",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 71,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "calculateApprectiation",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 67,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 58,
+                  "name": "_reserveBaseTokenBalance",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 71,
+                  "src": "596:32:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 57,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "596:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1648,92 +1699,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 53,
-                  "name": "_baseTokenPrice",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 58,
-                  "src": "523:23:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 52,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "523:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "349:203:1"
-            },
-            "returnParameters": {
-              "id": 57,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 56,
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 58,
-                  "src": "574:7:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 55,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "574:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "573:9:1"
-            },
-            "scope": 115,
-            "src": "321:262:1",
-            "stateMutability": "pure",
-            "superFunction": null,
-            "visibility": "public"
-          },
-          {
-            "body": null,
-            "documentation": null,
-            "id": 73,
-            "implemented": false,
-            "kind": "function",
-            "modifiers": [],
-            "name": "calculateApprectiation",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 69,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
                   "id": 60,
-                  "name": "_reserveBaseTokenBalance",
+                  "name": "_reserveBaseTokenRatio",
                   "nodeType": "VariableDeclaration",
-                  "scope": 73,
-                  "src": "630:32:1",
+                  "scope": 71,
+                  "src": "638:30:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1744,7 +1714,7 @@
                     "id": 59,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "630:7:1",
+                    "src": "638:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1756,10 +1726,10 @@
                 {
                   "constant": false,
                   "id": 62,
-                  "name": "_reserveBaseTokenRatio",
+                  "name": "_reserveMainTokenPrice",
                   "nodeType": "VariableDeclaration",
-                  "scope": 73,
-                  "src": "672:30:1",
+                  "scope": 71,
+                  "src": "678:30:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1770,7 +1740,7 @@
                     "id": 61,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "672:7:1",
+                    "src": "678:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1782,10 +1752,10 @@
                 {
                   "constant": false,
                   "id": 64,
-                  "name": "_reserveMainTokenPrice",
+                  "name": "_reserveMainTokenRatio",
                   "nodeType": "VariableDeclaration",
-                  "scope": 73,
-                  "src": "712:30:1",
+                  "scope": 71,
+                  "src": "718:30:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1796,7 +1766,7 @@
                     "id": 63,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "712:7:1",
+                    "src": "718:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1808,10 +1778,10 @@
                 {
                   "constant": false,
                   "id": 66,
-                  "name": "_reserveMainTokenRatio",
+                  "name": "_baseTokenPrice",
                   "nodeType": "VariableDeclaration",
-                  "scope": 73,
-                  "src": "752:30:1",
+                  "scope": 71,
+                  "src": "758:23:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1822,7 +1792,88 @@
                     "id": 65,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "752:7:1",
+                    "src": "758:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "586:201:1"
+            },
+            "returnParameters": {
+              "id": 70,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 69,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 71,
+                  "src": "809:7:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 68,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "809:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "808:9:1"
+            },
+            "scope": 113,
+            "src": "555:263:1",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 86,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "calcuateAuctionFundDistrubution",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 78,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 73,
+                  "name": "_value",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 86,
+                  "src": "874:14:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 72,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "874:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1833,92 +1884,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 68,
-                  "name": "_baseTokenPrice",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 73,
-                  "src": "792:23:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 67,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "792:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "620:201:1"
-            },
-            "returnParameters": {
-              "id": 72,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 71,
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 73,
-                  "src": "843:7:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 70,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "843:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "842:9:1"
-            },
-            "scope": 115,
-            "src": "589:263:1",
-            "stateMutability": "pure",
-            "superFunction": null,
-            "visibility": "public"
-          },
-          {
-            "body": null,
-            "documentation": null,
-            "id": 88,
-            "implemented": false,
-            "kind": "function",
-            "modifiers": [],
-            "name": "calcuateAuctionFundDistrubution",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 80,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
                   "id": 75,
-                  "name": "_value",
+                  "name": "downSideProtectionRatio",
                   "nodeType": "VariableDeclaration",
-                  "scope": 88,
-                  "src": "908:14:1",
+                  "scope": 86,
+                  "src": "898:31:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1929,7 +1899,7 @@
                     "id": 74,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "908:7:1",
+                    "src": "898:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1941,10 +1911,10 @@
                 {
                   "constant": false,
                   "id": 77,
-                  "name": "downSideProtectionRatio",
+                  "name": "fundWalletRatio",
                   "nodeType": "VariableDeclaration",
-                  "scope": 88,
-                  "src": "932:31:1",
+                  "scope": 86,
+                  "src": "939:23:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1955,7 +1925,40 @@
                     "id": 76,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "932:7:1",
+                    "src": "939:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "864:104:1"
+            },
+            "returnParameters": {
+              "id": 85,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 80,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 86,
+                  "src": "990:7:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 79,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "990:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1966,44 +1969,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 79,
-                  "name": "fundWalletRatio",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 88,
-                  "src": "973:23:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 78,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "973:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "898:104:1"
-            },
-            "returnParameters": {
-              "id": 87,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
                   "id": 82,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 88,
-                  "src": "1024:7:1",
+                  "scope": 86,
+                  "src": "999:7:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2014,7 +1984,7 @@
                     "id": 81,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1024:7:1",
+                    "src": "999:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2028,8 +1998,8 @@
                   "id": 84,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 88,
-                  "src": "1033:7:1",
+                  "scope": 86,
+                  "src": "1008:7:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2040,7 +2010,55 @@
                     "id": 83,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1033:7:1",
+                    "src": "1008:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "989:27:1"
+            },
+            "scope": 113,
+            "src": "824:193:1",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 95,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "calculateMangmentFee",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 91,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 88,
+                  "name": "_supply",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 95,
+                  "src": "1053:15:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 87,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1053:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2051,59 +2069,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 86,
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 88,
-                  "src": "1042:7:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 85,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1042:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "1023:27:1"
-            },
-            "scope": 115,
-            "src": "858:193:1",
-            "stateMutability": "pure",
-            "superFunction": null,
-            "visibility": "public"
-          },
-          {
-            "body": null,
-            "documentation": null,
-            "id": 97,
-            "implemented": false,
-            "kind": "function",
-            "modifiers": [],
-            "name": "calculateMangmentFee",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 93,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
                   "id": 90,
-                  "name": "_supply",
+                  "name": "_percent",
                   "nodeType": "VariableDeclaration",
-                  "scope": 97,
-                  "src": "1087:15:1",
+                  "scope": 95,
+                  "src": "1070:16:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2114,7 +2084,88 @@
                     "id": 89,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1087:7:1",
+                    "src": "1070:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1052:35:1"
+            },
+            "returnParameters": {
+              "id": 94,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 93,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 95,
+                  "src": "1135:7:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 92,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1135:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1134:9:1"
+            },
+            "scope": 113,
+            "src": "1023:121:1",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 112,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "calcuateAuctionTokenDistrubution",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 106,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 97,
+                  "name": "dayWiseContributionByWallet",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 112,
+                  "src": "1201:35:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 96,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1201:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2125,92 +2176,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 92,
-                  "name": "_percent",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 97,
-                  "src": "1104:16:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 91,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1104:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "1086:35:1"
-            },
-            "returnParameters": {
-              "id": 96,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 95,
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 97,
-                  "src": "1169:7:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 94,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1169:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "1168:9:1"
-            },
-            "scope": 115,
-            "src": "1057:121:1",
-            "stateMutability": "pure",
-            "superFunction": null,
-            "visibility": "external"
-          },
-          {
-            "body": null,
-            "documentation": null,
-            "id": 114,
-            "implemented": false,
-            "kind": "function",
-            "modifiers": [],
-            "name": "calcuateAuctionTokenDistrubution",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 108,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
                   "id": 99,
-                  "name": "dayWiseContributionByWallet",
+                  "name": "dayWiseSupplyCore",
                   "nodeType": "VariableDeclaration",
-                  "scope": 114,
-                  "src": "1235:35:1",
+                  "scope": 112,
+                  "src": "1246:25:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2221,7 +2191,7 @@
                     "id": 98,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1235:7:1",
+                    "src": "1246:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2233,10 +2203,10 @@
                 {
                   "constant": false,
                   "id": 101,
-                  "name": "dayWiseSupplyCore",
+                  "name": "dayWiseSupplyBonus",
                   "nodeType": "VariableDeclaration",
-                  "scope": 114,
-                  "src": "1280:25:1",
+                  "scope": 112,
+                  "src": "1281:26:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2247,7 +2217,7 @@
                     "id": 100,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1280:7:1",
+                    "src": "1281:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2259,10 +2229,10 @@
                 {
                   "constant": false,
                   "id": 103,
-                  "name": "dayWiseSupplyBonus",
+                  "name": "dayWiseContribution",
                   "nodeType": "VariableDeclaration",
-                  "scope": 114,
-                  "src": "1315:26:1",
+                  "scope": 112,
+                  "src": "1317:27:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2273,7 +2243,7 @@
                     "id": 102,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1315:7:1",
+                    "src": "1317:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2285,10 +2255,10 @@
                 {
                   "constant": false,
                   "id": 105,
-                  "name": "dayWiseContribution",
+                  "name": "downSideProtectionRatio",
                   "nodeType": "VariableDeclaration",
-                  "scope": 114,
-                  "src": "1351:27:1",
+                  "scope": 112,
+                  "src": "1354:31:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2299,7 +2269,40 @@
                     "id": 104,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1351:7:1",
+                    "src": "1354:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1191:200:1"
+            },
+            "returnParameters": {
+              "id": 111,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 108,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 112,
+                  "src": "1415:7:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 107,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1415:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2310,44 +2313,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 107,
-                  "name": "downSideProtectionRatio",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 114,
-                  "src": "1388:31:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 106,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1388:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "1225:200:1"
-            },
-            "returnParameters": {
-              "id": 113,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
                   "id": 110,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 114,
-                  "src": "1449:7:1",
+                  "scope": 112,
+                  "src": "1424:7:1",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2358,33 +2328,7 @@
                     "id": 109,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1449:7:1",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 112,
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 114,
-                  "src": "1458:7:1",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 111,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1458:7:1",
+                    "src": "1424:7:1",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2394,28 +2338,28 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1448:18:1"
+              "src": "1414:18:1"
             },
-            "scope": 115,
-            "src": "1184:283:1",
+            "scope": 113,
+            "src": "1150:283:1",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 116,
-        "src": "26:1443:1"
+        "scope": 114,
+        "src": "26:1409:1"
       }
     ],
-    "src": "0:1470:1"
+    "src": "0:1436:1"
   },
   "compiler": {
     "name": "solc",
     "version": "0.5.9+commit.e560f70d.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.0.16",
-  "updatedAt": "2020-05-13T15:06:46.194Z",
+  "schemaVersion": "3.1.0",
+  "updatedAt": "2020-05-22T13:05:27.451Z",
   "devdoc": {
     "methods": {}
   },

@@ -68,15 +68,15 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[],\"name\":\"auctionDay\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"tokenAuctionEndPrice\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"dayId\",\"type\":\"uint256\"}],\"name\":\"dayWiseMarketPrice\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"dayId\",\"type\":\"uint256\"}],\"name\":\"dayWiseContribution\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuction.sol\":\"IAuction\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuction.sol\":{\"keccak256\":\"0xd67623c83a1c95f225a90ef35bf28d5f92ab648514fe978fd326d0e3e0f94e8f\",\"urls\":[\"bzzr://503c3dd719c773b2208c7c89a2aed54ac409f93a3f0b4a8b21ebb8cef4b8968a\",\"dweb:/ipfs/QmWKnwtKGnupCWvkHjXqiC1NJ19re6yvJsDm6chAa4uP35\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[],\"name\":\"auctionDay\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"tokenAuctionEndPrice\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"dayId\",\"type\":\"uint256\"}],\"name\":\"dayWiseMarketPrice\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"dayId\",\"type\":\"uint256\"}],\"name\":\"dayWiseContribution\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuction.sol\":\"IAuction\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuction.sol\":{\"keccak256\":\"0xd67623c83a1c95f225a90ef35bf28d5f92ab648514fe978fd326d0e3e0f94e8f\",\"urls\":[\"bzzr://503c3dd719c773b2208c7c89a2aed54ac409f93a3f0b4a8b21ebb8cef4b8968a\",\"dweb:/ipfs/QmWKnwtKGnupCWvkHjXqiC1NJ19re6yvJsDm6chAa4uP35\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.5.9;\n\ncontract IAuction {\n    \n    function tokenAuctionEndPrice() public returns (uint256);\n    \n    function dayWiseMarketPrice(uint256 dayId) public view returns(uint256);\n    \n    function dayWiseContribution(uint256 dayId) public view returns(uint256);\n    \n    \n    function auctionDay() public returns(uint256);\n    \n}\n",
-  "sourcePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuction.sol",
+  "sourcePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuction.sol",
   "ast": {
-    "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuction.sol",
+    "absolutePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuction.sol",
     "exportedSymbols": {
       "IAuction": [
         26
@@ -387,7 +387,7 @@
     "src": "0:345:0"
   },
   "legacyAST": {
-    "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuction.sol",
+    "absolutePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuction.sol",
     "exportedSymbols": {
       "IAuction": [
         26
@@ -702,8 +702,8 @@
     "version": "0.5.9+commit.e560f70d.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.0.16",
-  "updatedAt": "2020-05-07T07:18:50.679Z",
+  "schemaVersion": "3.1.0",
+  "updatedAt": "2020-05-22T11:44:26.227Z",
   "devdoc": {
     "methods": {}
   },

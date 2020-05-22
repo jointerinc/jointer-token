@@ -3,13 +3,21 @@ import "../common/RegisteryOwnable.sol";
 import "../Proxy/IRegistry.sol";
 import "../Proxy/UpgradeabilityProxy.sol";
 
+
 interface InitializeInterface {
     function initialize(
         address _primaryOwner,
         address _systemAddress,
-        address _authorityAddress
+        address _authorityAddress,
+        uint256 _mainHoldBackDays,
+        uint256 _etnHoldBackDays,
+        uint256 _stockHoldBackDays,
+        uint256 _mainMaturityDays,
+        uint256 _etnMaturityDays,
+        uint256 _stockMaturityDays
     ) external;
 }
+
 
 /**
  * @title Registry
@@ -17,10 +25,10 @@ interface InitializeInterface {
  */
 contract WhiteListRegistery is RegisteryOwnable, IRegistry {
     // Mapping of versions to implementations of different functions
-    mapping(uint256 => address) internal versions;   
-     
+    mapping(uint256 => address) internal versions;
+
     uint256 public currentVersion;
-    
+
     address payable public proxyAddress;
 
     //@dev constructor
@@ -63,38 +71,47 @@ contract WhiteListRegistery is RegisteryOwnable, IRegistry {
      * @return address of the new proxy created
      */
     function createProxy(
-        uint256  version,
+        uint256 version,
         address _primaryOwner,
         address _systemAddress,
-        address _authorityAddress
+        address _authorityAddress,
+        uint256 _mainHoldBackDays,
+        uint256 _etnHoldBackDays,
+        uint256 _stockHoldBackDays,
+        uint256 _mainMaturityDays,
+        uint256 _etnMaturityDays,
+        uint256 _stockMaturityDays
     ) public onlyOneOfOnwer() returns (address) {
-        
-        require(proxyAddress == address(0),"ERR_PROXY_ALREADY_CREATED");
-        
+        require(proxyAddress == address(0), "ERR_PROXY_ALREADY_CREATED");
+
         UpgradeabilityProxy proxy = new UpgradeabilityProxy(version);
-        
+
         InitializeInterface(address(proxy)).initialize(
             _primaryOwner,
             _systemAddress,
-            _authorityAddress
+            _authorityAddress,
+            _mainHoldBackDays,
+            _etnHoldBackDays,
+            _stockHoldBackDays,
+            _mainMaturityDays,
+            _etnMaturityDays,
+            _stockMaturityDays
         );
-        
+
         currentVersion = version;
         proxyAddress = address(proxy);
         emit ProxyCreated(address(proxy));
         return address(proxy);
     }
-    
 
     /**
      * @dev Upgrades the implementation to the requested version
      * @param version representing the version name of the new implementation to be set
      */
-    
-    function upgradeTo(uint256 version) public onlyAuthorized() returns(bool) {
+
+    function upgradeTo(uint256 version) public onlyAuthorized() returns (bool) {
         currentVersion = version;
         UpgradeabilityProxy(proxyAddress).upgradeTo(version);
         return true;
     }
-    
 }

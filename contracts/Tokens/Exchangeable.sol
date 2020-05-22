@@ -1,13 +1,14 @@
 pragma solidity ^0.5.9;
 
 import "./StandardToken.sol";
-import "./RestrictedToken.sol";
 import "../InterFaces/ICurrencyPrices.sol";
 import "../InterFaces/ITokenVault.sol";
 import "../InterFaces/IToken.sol";
+import "./TokenUtils.sol";
+import "../InterFaces/IWhiteList.sol";
 
 
-contract ForceSwap is RestrictedToken {
+contract ForceSwap is TokenUtils {
     // here returnToken means with mainToken
     address public returnToken;
 
@@ -69,51 +70,6 @@ contract Exchangeable is ForceSwap {
             "ERR_TOKEN_IS_NOT_IN_LIST"
         );
         _;
-    }
-
-    // we are currently developing whitelist with this change
-    function buyTokens(address _fromToken, uint256 _amount)
-        external
-        isConversionAllowed(_fromToken)
-        returns (uint256)
-    {
-        address whiteListAddress = getAddressOf(WHITE_LIST);
-
-        require(
-            IWhiteList(whiteListAddress).hasPermission(
-                msg.sender,
-                address(this)
-            ),
-            "ERR_NOT_HAVE_PERMISSION_TO_BUY"
-        );
-
-        ICurrencyPrices currencyPrice = ICurrencyPrices(getAddressOf(CURRENCY));
-
-        uint256 fromTokenPrice = currencyPrice.getCurrencyPrice(_fromToken);
-
-        uint256 currentTokenPrice = currencyPrice.getCurrencyPrice(
-            address(this)
-        );
-
-        uint256 _assignToken = safeDiv(
-            safeMul(_amount, fromTokenPrice),
-            currentTokenPrice
-        );
-
-        if (_fromToken == returnToken) {
-            ERC20(_fromToken).transferFrom(
-                msg.sender,
-                getAddressOf(VAULT),
-                _amount
-            );
-        } else {
-            ERC20(_fromToken).transferFrom(msg.sender, address(this), _amount);
-            IToken(_fromToken).burn(_amount);
-        }
-
-        _mint(msg.sender, _assignToken);
-
-        return _assignToken;
     }
 
     function swapTokens(uint256 _amount) external returns (bool) {
