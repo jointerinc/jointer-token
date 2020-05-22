@@ -68,25 +68,25 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"name\":\"version\",\"type\":\"uint256\"},{\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"addVersion\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"version\",\"type\":\"uint256\"}],\"name\":\"getVersion\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"proxy\",\"type\":\"address\"}],\"name\":\"ProxyCreated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"version\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"VersionAdded\",\"type\":\"event\"}],\"devdoc\":{\"details\":\"This contract represents the interface of a registry contract\",\"methods\":{\"addVersion(uint256,address)\":{\"details\":\"Registers a new version with its implementation address\",\"params\":{\"implementation\":\"representing the address of the new implementation to be registered\",\"version\":\"representing the version name of the new implementation to be registered\"}},\"getVersion(uint256)\":{\"details\":\"Tells the address of the implementation for a given version\",\"params\":{\"version\":\"to query the implementation of\"},\"return\":\"address of the implementation registered for the given version\"}},\"title\":\"IRegistry\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/IRegistry.sol\":\"IRegistry\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/IRegistry.sol\":{\"keccak256\":\"0x4046702de6033eac80487702f5a808005efdb7fd1154e589db40c8a1f42217c4\",\"urls\":[\"bzzr://4ad3e0b9d3ad8097be6704cd9e86d5cf7ec02a9024f743c5078724cb44485b23\",\"dweb:/ipfs/QmXzkfV2DNFVTe6Mx4eP7VzDKXPeanEjXeyJoo8pvDEUiJ\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"name\":\"version\",\"type\":\"uint256\"},{\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"addVersion\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"version\",\"type\":\"uint256\"}],\"name\":\"getVersion\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"proxy\",\"type\":\"address\"}],\"name\":\"ProxyCreated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"version\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"VersionAdded\",\"type\":\"event\"}],\"devdoc\":{\"details\":\"This contract represents the interface of a registry contract\",\"methods\":{\"addVersion(uint256,address)\":{\"details\":\"Registers a new version with its implementation address\",\"params\":{\"implementation\":\"representing the address of the new implementation to be registered\",\"version\":\"representing the version name of the new implementation to be registered\"}},\"getVersion(uint256)\":{\"details\":\"Tells the address of the implementation for a given version\",\"params\":{\"version\":\"to query the implementation of\"},\"return\":\"address of the implementation registered for the given version\"}},\"title\":\"IRegistry\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/safu/minddeft/jointerInc/jointer-token/contracts/Proxy/IRegistry.sol\":\"IRegistry\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/safu/minddeft/jointerInc/jointer-token/contracts/Proxy/IRegistry.sol\":{\"keccak256\":\"0x4046702de6033eac80487702f5a808005efdb7fd1154e589db40c8a1f42217c4\",\"urls\":[\"bzzr://4ad3e0b9d3ad8097be6704cd9e86d5cf7ec02a9024f743c5078724cb44485b23\",\"dweb:/ipfs/QmXzkfV2DNFVTe6Mx4eP7VzDKXPeanEjXeyJoo8pvDEUiJ\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.5.9;\n\n/**\n * @title IRegistry\n * @dev This contract represents the interface of a registry contract\n */\ninterface IRegistry {\n    /**\n     * @dev This event will be emitted every time a new proxy is created\n     * @param proxy representing the address of the proxy created\n     */\n    event ProxyCreated(address proxy);\n\n    /**\n     * @dev This event will be emitted every time a new implementation is registered\n     * @param version representing the version name of the registered implementation\n     * @param implementation representing the address of the registered implementation\n     */\n    event VersionAdded(uint256 version, address implementation);\n\n    /**\n     * @dev Registers a new version with its implementation address\n     * @param version representing the version name of the new implementation to be registered\n     * @param implementation representing the address of the new implementation to be registered\n     */\n    function addVersion(uint256  version, address implementation)\n        external;\n\n    /**\n     * @dev Tells the address of the implementation for a given version\n     * @param version to query the implementation of\n     * @return address of the implementation registered for the given version\n     */\n    function getVersion(uint256 version)\n        external\n        view\n        returns (address);\n}\n\n\n",
-  "sourcePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/IRegistry.sol",
+  "sourcePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/Proxy/IRegistry.sol",
   "ast": {
-    "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/IRegistry.sol",
+    "absolutePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/Proxy/IRegistry.sol",
     "exportedSymbols": {
       "IRegistry": [
-        1953
+        8589
       ]
     },
-    "id": 1954,
+    "id": 8590,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1928,
+        "id": 8564,
         "literals": [
           "solidity",
           "^",
@@ -94,7 +94,7 @@
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:16"
+        "src": "0:23:19"
       },
       {
         "baseContracts": [],
@@ -102,9 +102,9 @@
         "contractKind": "interface",
         "documentation": "@title IRegistry\n@dev This contract represents the interface of a registry contract",
         "fullyImplemented": false,
-        "id": 1953,
+        "id": 8589,
         "linearizedBaseContracts": [
-          1953
+          8589
         ],
         "name": "IRegistry",
         "nodeType": "ContractDefinition",
@@ -112,21 +112,21 @@
           {
             "anonymous": false,
             "documentation": "@dev This event will be emitted every time a new proxy is created\n@param proxy representing the address of the proxy created",
-            "id": 1932,
+            "id": 8568,
             "name": "ProxyCreated",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1931,
+              "id": 8567,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1930,
+                  "id": 8566,
                   "indexed": false,
                   "name": "proxy",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1932,
-                  "src": "323:13:16",
+                  "scope": 8568,
+                  "src": "323:13:19",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -134,10 +134,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1929,
+                    "id": 8565,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "323:7:16",
+                    "src": "323:7:19",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -148,28 +148,28 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "322:15:16"
+              "src": "322:15:19"
             },
-            "src": "304:34:16"
+            "src": "304:34:19"
           },
           {
             "anonymous": false,
             "documentation": "@dev This event will be emitted every time a new implementation is registered\n@param version representing the version name of the registered implementation\n@param implementation representing the address of the registered implementation",
-            "id": 1938,
+            "id": 8574,
             "name": "VersionAdded",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1937,
+              "id": 8573,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1934,
+                  "id": 8570,
                   "indexed": false,
                   "name": "version",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1938,
-                  "src": "636:15:16",
+                  "scope": 8574,
+                  "src": "636:15:19",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -177,10 +177,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1933,
+                    "id": 8569,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "636:7:16",
+                    "src": "636:7:19",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -191,12 +191,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 1936,
+                  "id": 8572,
                   "indexed": false,
                   "name": "implementation",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1938,
-                  "src": "653:22:16",
+                  "scope": 8574,
+                  "src": "653:22:19",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -204,10 +204,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1935,
+                    "id": 8571,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "653:7:16",
+                    "src": "653:7:19",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -218,30 +218,30 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "635:41:16"
+              "src": "635:41:19"
             },
-            "src": "617:60:16"
+            "src": "617:60:19"
           },
           {
             "body": null,
             "documentation": "@dev Registers a new version with its implementation address\n@param version representing the version name of the new implementation to be registered\n@param implementation representing the address of the new implementation to be registered",
-            "id": 1945,
+            "id": 8581,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "addVersion",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1943,
+              "id": 8579,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1940,
+                  "id": 8576,
                   "name": "version",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1945,
-                  "src": "979:16:16",
+                  "scope": 8581,
+                  "src": "979:16:19",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -249,10 +249,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1939,
+                    "id": 8575,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "979:7:16",
+                    "src": "979:7:19",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -263,11 +263,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 1942,
+                  "id": 8578,
                   "name": "implementation",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1945,
-                  "src": "997:22:16",
+                  "scope": 8581,
+                  "src": "997:22:19",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -275,10 +275,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1941,
+                    "id": 8577,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "997:7:16",
+                    "src": "997:7:19",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -289,16 +289,16 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "978:42:16"
+              "src": "978:42:19"
             },
             "returnParameters": {
-              "id": 1944,
+              "id": 8580,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1037:0:16"
+              "src": "1037:0:19"
             },
-            "scope": 1953,
-            "src": "959:79:16",
+            "scope": 8589,
+            "src": "959:79:19",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
@@ -306,23 +306,23 @@
           {
             "body": null,
             "documentation": "@dev Tells the address of the implementation for a given version\n@param version to query the implementation of\n@return address of the implementation registered for the given version",
-            "id": 1952,
+            "id": 8588,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getVersion",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1948,
+              "id": 8584,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1947,
+                  "id": 8583,
                   "name": "version",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1952,
-                  "src": "1283:15:16",
+                  "scope": 8588,
+                  "src": "1283:15:19",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -330,10 +330,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1946,
+                    "id": 8582,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1283:7:16",
+                    "src": "1283:7:19",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -343,19 +343,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1282:17:16"
+              "src": "1282:17:19"
             },
             "returnParameters": {
-              "id": 1951,
+              "id": 8587,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1950,
+                  "id": 8586,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1952,
-                  "src": "1347:7:16",
+                  "scope": 8588,
+                  "src": "1347:7:19",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -363,10 +363,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1949,
+                    "id": 8585,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1347:7:16",
+                    "src": "1347:7:19",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -377,33 +377,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1346:9:16"
+              "src": "1346:9:19"
             },
-            "scope": 1953,
-            "src": "1263:93:16",
+            "scope": 8589,
+            "src": "1263:93:19",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 1954,
-        "src": "123:1235:16"
+        "scope": 8590,
+        "src": "123:1235:19"
       }
     ],
-    "src": "0:1361:16"
+    "src": "0:1361:19"
   },
   "legacyAST": {
-    "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/Proxy/IRegistry.sol",
+    "absolutePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/Proxy/IRegistry.sol",
     "exportedSymbols": {
       "IRegistry": [
-        1953
+        8589
       ]
     },
-    "id": 1954,
+    "id": 8590,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1928,
+        "id": 8564,
         "literals": [
           "solidity",
           "^",
@@ -411,7 +411,7 @@
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:16"
+        "src": "0:23:19"
       },
       {
         "baseContracts": [],
@@ -419,9 +419,9 @@
         "contractKind": "interface",
         "documentation": "@title IRegistry\n@dev This contract represents the interface of a registry contract",
         "fullyImplemented": false,
-        "id": 1953,
+        "id": 8589,
         "linearizedBaseContracts": [
-          1953
+          8589
         ],
         "name": "IRegistry",
         "nodeType": "ContractDefinition",
@@ -429,21 +429,21 @@
           {
             "anonymous": false,
             "documentation": "@dev This event will be emitted every time a new proxy is created\n@param proxy representing the address of the proxy created",
-            "id": 1932,
+            "id": 8568,
             "name": "ProxyCreated",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1931,
+              "id": 8567,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1930,
+                  "id": 8566,
                   "indexed": false,
                   "name": "proxy",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1932,
-                  "src": "323:13:16",
+                  "scope": 8568,
+                  "src": "323:13:19",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -451,10 +451,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1929,
+                    "id": 8565,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "323:7:16",
+                    "src": "323:7:19",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -465,28 +465,28 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "322:15:16"
+              "src": "322:15:19"
             },
-            "src": "304:34:16"
+            "src": "304:34:19"
           },
           {
             "anonymous": false,
             "documentation": "@dev This event will be emitted every time a new implementation is registered\n@param version representing the version name of the registered implementation\n@param implementation representing the address of the registered implementation",
-            "id": 1938,
+            "id": 8574,
             "name": "VersionAdded",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1937,
+              "id": 8573,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1934,
+                  "id": 8570,
                   "indexed": false,
                   "name": "version",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1938,
-                  "src": "636:15:16",
+                  "scope": 8574,
+                  "src": "636:15:19",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -494,10 +494,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1933,
+                    "id": 8569,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "636:7:16",
+                    "src": "636:7:19",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -508,12 +508,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 1936,
+                  "id": 8572,
                   "indexed": false,
                   "name": "implementation",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1938,
-                  "src": "653:22:16",
+                  "scope": 8574,
+                  "src": "653:22:19",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -521,10 +521,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1935,
+                    "id": 8571,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "653:7:16",
+                    "src": "653:7:19",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -535,30 +535,30 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "635:41:16"
+              "src": "635:41:19"
             },
-            "src": "617:60:16"
+            "src": "617:60:19"
           },
           {
             "body": null,
             "documentation": "@dev Registers a new version with its implementation address\n@param version representing the version name of the new implementation to be registered\n@param implementation representing the address of the new implementation to be registered",
-            "id": 1945,
+            "id": 8581,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "addVersion",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1943,
+              "id": 8579,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1940,
+                  "id": 8576,
                   "name": "version",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1945,
-                  "src": "979:16:16",
+                  "scope": 8581,
+                  "src": "979:16:19",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -566,10 +566,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1939,
+                    "id": 8575,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "979:7:16",
+                    "src": "979:7:19",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -580,11 +580,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 1942,
+                  "id": 8578,
                   "name": "implementation",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1945,
-                  "src": "997:22:16",
+                  "scope": 8581,
+                  "src": "997:22:19",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -592,10 +592,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1941,
+                    "id": 8577,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "997:7:16",
+                    "src": "997:7:19",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -606,16 +606,16 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "978:42:16"
+              "src": "978:42:19"
             },
             "returnParameters": {
-              "id": 1944,
+              "id": 8580,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1037:0:16"
+              "src": "1037:0:19"
             },
-            "scope": 1953,
-            "src": "959:79:16",
+            "scope": 8589,
+            "src": "959:79:19",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
@@ -623,23 +623,23 @@
           {
             "body": null,
             "documentation": "@dev Tells the address of the implementation for a given version\n@param version to query the implementation of\n@return address of the implementation registered for the given version",
-            "id": 1952,
+            "id": 8588,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getVersion",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1948,
+              "id": 8584,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1947,
+                  "id": 8583,
                   "name": "version",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1952,
-                  "src": "1283:15:16",
+                  "scope": 8588,
+                  "src": "1283:15:19",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -647,10 +647,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1946,
+                    "id": 8582,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1283:7:16",
+                    "src": "1283:7:19",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -660,19 +660,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1282:17:16"
+              "src": "1282:17:19"
             },
             "returnParameters": {
-              "id": 1951,
+              "id": 8587,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1950,
+                  "id": 8586,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1952,
-                  "src": "1347:7:16",
+                  "scope": 8588,
+                  "src": "1347:7:19",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -680,10 +680,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1949,
+                    "id": 8585,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1347:7:16",
+                    "src": "1347:7:19",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -694,28 +694,28 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1346:9:16"
+              "src": "1346:9:19"
             },
-            "scope": 1953,
-            "src": "1263:93:16",
+            "scope": 8589,
+            "src": "1263:93:19",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 1954,
-        "src": "123:1235:16"
+        "scope": 8590,
+        "src": "123:1235:19"
       }
     ],
-    "src": "0:1361:16"
+    "src": "0:1361:19"
   },
   "compiler": {
     "name": "solc",
     "version": "0.5.9+commit.e560f70d.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.0.16",
-  "updatedAt": "2020-05-07T07:18:50.782Z",
+  "schemaVersion": "3.1.0",
+  "updatedAt": "2020-05-22T11:44:27.770Z",
   "devdoc": {
     "details": "This contract represents the interface of a registry contract",
     "methods": {
