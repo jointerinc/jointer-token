@@ -3,13 +3,13 @@ import "./IERC20Token.sol";
 
 
 contract IAuctionLiquadity {
+    //function previousMainReserveContribution() public view returns(uint256);
+
     function contributeWithEther() public payable returns (uint256);
 
     function auctionEnded() public returns (bool);
 
-    function contributeTowardMainReserve(uint256 _amount)
-        public
-        returns (uint256);
+    function contributeTowardMainReserve() public returns (uint256);
 
     function contributeWithToken(
         IERC20Token _token,

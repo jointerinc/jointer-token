@@ -479,7 +479,6 @@ contract Auction is AuctionFundCollector {
     );
 
     function auctionEnd() external onlySystem() returns (bool) {
-        
         require(
             safeAdd(LAST_AUCTION_START, MIN_AUCTION_END_TIME) > now,
             "ERR_MIN_TIME_IS_NOT_OVER"
@@ -491,32 +490,15 @@ contract Auction is AuctionFundCollector {
 
         address vault = getAddressOf(VAULT);
 
+        address liqudity = getAddressOf(LIQUADITY);
+
         if (todayContribution == 0) {
             uint256 _currencyPrices = ICurrencyPrices(getAddressOf(CURRENCY))
                 .getCurrencyPrice(address(0));
 
-            uint256 _ethAmount = safeDiv(
-                safeMul(yesterdayContribution, safeExponent(10, 18)),
-                _currencyPrices
-            );
+            uint256 mainReserveAmount = IAuctionLiquadity(liqudity)
+                .contributeTowardMainReserve();
 
-            (
-                uint256 downSideAmount,
-                uint256 fundWalletamount,
-                uint256 reserveAmount
-            ) = formula.calcuateAuctionFundDistrubution(
-                _ethAmount,
-                dayWiseDownSideProtectionRatio[auctionDay],
-                fundWalletRatio
-            );
-
-            delete downSideAmount;
-            delete fundWalletamount;
-
-            uint256 mainReserveAmount = IAuctionLiquadity(
-                getAddressOf(LIQUADITY)
-            )
-                .contributeTowardMainReserve(reserveAmount);
             mainReserveAmount = safeDiv(
                 safeMul(mainReserveAmount, _currencyPrices),
                 safeExponent(10, 18)
@@ -624,9 +606,9 @@ contract Auction is AuctionFundCollector {
 
         tokenAuctionEndPrice = _tokenMarketPrice;
 
-        IAuctionLiquadity(getAddressOf(LIQUADITY)).auctionEnded();
-
         auctionDay = safeAdd(auctionDay, 1);
+
+        IAuctionLiquadity(liqudity).auctionEnded();
 
         dayWiseDownSideProtectionRatio[auctionDay] = downSideProtectionRatio;
 
