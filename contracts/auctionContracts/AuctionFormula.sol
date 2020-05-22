@@ -123,25 +123,22 @@ contract AuctionFormula is SafeMath {
         uint256 yesterdayPrice,
         uint256 dayBeforyesterdayPrice,
         uint256 yesterDaycontibution,
-        uint256 yesterdayMainReserv,
-        uint256 _mainReserverAmount
+        uint256 yesterdayMainReserv
     ) external pure returns (uint256) {
-        // multiply 10**6 so we cant get zero value if amount come in float
+        
+        // multiply 10**6 so we cant get zero value if amount come in float 
         uint256 _tempContrbution = safeDiv(
             safeMul(yesterDaycontibution, safeExponent(10, 6)),
             yesterdayMainReserv
         );
-
+        
+        
         uint256 _tempSupply = safeDiv(
             safeMul(yesterdayPrice, safeExponent(10, 6)),
             dayBeforyesterdayPrice
         );
-
-        // multiply by _mainReserverAmount 10**12
-        return
-            safeDiv(
-                safeMul(_mainReserverAmount, safeExponent(10, 12)),
-                safeMul(_tempContrbution, _tempSupply)
-            );
+        
+        
+        return safeMul(_tempContrbution, _tempSupply);
     }
 }

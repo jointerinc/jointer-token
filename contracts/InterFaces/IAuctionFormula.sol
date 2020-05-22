@@ -6,8 +6,7 @@ contract IAuctionFormula {
         uint256 yesterdayPrice,
         uint256 dayBeforyesterdayPrice,
         uint256 yesterDaycontibution,
-        uint256 yesterdayMainReserv,
-        uint256 _mainReserverAmount
+        uint256 yesterdayMainReserv
     ) external pure returns (uint256);
 
     function calculateTokenPrice(
