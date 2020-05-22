@@ -8,17 +8,24 @@ contract IWhiteList {
 
     function isAddressByPassed(address _which) public view returns (bool);
 
-    function hasPermission(address _from, address _to)
+    function main_isTransferAllowed(address _from, address _to)
         public
         view
         returns (bool);
 
-    function canReciveToken(address _which) public view returns (bool);
-
-    function isRestrictedAddress(address _which) public view returns (bool);
-
-    function isTransferAllowed(address _from, address _to)
+    function etn_isTransferAllowed(address _from, address _to)
         public
         view
         returns (bool);
+
+    function stock_isTransferAllowed(address _from, address _to)
+        public
+        view
+        returns (bool);
+
+    function main_isReceiveAllowed(address user) public view returns (bool);
+
+    function etn_isReceiveAllowed(address user) public view returns (bool);
+
+    function stock_isReceiveAllowed(address user) public view returns (bool);
 }

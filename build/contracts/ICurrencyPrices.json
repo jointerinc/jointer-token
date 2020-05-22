@@ -21,25 +21,25 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"getCurrencyPrice\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol\":\"ICurrencyPrices\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol\":{\"keccak256\":\"0x3094a527af372691740bb6538d20aa09390b9eccbb10261350cca5964cfb5c31\",\"urls\":[\"bzzr://f1f186741797eab94adde214481e1b02dc659f856bbd88d01bf6a4f46604353e\",\"dweb:/ipfs/QmYCEEM3Lr31YMogYFTJFCZ1mFu36Rwi7R9eH665kMTqAc\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"_which\",\"type\":\"address\"}],\"name\":\"getCurrencyPrice\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/ICurrencyPrices.sol\":\"ICurrencyPrices\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/ICurrencyPrices.sol\":{\"keccak256\":\"0x3094a527af372691740bb6538d20aa09390b9eccbb10261350cca5964cfb5c31\",\"urls\":[\"bzzr://f1f186741797eab94adde214481e1b02dc659f856bbd88d01bf6a4f46604353e\",\"dweb:/ipfs/QmYCEEM3Lr31YMogYFTJFCZ1mFu36Rwi7R9eH665kMTqAc\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.5.9;\n\ncontract ICurrencyPrices {\n    function getCurrencyPrice(address _which) public view returns (uint256);\n}\n",
-  "sourcePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol",
+  "sourcePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/ICurrencyPrices.sol",
   "ast": {
-    "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol",
+    "absolutePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/ICurrencyPrices.sol",
     "exportedSymbols": {
       "ICurrencyPrices": [
-        285
+        291
       ]
     },
-    "id": 286,
+    "id": 292,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 277,
+        "id": 283,
         "literals": [
           "solidity",
           "^",
@@ -55,9 +55,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 285,
+        "id": 291,
         "linearizedBaseContracts": [
-          285
+          291
         ],
         "name": "ICurrencyPrices",
         "nodeType": "ContractDefinition",
@@ -65,22 +65,22 @@
           {
             "body": null,
             "documentation": null,
-            "id": 284,
+            "id": 290,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getCurrencyPrice",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 280,
+              "id": 286,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 279,
+                  "id": 285,
                   "name": "_which",
                   "nodeType": "VariableDeclaration",
-                  "scope": 284,
+                  "scope": 290,
                   "src": "82:14:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -89,7 +89,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 278,
+                    "id": 284,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "82:7:6",
@@ -106,15 +106,15 @@
               "src": "81:16:6"
             },
             "returnParameters": {
-              "id": 283,
+              "id": 289,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 282,
+                  "id": 288,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 284,
+                  "scope": 290,
                   "src": "119:7:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -123,7 +123,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 281,
+                    "id": 287,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "119:7:6",
@@ -138,31 +138,31 @@
               ],
               "src": "118:9:6"
             },
-            "scope": 285,
+            "scope": 291,
             "src": "56:72:6",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 286,
+        "scope": 292,
         "src": "25:105:6"
       }
     ],
     "src": "0:131:6"
   },
   "legacyAST": {
-    "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/ICurrencyPrices.sol",
+    "absolutePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/ICurrencyPrices.sol",
     "exportedSymbols": {
       "ICurrencyPrices": [
-        285
+        291
       ]
     },
-    "id": 286,
+    "id": 292,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 277,
+        "id": 283,
         "literals": [
           "solidity",
           "^",
@@ -178,9 +178,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 285,
+        "id": 291,
         "linearizedBaseContracts": [
-          285
+          291
         ],
         "name": "ICurrencyPrices",
         "nodeType": "ContractDefinition",
@@ -188,22 +188,22 @@
           {
             "body": null,
             "documentation": null,
-            "id": 284,
+            "id": 290,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getCurrencyPrice",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 280,
+              "id": 286,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 279,
+                  "id": 285,
                   "name": "_which",
                   "nodeType": "VariableDeclaration",
-                  "scope": 284,
+                  "scope": 290,
                   "src": "82:14:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -212,7 +212,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 278,
+                    "id": 284,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "82:7:6",
@@ -229,15 +229,15 @@
               "src": "81:16:6"
             },
             "returnParameters": {
-              "id": 283,
+              "id": 289,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 282,
+                  "id": 288,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 284,
+                  "scope": 290,
                   "src": "119:7:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -246,7 +246,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 281,
+                    "id": 287,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "119:7:6",
@@ -261,14 +261,14 @@
               ],
               "src": "118:9:6"
             },
-            "scope": 285,
+            "scope": 291,
             "src": "56:72:6",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 286,
+        "scope": 292,
         "src": "25:105:6"
       }
     ],
@@ -279,8 +279,8 @@
     "version": "0.5.9+commit.e560f70d.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.0.16",
-  "updatedAt": "2020-05-07T07:18:50.687Z",
+  "schemaVersion": "3.1.0",
+  "updatedAt": "2020-05-22T11:44:26.239Z",
   "devdoc": {
     "methods": {}
   },

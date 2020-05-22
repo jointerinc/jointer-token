@@ -1,10 +1,10 @@
 pragma solidity ^0.5.9;
 
-import "./RestrictedToken.sol";
 import "../InterFaces/IWhiteList.sol";
+import "./TokenUtils.sol";
 
 
-contract TokenMinter is RestrictedToken {
+contract TokenMinter is TokenUtils {
     modifier onlyAuthorizedAddress() {
         address auctionAddress = getAddressOf(AUCTION);
         require(msg.sender == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
@@ -60,6 +60,22 @@ contract MainToken is TokenMinter {
         }
     }
 
+    function checkBeforeTransfer(address _from, address _to)
+        internal
+        view
+        returns (bool)
+    {
+        address whiteListAddress = getAddressOf(WHITE_LIST);
+
+        if (_to != getAddressOf(SMART_SWAP)) {
+            require(
+                IWhiteList(whiteListAddress).main_isTransferAllowed(_from, _to),
+                "ERR_NOT_HAVE_PERMISSION_TO_TRANSFER"
+            );
+        }
+        return true;
+    }
+
     function transfer(address _to, uint256 _value) external returns (bool ok) {
         uint256 senderBalance = safeSub(
             balances[msg.sender],
@@ -70,10 +86,11 @@ contract MainToken is TokenMinter {
         return _transfer(msg.sender, _to, _value);
     }
 
-    function transferFrom(address _from, address _to, uint256 _value)
-        external
-        returns (bool)
-    {
+    function transferFrom(
+        address _from,
+        address _to,
+        uint256 _value
+    ) external returns (bool) {
         uint256 senderBalance = safeSub(
             balances[msg.sender],
             lockedToken[msg.sender]
@@ -89,10 +106,11 @@ contract MainToken is TokenMinter {
     // ex ->user invest  at 11:35 and token distrubution happened at 11:40
     // if in between user invest we dont unlock user token we keep as it as
     // to unlock token set _amount = 0
-    function lockToken(address _which, uint256 _amount, uint256 _locktime)
-        external
-        returns (bool)
-    {
+    function lockToken(
+        address _which,
+        uint256 _amount,
+        uint256 _locktime
+    ) external returns (bool) {
         require(
             msg.sender == getAddressOf(AUCTION),
             ERR_AUTHORIZED_ADDRESS_ONLY

@@ -1,24 +1,24 @@
 {
   "contractName": "AuctionRegisteryContracts",
   "abi": [],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionRegistery.sol\":\"AuctionRegisteryContracts\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionRegistery.sol\":{\"keccak256\":\"0x8652223965e1b37ba96540ba889a869a99639a02a4173584657f5e5558c9bd7f\",\"urls\":[\"bzzr://5357c9f9528b4640964d3579878d3fbae5cec52d0841701ccd6b09128937b37f\",\"dweb:/ipfs/Qmdr4DWUdvAHNuGfHPMEFibWCHm3yrkSpRLrXrsF1C3Sas\"]}},\"version\":1}",
-  "bytecode": "0x6080604052348015600f57600080fd5b50603e80601d6000396000f3fe6080604052600080fdfea265627a7a7230582019b2f10dab8b97869cceb6319e9845e00b12efe541e922e4c23755a521a2d57664736f6c63430005090032",
-  "deployedBytecode": "0x6080604052600080fdfea265627a7a7230582019b2f10dab8b97869cceb6319e9845e00b12efe541e922e4c23755a521a2d57664736f6c63430005090032",
-  "sourceMap": "25:792:4:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;25:792:4;;;;;;;",
-  "deployedSourceMap": "25:792:4:-;;;;;",
-  "source": "pragma solidity ^0.5.9;\n\ncontract AuctionRegisteryContracts{\n    \n    bytes32 internal constant MAIN_TOKEN = \"MAIN_TOKEN\";\n    \n    bytes32 internal constant ETN_TOKEN = \"ETN_TOKEN\";\n    \n    bytes32 internal constant STOCK_TOKEN = \"STOCK_TOKEN\";\n    \n    bytes32 internal constant AUCTION_FORMULA = \"AUCTION_FORMULA\";\n    \n    bytes32 internal constant AUCTION_PROTECTION = \"AUCTION_PROTECTION\";\n    \n    bytes32 internal constant WHITE_LIST = \"WHITE_LIST\";\n    \n    bytes32 internal constant AUCTION = \"AUCTION\";\n    \n    bytes32 internal constant LIQUADITY = \"LIQUADITY\";\n    \n    bytes32 internal constant CURRENCY = \"CURRENCY\";\n    \n    bytes32 internal constant INDIDUAL_BONUS = \"INDIDUAL_BONUS\";\n    \n    bytes32 internal constant VAULT = \"VAULT\";\n\n    bytes32 internal constant TAG_ALONG = \"TAG_ALONG\";\n    \n}\n\ncontract IAuctionRegistery {\n    function getAddressOf(bytes32 _contractName) external view returns (address);\n}\n\n\n",
-  "sourcePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionRegistery.sol",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuctionRegistery.sol\":\"AuctionRegisteryContracts\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuctionRegistery.sol\":{\"keccak256\":\"0x11b8cdb1286107866e1209fcbb9405f2d304904b4fcd61515e096078ad3cf83d\",\"urls\":[\"bzzr://e2bc3f876ee0cdeb68949e8191180a499fdd933d8cace212189b25b516e2934e\",\"dweb:/ipfs/QmVYcnSpGCxc83ZH5k8U4Hqeamjn3M79yN94EqXSMUXDJR\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b50603e80601d6000396000f3fe6080604052600080fdfea265627a7a7230582086ac05183411e0ff313f12c162448a0a2c046daf3e2c297f44cf54b1f595114164736f6c63430005090032",
+  "deployedBytecode": "0x6080604052600080fdfea265627a7a7230582086ac05183411e0ff313f12c162448a0a2c046daf3e2c297f44cf54b1f595114164736f6c63430005090032",
+  "sourceMap": "26:965:4:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;26:965:4;;;;;;;",
+  "deployedSourceMap": "26:965:4:-;;;;;",
+  "source": "pragma solidity ^0.5.9;\n\n\ncontract AuctionRegisteryContracts {\n    bytes32 internal constant MAIN_TOKEN = \"MAIN_TOKEN\";\n\n    bytes32 internal constant ETN_TOKEN = \"ETN_TOKEN\";\n\n    bytes32 internal constant STOCK_TOKEN = \"STOCK_TOKEN\";\n\n    bytes32 internal constant AUCTION_FORMULA = \"AUCTION_FORMULA\";\n\n    bytes32 internal constant AUCTION_PROTECTION = \"AUCTION_PROTECTION\";\n\n    bytes32 internal constant WHITE_LIST = \"WHITE_LIST\";\n\n    bytes32 internal constant AUCTION = \"AUCTION\";\n\n    bytes32 internal constant LIQUADITY = \"LIQUADITY\";\n\n    bytes32 internal constant CURRENCY = \"CURRENCY\";\n\n    bytes32 internal constant INDIDUAL_BONUS = \"INDIDUAL_BONUS\";\n\n    bytes32 internal constant VAULT = \"VAULT\";\n\n    bytes32 internal constant TAG_ALONG = \"TAG_ALONG\";\n\n    bytes32 internal constant COMPANY_FUND_WALLET = \"COMPANY_FUND_WALLET\";\n\n    bytes32 internal constant COMPANY_MAIN_TOKEN_WALLET = \"COMPANY_MAIN_TOKEN_WALLET\";\n\n    bytes32 internal constant SMART_SWAP = \"SMART_SWAP\";\n}\n\n\ncontract IAuctionRegistery {\n    function getAddressOf(bytes32 _contractName)\n        external\n        view\n        returns (address payable);\n}\n",
+  "sourcePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuctionRegistery.sol",
   "ast": {
-    "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionRegistery.sol",
+    "absolutePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuctionRegistery.sol",
     "exportedSymbols": {
       "AuctionRegisteryContracts": [
-        231
+        240
       ],
       "IAuctionRegistery": [
-        239
+        248
       ]
     },
-    "id": 240,
+    "id": 249,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -38,9 +38,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 231,
+        "id": 240,
         "linearizedBaseContracts": [
-          231
+          240
         ],
         "name": "AuctionRegisteryContracts",
         "nodeType": "ContractDefinition",
@@ -50,8 +50,8 @@
             "id": 197,
             "name": "MAIN_TOKEN",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "70:51:4",
+            "scope": 240,
+            "src": "67:51:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -62,7 +62,7 @@
               "id": 195,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "70:7:4",
+              "src": "67:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -78,7 +78,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "109:12:4",
+              "src": "106:12:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_155af7911d119cc7437861d1fdef227768928d772ae2450ad865b0aeb0d1f812",
@@ -93,8 +93,8 @@
             "id": 200,
             "name": "ETN_TOKEN",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "132:49:4",
+            "scope": 240,
+            "src": "125:49:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -105,7 +105,7 @@
               "id": 198,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "132:7:4",
+              "src": "125:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -121,7 +121,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "170:11:4",
+              "src": "163:11:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_9a83b19ac5d40bb2a19c7dda2d0b44fdd1dad602a616e16eebc49ab1976951b7",
@@ -136,8 +136,8 @@
             "id": 203,
             "name": "STOCK_TOKEN",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "192:53:4",
+            "scope": 240,
+            "src": "181:53:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -148,7 +148,7 @@
               "id": 201,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "192:7:4",
+              "src": "181:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -164,7 +164,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "232:13:4",
+              "src": "221:13:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_20de1d9070149866aaac48c773c148584e9930018e2bc9f4e43b1733b06cb19b",
@@ -179,8 +179,8 @@
             "id": 206,
             "name": "AUCTION_FORMULA",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "256:61:4",
+            "scope": 240,
+            "src": "241:61:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -191,7 +191,7 @@
               "id": 204,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "256:7:4",
+              "src": "241:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -207,7 +207,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "300:17:4",
+              "src": "285:17:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_90c175aba01f1b423ad61521206b4da926528fccc35ea049b56674997f61e5d3",
@@ -222,8 +222,8 @@
             "id": 209,
             "name": "AUCTION_PROTECTION",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "328:67:4",
+            "scope": 240,
+            "src": "309:67:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -234,7 +234,7 @@
               "id": 207,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "328:7:4",
+              "src": "309:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -250,7 +250,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "375:20:4",
+              "src": "356:20:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_c928e65acd4de2e804fd934d409a5a99d0362bdb42f85bcf438faa5090eaf57f",
@@ -265,8 +265,8 @@
             "id": 212,
             "name": "WHITE_LIST",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "406:51:4",
+            "scope": 240,
+            "src": "383:51:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -277,7 +277,7 @@
               "id": 210,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "406:7:4",
+              "src": "383:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -293,7 +293,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "445:12:4",
+              "src": "422:12:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_55c152c9a5853c3d40c3526c5658b385c26370d280a2f3e4fc70692fdc363497",
@@ -308,8 +308,8 @@
             "id": 215,
             "name": "AUCTION",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "468:45:4",
+            "scope": 240,
+            "src": "441:45:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -320,7 +320,7 @@
               "id": 213,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "468:7:4",
+              "src": "441:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -336,7 +336,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "504:9:4",
+              "src": "477:9:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_2a86bfecab7c1dc1a00b694d14a5a3c91a3ce748c12f853f875c4c7b4b254eb7",
@@ -351,8 +351,8 @@
             "id": 218,
             "name": "LIQUADITY",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "524:49:4",
+            "scope": 240,
+            "src": "493:49:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -363,7 +363,7 @@
               "id": 216,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "524:7:4",
+              "src": "493:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -379,7 +379,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "562:11:4",
+              "src": "531:11:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_b01c5cbe9c80f4ec0318b70720550067a3bd22355075beba13c2b562d5590e7a",
@@ -394,8 +394,8 @@
             "id": 221,
             "name": "CURRENCY",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "584:47:4",
+            "scope": 240,
+            "src": "549:47:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -406,7 +406,7 @@
               "id": 219,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "584:7:4",
+              "src": "549:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -422,7 +422,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "621:10:4",
+              "src": "586:10:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_4e8e254edb01426b6143b7bc645e83d15690c4c05223fa236535e12cb103e884",
@@ -437,8 +437,8 @@
             "id": 224,
             "name": "INDIDUAL_BONUS",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "642:59:4",
+            "scope": 240,
+            "src": "603:59:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -449,7 +449,7 @@
               "id": 222,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "642:7:4",
+              "src": "603:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -465,7 +465,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "685:16:4",
+              "src": "646:16:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_feb37b9cf9c9114adbcc11c4297bca73aa14c58ea6a05a792fd99c17df891f40",
@@ -480,8 +480,8 @@
             "id": 227,
             "name": "VAULT",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "712:41:4",
+            "scope": 240,
+            "src": "669:41:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -492,7 +492,7 @@
               "id": 225,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "712:7:4",
+              "src": "669:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -508,7 +508,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "746:7:4",
+              "src": "703:7:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_68fc488efe30251cadb6ac88bdeef3f1a5e6048808baf387258d1d78e986720c",
@@ -523,8 +523,8 @@
             "id": 230,
             "name": "TAG_ALONG",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "760:49:4",
+            "scope": 240,
+            "src": "717:49:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -535,7 +535,7 @@
               "id": 228,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "760:7:4",
+              "src": "717:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -551,7 +551,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "798:11:4",
+              "src": "755:11:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_3d1e441406b638f19e10a321f47a88fa6b5f8fddd264578c333196c5ca44db61",
@@ -560,10 +560,139 @@
               "value": "TAG_ALONG"
             },
             "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 233,
+            "name": "COMPANY_FUND_WALLET",
+            "nodeType": "VariableDeclaration",
+            "scope": 240,
+            "src": "773:69:4",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 231,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "773:7:4",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "434f4d50414e595f46554e445f57414c4c4554",
+              "id": 232,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "821:21:4",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier": "t_stringliteral_c14df940109d3bd0a994ec51a48d314b58ae54d7f78f9e007a8615ede2b1a2d5",
+                "typeString": "literal_string \"COMPANY_FUND_WALLET\""
+              },
+              "value": "COMPANY_FUND_WALLET"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 236,
+            "name": "COMPANY_MAIN_TOKEN_WALLET",
+            "nodeType": "VariableDeclaration",
+            "scope": 240,
+            "src": "849:81:4",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 234,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "849:7:4",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "434f4d50414e595f4d41494e5f544f4b454e5f57414c4c4554",
+              "id": 235,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "903:27:4",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier": "t_stringliteral_ea5a3eb810570a7fef7a93cfb51342c708214891fc0f4e56315e620e28d3f4da",
+                "typeString": "literal_string \"COMPANY_MAIN_TOKEN_WALLET\""
+              },
+              "value": "COMPANY_MAIN_TOKEN_WALLET"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 239,
+            "name": "SMART_SWAP",
+            "nodeType": "VariableDeclaration",
+            "scope": 240,
+            "src": "937:51:4",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 237,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "937:7:4",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "534d4152545f53574150",
+              "id": 238,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "976:12:4",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier": "t_stringliteral_2624da635f04e1ca24c3ab50b00741a8412344deb950ba834fd653f9183d5031",
+                "typeString": "literal_string \"SMART_SWAP\""
+              },
+              "value": "SMART_SWAP"
+            },
+            "visibility": "internal"
           }
         ],
-        "scope": 240,
-        "src": "25:792:4"
+        "scope": 249,
+        "src": "26:965:4"
       },
       {
         "baseContracts": [],
@@ -571,9 +700,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 239,
+        "id": 248,
         "linearizedBaseContracts": [
-          239
+          248
         ],
         "name": "IAuctionRegistery",
         "nodeType": "ContractDefinition",
@@ -581,23 +710,23 @@
           {
             "body": null,
             "documentation": null,
-            "id": 238,
+            "id": 247,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getAddressOf",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 234,
+              "id": 243,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 233,
+                  "id": 242,
                   "name": "_contractName",
                   "nodeType": "VariableDeclaration",
-                  "scope": 238,
-                  "src": "874:21:4",
+                  "scope": 247,
+                  "src": "1049:21:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -605,10 +734,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 232,
+                    "id": 241,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "874:7:4",
+                    "src": "1049:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -618,66 +747,66 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "873:23:4"
+              "src": "1048:23:4"
             },
             "returnParameters": {
-              "id": 237,
+              "id": 246,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 236,
+                  "id": 245,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 238,
-                  "src": "920:7:4",
+                  "scope": 247,
+                  "src": "1119:15:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_address",
-                    "typeString": "address"
+                    "typeIdentifier": "t_address_payable",
+                    "typeString": "address payable"
                   },
                   "typeName": {
-                    "id": 235,
+                    "id": 244,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "920:7:4",
-                    "stateMutability": "nonpayable",
+                    "src": "1119:15:4",
+                    "stateMutability": "payable",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_address",
-                      "typeString": "address"
+                      "typeIdentifier": "t_address_payable",
+                      "typeString": "address payable"
                     }
                   },
                   "value": null,
                   "visibility": "internal"
                 }
               ],
-              "src": "919:9:4"
+              "src": "1118:17:4"
             },
-            "scope": 239,
-            "src": "852:77:4",
+            "scope": 248,
+            "src": "1027:109:4",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 240,
-        "src": "819:112:4"
+        "scope": 249,
+        "src": "994:144:4"
       }
     ],
-    "src": "0:934:4"
+    "src": "0:1139:4"
   },
   "legacyAST": {
-    "absolutePath": "/home/mind/Work/Projects/Jointer/Jointer_auction/NewContracts/contracts/InterFaces/IAuctionRegistery.sol",
+    "absolutePath": "/home/safu/minddeft/jointerInc/jointer-token/contracts/InterFaces/IAuctionRegistery.sol",
     "exportedSymbols": {
       "AuctionRegisteryContracts": [
-        231
+        240
       ],
       "IAuctionRegistery": [
-        239
+        248
       ]
     },
-    "id": 240,
+    "id": 249,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -697,9 +826,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 231,
+        "id": 240,
         "linearizedBaseContracts": [
-          231
+          240
         ],
         "name": "AuctionRegisteryContracts",
         "nodeType": "ContractDefinition",
@@ -709,8 +838,8 @@
             "id": 197,
             "name": "MAIN_TOKEN",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "70:51:4",
+            "scope": 240,
+            "src": "67:51:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -721,7 +850,7 @@
               "id": 195,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "70:7:4",
+              "src": "67:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -737,7 +866,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "109:12:4",
+              "src": "106:12:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_155af7911d119cc7437861d1fdef227768928d772ae2450ad865b0aeb0d1f812",
@@ -752,8 +881,8 @@
             "id": 200,
             "name": "ETN_TOKEN",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "132:49:4",
+            "scope": 240,
+            "src": "125:49:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -764,7 +893,7 @@
               "id": 198,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "132:7:4",
+              "src": "125:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -780,7 +909,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "170:11:4",
+              "src": "163:11:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_9a83b19ac5d40bb2a19c7dda2d0b44fdd1dad602a616e16eebc49ab1976951b7",
@@ -795,8 +924,8 @@
             "id": 203,
             "name": "STOCK_TOKEN",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "192:53:4",
+            "scope": 240,
+            "src": "181:53:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -807,7 +936,7 @@
               "id": 201,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "192:7:4",
+              "src": "181:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -823,7 +952,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "232:13:4",
+              "src": "221:13:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_20de1d9070149866aaac48c773c148584e9930018e2bc9f4e43b1733b06cb19b",
@@ -838,8 +967,8 @@
             "id": 206,
             "name": "AUCTION_FORMULA",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "256:61:4",
+            "scope": 240,
+            "src": "241:61:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -850,7 +979,7 @@
               "id": 204,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "256:7:4",
+              "src": "241:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -866,7 +995,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "300:17:4",
+              "src": "285:17:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_90c175aba01f1b423ad61521206b4da926528fccc35ea049b56674997f61e5d3",
@@ -881,8 +1010,8 @@
             "id": 209,
             "name": "AUCTION_PROTECTION",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "328:67:4",
+            "scope": 240,
+            "src": "309:67:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -893,7 +1022,7 @@
               "id": 207,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "328:7:4",
+              "src": "309:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -909,7 +1038,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "375:20:4",
+              "src": "356:20:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_c928e65acd4de2e804fd934d409a5a99d0362bdb42f85bcf438faa5090eaf57f",
@@ -924,8 +1053,8 @@
             "id": 212,
             "name": "WHITE_LIST",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "406:51:4",
+            "scope": 240,
+            "src": "383:51:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -936,7 +1065,7 @@
               "id": 210,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "406:7:4",
+              "src": "383:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -952,7 +1081,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "445:12:4",
+              "src": "422:12:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_55c152c9a5853c3d40c3526c5658b385c26370d280a2f3e4fc70692fdc363497",
@@ -967,8 +1096,8 @@
             "id": 215,
             "name": "AUCTION",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "468:45:4",
+            "scope": 240,
+            "src": "441:45:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -979,7 +1108,7 @@
               "id": 213,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "468:7:4",
+              "src": "441:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -995,7 +1124,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "504:9:4",
+              "src": "477:9:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_2a86bfecab7c1dc1a00b694d14a5a3c91a3ce748c12f853f875c4c7b4b254eb7",
@@ -1010,8 +1139,8 @@
             "id": 218,
             "name": "LIQUADITY",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "524:49:4",
+            "scope": 240,
+            "src": "493:49:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -1022,7 +1151,7 @@
               "id": 216,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "524:7:4",
+              "src": "493:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -1038,7 +1167,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "562:11:4",
+              "src": "531:11:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_b01c5cbe9c80f4ec0318b70720550067a3bd22355075beba13c2b562d5590e7a",
@@ -1053,8 +1182,8 @@
             "id": 221,
             "name": "CURRENCY",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "584:47:4",
+            "scope": 240,
+            "src": "549:47:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -1065,7 +1194,7 @@
               "id": 219,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "584:7:4",
+              "src": "549:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -1081,7 +1210,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "621:10:4",
+              "src": "586:10:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_4e8e254edb01426b6143b7bc645e83d15690c4c05223fa236535e12cb103e884",
@@ -1096,8 +1225,8 @@
             "id": 224,
             "name": "INDIDUAL_BONUS",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "642:59:4",
+            "scope": 240,
+            "src": "603:59:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -1108,7 +1237,7 @@
               "id": 222,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "642:7:4",
+              "src": "603:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -1124,7 +1253,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "685:16:4",
+              "src": "646:16:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_feb37b9cf9c9114adbcc11c4297bca73aa14c58ea6a05a792fd99c17df891f40",
@@ -1139,8 +1268,8 @@
             "id": 227,
             "name": "VAULT",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "712:41:4",
+            "scope": 240,
+            "src": "669:41:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -1151,7 +1280,7 @@
               "id": 225,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "712:7:4",
+              "src": "669:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -1167,7 +1296,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "746:7:4",
+              "src": "703:7:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_68fc488efe30251cadb6ac88bdeef3f1a5e6048808baf387258d1d78e986720c",
@@ -1182,8 +1311,8 @@
             "id": 230,
             "name": "TAG_ALONG",
             "nodeType": "VariableDeclaration",
-            "scope": 231,
-            "src": "760:49:4",
+            "scope": 240,
+            "src": "717:49:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -1194,7 +1323,7 @@
               "id": 228,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "760:7:4",
+              "src": "717:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -1210,7 +1339,7 @@
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "798:11:4",
+              "src": "755:11:4",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_3d1e441406b638f19e10a321f47a88fa6b5f8fddd264578c333196c5ca44db61",
@@ -1219,10 +1348,139 @@
               "value": "TAG_ALONG"
             },
             "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 233,
+            "name": "COMPANY_FUND_WALLET",
+            "nodeType": "VariableDeclaration",
+            "scope": 240,
+            "src": "773:69:4",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 231,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "773:7:4",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "434f4d50414e595f46554e445f57414c4c4554",
+              "id": 232,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "821:21:4",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier": "t_stringliteral_c14df940109d3bd0a994ec51a48d314b58ae54d7f78f9e007a8615ede2b1a2d5",
+                "typeString": "literal_string \"COMPANY_FUND_WALLET\""
+              },
+              "value": "COMPANY_FUND_WALLET"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 236,
+            "name": "COMPANY_MAIN_TOKEN_WALLET",
+            "nodeType": "VariableDeclaration",
+            "scope": 240,
+            "src": "849:81:4",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 234,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "849:7:4",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "434f4d50414e595f4d41494e5f544f4b454e5f57414c4c4554",
+              "id": 235,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "903:27:4",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier": "t_stringliteral_ea5a3eb810570a7fef7a93cfb51342c708214891fc0f4e56315e620e28d3f4da",
+                "typeString": "literal_string \"COMPANY_MAIN_TOKEN_WALLET\""
+              },
+              "value": "COMPANY_MAIN_TOKEN_WALLET"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 239,
+            "name": "SMART_SWAP",
+            "nodeType": "VariableDeclaration",
+            "scope": 240,
+            "src": "937:51:4",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 237,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "937:7:4",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "534d4152545f53574150",
+              "id": 238,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "976:12:4",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier": "t_stringliteral_2624da635f04e1ca24c3ab50b00741a8412344deb950ba834fd653f9183d5031",
+                "typeString": "literal_string \"SMART_SWAP\""
+              },
+              "value": "SMART_SWAP"
+            },
+            "visibility": "internal"
           }
         ],
-        "scope": 240,
-        "src": "25:792:4"
+        "scope": 249,
+        "src": "26:965:4"
       },
       {
         "baseContracts": [],
@@ -1230,9 +1488,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 239,
+        "id": 248,
         "linearizedBaseContracts": [
-          239
+          248
         ],
         "name": "IAuctionRegistery",
         "nodeType": "ContractDefinition",
@@ -1240,23 +1498,23 @@
           {
             "body": null,
             "documentation": null,
-            "id": 238,
+            "id": 247,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getAddressOf",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 234,
+              "id": 243,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 233,
+                  "id": 242,
                   "name": "_contractName",
                   "nodeType": "VariableDeclaration",
-                  "scope": 238,
-                  "src": "874:21:4",
+                  "scope": 247,
+                  "src": "1049:21:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1264,10 +1522,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 232,
+                    "id": 241,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "874:7:4",
+                    "src": "1049:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1277,62 +1535,62 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "873:23:4"
+              "src": "1048:23:4"
             },
             "returnParameters": {
-              "id": 237,
+              "id": 246,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 236,
+                  "id": 245,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 238,
-                  "src": "920:7:4",
+                  "scope": 247,
+                  "src": "1119:15:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_address",
-                    "typeString": "address"
+                    "typeIdentifier": "t_address_payable",
+                    "typeString": "address payable"
                   },
                   "typeName": {
-                    "id": 235,
+                    "id": 244,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "920:7:4",
-                    "stateMutability": "nonpayable",
+                    "src": "1119:15:4",
+                    "stateMutability": "payable",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_address",
-                      "typeString": "address"
+                      "typeIdentifier": "t_address_payable",
+                      "typeString": "address payable"
                     }
                   },
                   "value": null,
                   "visibility": "internal"
                 }
               ],
-              "src": "919:9:4"
+              "src": "1118:17:4"
             },
-            "scope": 239,
-            "src": "852:77:4",
+            "scope": 248,
+            "src": "1027:109:4",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 240,
-        "src": "819:112:4"
+        "scope": 249,
+        "src": "994:144:4"
       }
     ],
-    "src": "0:934:4"
+    "src": "0:1139:4"
   },
   "compiler": {
     "name": "solc",
     "version": "0.5.9+commit.e560f70d.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.0.16",
-  "updatedAt": "2020-05-07T07:18:50.684Z",
+  "schemaVersion": "3.1.0",
+  "updatedAt": "2020-05-22T12:31:56.375Z",
   "devdoc": {
     "methods": {}
   },
