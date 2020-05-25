@@ -39,15 +39,15 @@ contract StockToken is Exchangeable {
         view
         returns (bool)
     {
-        if (_to != smartSwapAddress) {
-            require(
-                IWhiteList(whiteListAddress).stock_isTransferAllowed(
-                    _from,
-                    _to
-                ),
-                "ERR_NOT_HAVE_PERMISSION_TO_TRANSFER"
-            );
-        }
+        require(
+            IWhiteList(whiteListAddress).stock_isTransferAllowed(
+                msg.sender,
+                _from,
+                _to
+            ),
+            "ERR_NOT_HAVE_PERMISSION_TO_TRANSFER"
+        );
+
         return true;
     }
 
