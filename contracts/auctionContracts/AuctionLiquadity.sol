@@ -336,7 +336,7 @@ contract Liquadity is LiquadityUtils {
         emit Contribution(address(0), value, returnAmount);
 
         checkAppeciationLimit();
-
+        lastTokenPrice = _getCurrentMarketPrice();
         return returnAmount;
     }
 
@@ -356,7 +356,9 @@ contract Liquadity is LiquadityUtils {
             getAddressOf(VAULT),
             returnAmount
         );
-
+        
+        lastTokenPrice = _getCurrentMarketPrice();
+        
         emit Redemption(address(0), value, returnAmount);
 
         return true;
@@ -436,33 +438,8 @@ contract Liquadity is LiquadityUtils {
                 100
             );
 
-            uint256 newReserverBalance = IAuctionFormula(
-                getAddressOf(AUCTION_FORMULA)
-            )
-                .calculateRecoverPrice(
-                _baseTokenBalance,
-                _baseTokenRatio,
-                fallBackPrice,
-                _mainTokenRatio,
-                _baseTokenPrice
-            );
-
-            if (newReserverBalance > _mainTokenBalance) {
-                
-                uint256 _reverseBalance = safeSub(
-                    newReserverBalance,
-                    _mainTokenBalance
-                );
-                
-                _reverseBalance = safeDiv(safeMul(_reverseBalance,_mainTokenBalance),_baseTokenBalance);
-                
-                ITokenVault(addressOf(VAULT)).directTransfer(
-                    address(mainToken),
-                    address(this),
-                    _reverseBalance
-                );
-                _redempation(_reverseBalance,mainTokenTobaseToken);
-            }
+            _recoverPriceWitMainToken(fallBackPrice);
+            
         }
 
         return _isRedemptionReqiured;
@@ -470,6 +447,8 @@ contract Liquadity is LiquadityUtils {
 
     // when we have zero contibution towards auction
     // this method called from auction contarct
+    // this method sell 10% realy and convert into ether if there 
+    // is no ether into tagAlong
     function contributeTowardMainReserve()
         external
         allowedAddressOnly(msg.sender)
@@ -477,12 +456,24 @@ contract Liquadity is LiquadityUtils {
     {
         
         address tagAlongAddress = getAddressOf(TAG_ALONG);
-        if()
-        IAuctionTagAlong()
-            .contributeTowardLiquadity(previousMainReserveContribution);
+        if(address(this).balance < previousMainReserveContribution){
+            
+            
+            if(tagAlongAddress.balance < previousMainReserveContribution){
+                uint256 sellRelay = safeDiv(safeMul(relayToken.balanceOf(address(this)),10),100);
+                _liquadate(address(this),sellRelay,true);
+                IAuctionTagAlong(tagAlongAddress)
+                .contributeTowardLiquadity(safeSub(previousMainReserveContribution,tagAlongAddress.balance));
+
+            }else{
+                IAuctionTagAlong(tagAlongAddress)
+                .contributeTowardLiquadity(previousMainReserveContribution);
+
+            }
+                        
+        }
 
         _contributeWithEther(previousMainReserveContribution);
-    
         return previousMainReserveContribution;
     }
 
@@ -522,8 +513,6 @@ contract Liquadity is LiquadityUtils {
         
         _contributeWithEther(mainReserverAmount);
         
-        lastTokenPrice = _getCurrentMarketPrice();
-        
         return lastTokenPrice;
     }
 
@@ -539,9 +528,77 @@ contract Liquadity is LiquadityUtils {
     }
 
     
+    //recover price from main token 
+    // if there is not enough main token sell 10% relay 
+    function _recoverPriceWitMainToken(uint256 recoverPrice) internal returns (bool){
+         
+        uint256 _baseTokenPrice = ICurrencyPrices(getAddressOf(CURRENCY))
+            .getCurrencyPrice(address(baseToken));
+            
+         
+        (
+            uint256 _baseTokenBalance,
+            uint256 _mainTokenBalance
+        ) = getTokensReserveBalance();
 
-    // // under development
-     function _recoverPriceFromRedemption(uint256 recoverPrice) internal returns (bool){
+        (
+            uint256 _baseTokenRatio,
+            uint256 _mainTokenRatio
+        ) = getTokensReserveRatio();
+        
+       uint256 newReserverBalance = IAuctionFormula(
+                getAddressOf(AUCTION_FORMULA)
+            )
+                .calculateRecoverPrice(
+                _baseTokenBalance,
+                _baseTokenRatio,
+                recoverPrice,
+                _mainTokenRatio,
+                _baseTokenPrice
+            );
+
+            
+        if (newReserverBalance > _mainTokenBalance) {
+                
+                address vaultAddress = addressOf(VAULT);
+                uint256 _reverseBalance = safeSub(
+                    newReserverBalance,
+                    _baseTokenBalance
+                );
+                
+                _reverseBalance = safeDiv(safeMul(_reverseBalance,_mainTokenBalance),_baseTokenBalance);
+                
+                if(_reverseBalance > mainToken.balanceOf(address(this))){
+                     
+                     uint256 vaultBalance = mainToken.balanceOf(vaultAddress);
+                     
+                     if(vaultBalance >= _reverseBalance){
+                        ITokenVault(vaultAddress).directTransfer(
+                            address(mainToken),
+                            address(this),
+                            _reverseBalance
+                        );
+                    }else{
+                        uint256 sellRelay = safeDiv(safeMul(relayToken.balanceOf(address(this)),10),100);
+                         ITokenVault(vaultAddress).directTransfer(
+                            address(mainToken),
+                            address(this),
+                            vaultBalance
+                        );
+                        _liquadate(address(this),sellRelay,false);
+                        return _recoverPriceWithBaseToken(recoverPrice);
+                    }
+                
+                }
+                
+                return _redempation(_reverseBalance,mainTokenTobaseToken);
+            }
+     }
+     
+    
+    //recover price from basetoken 
+    // if there is not enough main token sell 10% relay 
+    function _recoverPriceWithBaseToken(uint256 recoverPrice) internal returns (bool){
          
         uint256 _baseTokenPrice = ICurrencyPrices(getAddressOf(CURRENCY))
             .getCurrencyPrice(address(baseToken));
@@ -598,7 +655,7 @@ contract Liquadity is LiquadityUtils {
                             vaultBalance
                         );
                         _liquadate(address(this),sellRelay,false);
-                        return _recoverPriceFromRedemption(recoverPrice);
+                        return _recoverPriceWithBaseToken(recoverPrice);
                     }
                 
                 }
@@ -606,6 +663,15 @@ contract Liquadity is LiquadityUtils {
                 return _redempation(_reverseBalance,baseTokenToMainToken);
             }
      }
+
+    
+    // this function recover last price from contrbution or redeemption
+    // function recover price against volatilty from basetok
+    function recoverFromManiplution(uint256 _func) external onlySystem() returns(bool){
+     
+        if(_func == 1) _recoverPriceWitMainToken(lastTokenPrice);
+        else if(_func == 2) _recoverPriceWithBaseToken(lastTokenPrice);
+    }
 
     function redemption(IERC20Token[] memory _path, uint256 _amount)
         public
@@ -658,7 +724,7 @@ contract Liquadity is LiquadityUtils {
             returnAmount
         );
 
-        _recoverPriceFromRedemption(marketPrice);
+        _recoverPriceWithBaseToken(marketPrice);
         emit RecoverPrice(marketPrice, _getCurrentMarketPrice());
         return true;
     }
