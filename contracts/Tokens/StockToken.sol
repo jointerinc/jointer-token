@@ -10,8 +10,6 @@ contract StockToken is Exchangeable {
         address _systemAddress,
         address _authorityAddress,
         address _registeryAddress,
-        uint256 _tokenMaturityDays,
-        uint256 _tokenHoldBackDays,
         address _returnToken,
         address[] memory _which,
         uint256[] memory _amount
@@ -22,14 +20,11 @@ contract StockToken is Exchangeable {
             _symbol,
             _systemAddress,
             _authorityAddress,
-            _tokenMaturityDays,
-            _tokenHoldBackDays,
             _registeryAddress
         )
         ForceSwap(_returnToken)
     {
         require(_which.length == _amount.length, "ERR_NOT_SAME_LENGTH");
-        address whiteListAddress = getAddressOf(WHITE_LIST);
         for (uint256 tempX = 0; tempX < _which.length; tempX++) {
             require(
                 IWhiteList(whiteListAddress).isWhiteListed(_which[tempX]),
@@ -44,9 +39,7 @@ contract StockToken is Exchangeable {
         view
         returns (bool)
     {
-        address whiteListAddress = getAddressOf(WHITE_LIST);
-
-        if (_to != getAddressOf(SMART_SWAP)) {
+        if (_to != smartSwapAddress) {
             require(
                 IWhiteList(whiteListAddress).stock_isTransferAllowed(
                     _from,
@@ -64,17 +57,14 @@ contract StockToken is Exchangeable {
         isConversionAllowed(_fromToken)
         returns (uint256)
     {
-        address whiteListAddress = getAddressOf(WHITE_LIST);
-
         //check if msg.sender is allowed
 
         require(
             IWhiteList(whiteListAddress).stock_isReceiveAllowed(msg.sender),
             "ERR_CANNOT_RECIEVE"
         );
-        //if(address(this) == getAddressOf(STOCK_TOKEN);)
 
-        ICurrencyPrices currencyPrice = ICurrencyPrices(getAddressOf(CURRENCY));
+        ICurrencyPrices currencyPrice = ICurrencyPrices(currencyPricesAddress);
 
         uint256 fromTokenPrice = currencyPrice.getCurrencyPrice(_fromToken);
 
@@ -88,11 +78,7 @@ contract StockToken is Exchangeable {
         );
 
         if (_fromToken == returnToken) {
-            ERC20(_fromToken).transferFrom(
-                msg.sender,
-                getAddressOf(VAULT),
-                _amount
-            );
+            ERC20(_fromToken).transferFrom(msg.sender, vaultAddress, _amount);
         } else {
             ERC20(_fromToken).transferFrom(msg.sender, address(this), _amount);
             IToken(_fromToken).burn(_amount);

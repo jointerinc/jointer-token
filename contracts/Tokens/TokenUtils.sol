@@ -37,49 +37,29 @@ contract AuctionRegistery is AuctionRegisteryContracts, Ownable {
 
 
 contract TokenUtils is StandardToken, AuctionRegistery {
-    uint256 public tokenSaleStartDate;
-
-    uint256 public tokenMaturityDays;
-
-    uint256 public tokenHoldBackDays;
+    address public whiteListAddress;
+    address public smartSwapAddress;
+    address public currencyPricesAddress;
+    address public vaultAddress;
+    address public auctionAddress;
 
     constructor(
         string memory _name,
         string memory _symbol,
         address _systemAddress,
         address _authorityAddress,
-        uint256 _tokenMaturityDays,
-        uint256 _tokenHoldBackDays,
         address _registeryAddress
     )
         public
         StandardToken(_name, _symbol, _systemAddress, _authorityAddress)
         AuctionRegistery(_registeryAddress)
-    {
-        tokenSaleStartDate = now;
-        tokenMaturityDays = _tokenMaturityDays;
-        tokenHoldBackDays = _tokenHoldBackDays;
-    }
+    {}
 
-    function isTokenMature() public view returns (bool) {
-        if (tokenMaturityDays == 0) return false;
-        uint256 tempDay = safeMul(86400, tokenMaturityDays);
-        uint256 tempMature = safeAdd(tempDay, tokenSaleStartDate);
-        if (now >= tempMature) {
-            return true;
-        }
-        return false;
-    }
-
-    function isHoldbackDaysOver() public view returns (bool) {
-        uint256 tempDay = safeMul(86400, tokenHoldBackDays);
-
-        uint256 holdBackDaysEndDay = safeAdd(tempDay, tokenSaleStartDate);
-
-        if (now >= holdBackDaysEndDay) {
-            return true;
-        }
-
-        return false;
+    function updateAdresses() external {
+        whiteListAddress = getAddressOf(WHITE_LIST);
+        smartSwapAddress = getAddressOf(SMART_SWAP);
+        currencyPricesAddress = getAddressOf(CURRENCY);
+        vaultAddress = getAddressOf(VAULT);
+        auctionAddress = getAddressOf(AUCTION);
     }
 }

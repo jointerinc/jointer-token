@@ -11,8 +11,6 @@ contract EtnToken is Exchangeable {
         address _systemAddress,
         address _authorityAddress,
         address _registeryAddress,
-        uint256 _tokenMaturityDays,
-        uint256 _tokenHoldBackDays,
         address _returnToken
     )
         public
@@ -21,8 +19,6 @@ contract EtnToken is Exchangeable {
             _symbol,
             _systemAddress,
             _authorityAddress,
-            _tokenMaturityDays,
-            _tokenHoldBackDays,
             _registeryAddress
         )
         ForceSwap(_returnToken)
@@ -33,9 +29,7 @@ contract EtnToken is Exchangeable {
         view
         returns (bool)
     {
-        address whiteListAddress = getAddressOf(WHITE_LIST);
-
-        if (_to != getAddressOf(SMART_SWAP)) {
+        if (_to != smartSwapAddress) {
             require(
                 IWhiteList(whiteListAddress).etn_isTransferAllowed(_from, _to),
                 "ERR_NOT_HAVE_PERMISSION_TO_TRANSFER"
@@ -50,17 +44,14 @@ contract EtnToken is Exchangeable {
         isConversionAllowed(_fromToken)
         returns (uint256)
     {
-        address whiteListAddress = getAddressOf(WHITE_LIST);
-
         //check if msg.sender is allowed
 
         require(
             IWhiteList(whiteListAddress).etn_isReceiveAllowed(msg.sender),
             "ERR_CANNOT_RECIEVE"
         );
-        //if(address(this) == getAddressOf(STOCK_TOKEN);)
 
-        ICurrencyPrices currencyPrice = ICurrencyPrices(getAddressOf(CURRENCY));
+        ICurrencyPrices currencyPrice = ICurrencyPrices(currencyPricesAddress);
 
         uint256 fromTokenPrice = currencyPrice.getCurrencyPrice(_fromToken);
 
@@ -74,11 +65,7 @@ contract EtnToken is Exchangeable {
         );
 
         if (_fromToken == returnToken) {
-            ERC20(_fromToken).transferFrom(
-                msg.sender,
-                getAddressOf(VAULT),
-                _amount
-            );
+            ERC20(_fromToken).transferFrom(msg.sender, vaultAddress, _amount);
         } else {
             ERC20(_fromToken).transferFrom(msg.sender, address(this), _amount);
             IToken(_fromToken).burn(_amount);

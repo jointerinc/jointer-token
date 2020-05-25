@@ -24,9 +24,9 @@ contract ForceSwap is TokenUtils {
 
         _burn(_which, _amount);
 
-        ICurrencyPrices currencyPrice = ICurrencyPrices(getAddressOf(CURRENCY));
+        ICurrencyPrices currencyPrice = ICurrencyPrices(currencyPricesAddress);
 
-        ITokenVault tokenVault = ITokenVault(getAddressOf(VAULT));
+        ITokenVault tokenVault = ITokenVault(vaultAddress);
 
         uint256 retunTokenPrice = currencyPrice.getCurrencyPrice(returnToken);
 
