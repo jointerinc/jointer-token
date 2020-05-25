@@ -6,7 +6,6 @@ import "./TokenUtils.sol";
 
 contract TokenMinter is TokenUtils {
     modifier onlyAuthorizedAddress() {
-        address auctionAddress = getAddressOf(AUCTION);
         require(msg.sender == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
         _;
     }
@@ -31,8 +30,6 @@ contract MainToken is TokenMinter {
         address _systemAddress,
         address _authorityAddress,
         address _registeryAddress,
-        uint256 _tokenMaturityDays,
-        uint256 _tokenHoldBackDays,
         address[] memory _which,
         uint256[] memory _amount
     )
@@ -42,14 +39,10 @@ contract MainToken is TokenMinter {
             _symbol,
             _systemAddress,
             _authorityAddress,
-            _tokenMaturityDays,
-            _tokenHoldBackDays,
             _registeryAddress
         )
     {
         require(_which.length == _amount.length, "ERR_NOT_SAME_LENGTH");
-
-        address whiteListAddress = getAddressOf(WHITE_LIST);
 
         for (uint256 tempX = 0; tempX < _which.length; tempX++) {
             require(
@@ -65,9 +58,9 @@ contract MainToken is TokenMinter {
         view
         returns (bool)
     {
-        address whiteListAddress = getAddressOf(WHITE_LIST);
+        address whiteListAddress = whiteListAddress;
 
-        if (_to != getAddressOf(SMART_SWAP)) {
+        if (_to != smartSwapAddress) {
             require(
                 IWhiteList(whiteListAddress).main_isTransferAllowed(_from, _to),
                 "ERR_NOT_HAVE_PERMISSION_TO_TRANSFER"
@@ -111,10 +104,7 @@ contract MainToken is TokenMinter {
         uint256 _amount,
         uint256 _locktime
     ) external returns (bool) {
-        require(
-            msg.sender == getAddressOf(AUCTION),
-            ERR_AUTHORIZED_ADDRESS_ONLY
-        );
+        require(msg.sender == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
         if (_locktime > lastLock[_which]) {
             lockedToken[_which] = _amount;
             lastLock[_which] = _locktime;
