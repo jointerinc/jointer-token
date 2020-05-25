@@ -60,12 +60,15 @@ contract MainToken is TokenMinter {
     {
         address whiteListAddress = whiteListAddress;
 
-        if (_to != smartSwapAddress) {
-            require(
-                IWhiteList(whiteListAddress).main_isTransferAllowed(_from, _to),
-                "ERR_NOT_HAVE_PERMISSION_TO_TRANSFER"
-            );
-        }
+        require(
+            IWhiteList(whiteListAddress).main_isTransferAllowed(
+                msg.sender,
+                _from,
+                _to
+            ),
+            "ERR_NOT_HAVE_PERMISSION_TO_TRANSFER"
+        );
+
         return true;
     }
 
