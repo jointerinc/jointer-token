@@ -17,13 +17,13 @@ contract IAuctionFormula {
         uint256 _baseTokenPrice
     ) public pure returns (uint256);
 
-    function calculateApprectiation(
-        uint256 _reserveBaseTokenBalance,
-        uint256 _reserveBaseTokenRatio,
-        uint256 _reserveMainTokenPrice,
-        uint256 _reserveMainTokenRatio,
-        uint256 _baseTokenPrice
-    ) public pure returns (uint256);
+    function calculateRecoverPrice(
+        uint256 _reserveTokenBalance,
+        uint256 _reserveTokenRatio,
+        uint256 _needPrice,
+        uint256 _reserveFindTokenRatio,
+        uint256 _TokenPrice
+    ) external pure returns (uint256);
 
     function calcuateAuctionFundDistrubution(
         uint256 _value,
