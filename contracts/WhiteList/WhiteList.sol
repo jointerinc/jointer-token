@@ -313,7 +313,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         //makes sure that holdback days are over
         if (tokenToHoldBackDaysTimeStamp[token] != 0)
             require(
-                now >= tokenToHoldBackDaysTimeStamp[0],
+                now >= tokenToHoldBackDaysTimeStamp[token],
                 "ERR_TOKEN_HOLDBACK_NOT_OVER"
             );
 
