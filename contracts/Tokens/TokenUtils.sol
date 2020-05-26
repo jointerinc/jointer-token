@@ -6,9 +6,11 @@ import "../common/Ownable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 
 
+/**@dev keeps track of registry contract at which all the addresses of the wholes system's contracts are stored */
 contract AuctionRegistery is AuctionRegisteryContracts, Ownable {
     IAuctionRegistery public contractsRegistry;
 
+    /**@dev sets the initial registry address */
     constructor(address _registeryAddress)
         public
         notZeroAddress(_registeryAddress)
@@ -16,6 +18,7 @@ contract AuctionRegistery is AuctionRegisteryContracts, Ownable {
         contractsRegistry = IAuctionRegistery(_registeryAddress);
     }
 
+    /**@dev updates the address of the registry, called only by the system */
     function updateRegistery(address _address)
         external
         onlyAuthorized()
@@ -26,6 +29,8 @@ contract AuctionRegistery is AuctionRegisteryContracts, Ownable {
         return true;
     }
 
+    /**@dev returns address of the asked contract got from registry contract at the registryAddress
+    @param _contractName name of the contract  */
     function getAddressOf(bytes32 _contractName)
         internal
         view
@@ -36,50 +41,44 @@ contract AuctionRegistery is AuctionRegisteryContracts, Ownable {
 }
 
 
+/**@dev keeps track of all the addresses token needs which are fetched from registry contract
+        Also is a standard ERC20 token*/
 contract TokenUtils is StandardToken, AuctionRegistery {
-    uint256 public tokenSaleStartDate;
+    address public whiteListAddress;
+    address public smartSwapAddress;
+    address public currencyPricesAddress;
+    address public vaultAddress;
+    address public auctionAddress;
 
-    uint256 public tokenMaturityDays;
-
-    uint256 public tokenHoldBackDays;
-
+    /**
+     *@dev contructs standard erc20 token and auction registry
+     *@param _name name of the token
+     *@param _symbol symbol of the token
+     *@param _systemAddress address that acts as an admin of the system
+     *@param _authorityAddress address that can change the systemAddress
+     *@param _registeryAddress address of the registry contract the keeps track of all the contract Addresses
+     **/
     constructor(
         string memory _name,
         string memory _symbol,
         address _systemAddress,
         address _authorityAddress,
-        uint256 _tokenMaturityDays,
-        uint256 _tokenHoldBackDays,
         address _registeryAddress
     )
         public
         StandardToken(_name, _symbol, _systemAddress, _authorityAddress)
         AuctionRegistery(_registeryAddress)
     {
-        tokenSaleStartDate = now;
-        tokenMaturityDays = _tokenMaturityDays;
-        tokenHoldBackDays = _tokenHoldBackDays;
+        updateAddresses();
     }
 
-    function isTokenMature() public view returns (bool) {
-        if (tokenMaturityDays == 0) return false;
-        uint256 tempDay = safeMul(86400, tokenMaturityDays);
-        uint256 tempMature = safeAdd(tempDay, tokenSaleStartDate);
-        if (now >= tempMature) {
-            return true;
-        }
-        return false;
-    }
-
-    function isHoldbackDaysOver() public view returns (bool) {
-        uint256 tempDay = safeMul(86400, tokenHoldBackDays);
-
-        uint256 holdBackDaysEndDay = safeAdd(tempDay, tokenSaleStartDate);
-
-        if (now >= holdBackDaysEndDay) {
-            return true;
-        }
-
-        return false;
+    /**@dev updates all the address from the registry contract
+    this decision was made to save gas that occurs from calling an external view function */
+    function updateAddresses() public {
+        whiteListAddress = getAddressOf(WHITE_LIST);
+        smartSwapAddress = getAddressOf(SMART_SWAP);
+        currencyPricesAddress = getAddressOf(CURRENCY);
+        vaultAddress = getAddressOf(VAULT);
+        auctionAddress = getAddressOf(AUCTION);
     }
 }
