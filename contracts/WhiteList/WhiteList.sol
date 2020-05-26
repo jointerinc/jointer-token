@@ -280,7 +280,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         returns (bool)
     {
         address investor = address_belongs[user];
-        require(investor != address(0), "ERR_ACTION_NOT_ALLOWED");
+        require(investor != address(0), "ERR_TRANSFER_CHECK_WHITELIST");
         uint256 flags = user_details[investor].flags;
         bool result;
         result = checkRule(
@@ -315,7 +315,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         result = _isReceiveAllowed(_to, token); // Check receiver at first
         if (!result) return false; // if receiver disallowed the transfer disallowed too.
         address from = address_belongs[_from];
-        require(from != address(0), "ERR_ACTION_NOT_ALLOWED");
+        require(from != address(0), "ERR_TRANSFER_CHECK_WHITELIST");
         uint256 from_flags = user_details[from].flags;
         uint256 to_flags = user_details[to].flags;
         //makes sure that token is not mature
