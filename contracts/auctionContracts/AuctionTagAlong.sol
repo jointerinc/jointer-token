@@ -87,47 +87,45 @@ contract AuctionTagAlong is Utils {
     ) internal {
         _token.approve(_spender, _amount);
     }
-    
-    //selling 10% relay to be developed
+
     function contributeTowardLiquadity(uint256 _amount)
-        public
+        external
         returns (uint256)
     {
         require(
             msg.sender == getAddressOf(LIQUADITY),
             "ERR_ONLY_AUCTION_ALLWOED"
         );
-        
+
         if (_amount > address(this).balance) {
-            _amount = address(this).balance;
-            msg.sender.transfer(_amount);
-            return _amount;
+            uint256 _newamount = address(this).balance;
+            msg.sender.transfer(_newamount);
+            return _newamount;
         }
-        
+
         msg.sender.transfer(_amount);
         return _amount;
     }
 
-    function() external payable {
-        emit FundDeposited(address(0), msg.sender, msg.value);
+    // relay token and bnt token
+    function transferTokenLiquadity(
+        IERC20Token _token,
+        address _reciver,
+        uint256 _amount
+    ) external returns (bool) {
+        require(
+            msg.sender == getAddressOf(LIQUADITY),
+            "ERR_ONLY_AUCTION_ALLWOED"
+        );
+        ensureTransferFrom(_token, address(this), _reciver, _amount);
+        return true;
     }
 
-    function cancelInvestment() public onlyOwner() returns (bool) {
-        return
-            IAuctionProtection(getAddressOf(AUCTION_PROTECTION))
-                .cancelInvestment();
-    }
-
-    function unLockTokens() public onlyOwner() returns (bool) {
-        return
-            IAuctionProtection(getAddressOf(AUCTION_PROTECTION)).unLockTokens();
-    }
-
-    function returnTokens(IERC20Token _tokens, address _to, uint256 _value)
-        external
-        onlyOwner()
-        returns (bool)
-    {
+    function returnTokens(
+        IERC20Token _tokens,
+        address _to,
+        uint256 _value
+    ) external onlyOwner() returns (bool) {
         ensureTransferFrom(_tokens, address(this), _to, _value);
         return true;
     }
@@ -136,18 +134,18 @@ contract AuctionTagAlong is Utils {
         msg.sender.transfer(_value);
         return true;
     }
-    
-    function depositeEther() external payable returns (bool) {
-        emit FundDeposited(address(0), msg.sender, msg.value);
-        return true;
-    }
 
-    function depositeToken(IERC20Token _token, address _from, uint256 _amount)
-        external
-        returns (bool)
-    {
+    function depositeToken(
+        IERC20Token _token,
+        address _from,
+        uint256 _amount
+    ) external returns (bool) {
         ensureTransferFrom(_token, _from, address(this), _amount);
         emit FundDeposited(address(0), _from, _amount);
         return true;
+    }
+
+    function() external payable {
+        emit FundDeposited(address(0), msg.sender, msg.value);
     }
 }
