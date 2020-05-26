@@ -31,8 +31,8 @@ const advanceTime = (time) => {
 const jntrToken = artifacts.require("MainToken");
 const stockToken = artifacts.require("StockToken");
 const etnToken = artifacts.require("EtnToken");
-const CurrencyPrices = artifacts.require("CurrencyPrices");
-const AuctionRegisty = artifacts.require("AuctionRegistery");
+const CurrencyPrices = artifacts.require("TestCurrencyPrices");
+const AuctionRegisty = artifacts.require("TestAuctionRegistery");
 const whiteListContract = artifacts.require("WhiteList");
 const WhiteListRegistry = artifacts.require("WhiteListRegistery");
 
@@ -65,7 +65,7 @@ contract("~System works", function (accounts) {
   const stockTokenPrice = 10000000; //10$
 
   const stockTokenMaturityDays = 3560;
-  const tokenMaturityDays = 0;
+  const tokenMaturityDays = 3560;
   const tokenHoldBackDays = 90;
 
   //can modify these
@@ -88,7 +88,7 @@ contract("~System works", function (accounts) {
       {from: primaryOwner}
     );
     //setup WhiteList
-    let whiteListType = 0;
+    let flags = 0;
     let maxWallets = 10;
 
     var whiteListRegistry = await WhiteListRegistry.new(
@@ -101,24 +101,34 @@ contract("~System works", function (accounts) {
       1,
       primaryOwner,
       systemAddress,
-      authorityAddress
+      authorityAddress,
+      tokenHoldBackDays,
+      tokenHoldBackDays,
+      tokenHoldBackDays,
+      tokenMaturityDays,
+      tokenMaturityDays,
+      stockTokenMaturityDays
     );
     let proxyAddress = await whiteListRegistry.proxyAddress();
     this.whiteList = await whiteListContract.at(proxyAddress);
     registryAddress = whiteListRegistry.address;
 
     //add wallets
-    await this.whiteList.addNewWallet(accountA, whiteListType, maxWallets, {
+    await this.whiteList.addNewWallet(accountA, flags, maxWallets, {
       from: systemAddress,
     });
-    await this.whiteList.addNewWallet(accountB, whiteListType, maxWallets, {
+    await this.whiteList.addNewWallet(accountB, flags, maxWallets, {
       from: systemAddress,
     });
-    await this.whiteList.addNewWallet(vault, whiteListType, maxWallets, {
+    await this.whiteList.addNewWallet(vault, flags, maxWallets, {
       from: systemAddress,
     });
     //add currencyPrices
-    this.currencyPrices = await CurrencyPrices.new({from: primaryOwner});
+    this.currencyPrices = await CurrencyPrices.new(
+      systemAddress,
+      multiSigPlaceHolder,
+      {from: primaryOwner}
+    );
 
     //add addresses to the auctionRegistery
     this.auctionRegistery.registerContractAddress(
@@ -150,9 +160,6 @@ contract("~System works", function (accounts) {
       systemAddress,
       authorityAddress,
       this.auctionRegistery.address,
-      JntrTokenPrice,
-      tokenMaturityDays,
-      tokenHoldBackDays,
       [accountA, accountB],
       [accountAAmountJntr, accountBAmountJntr],
       {
@@ -165,9 +172,6 @@ contract("~System works", function (accounts) {
       systemAddress,
       authorityAddress,
       this.auctionRegistery.address,
-      stockTokenPrice,
-      stockTokenMaturityDays,
-      tokenHoldBackDays,
       returnTokenPlaceHolder,
       [accountA],
       [accountAAmountStock],
@@ -181,30 +185,27 @@ contract("~System works", function (accounts) {
       systemAddress,
       authorityAddress,
       this.auctionRegistery.address,
-      etnTokenPrice,
-      tokenMaturityDays, //maturityDays
-      tokenHoldBackDays,
       returnTokenPlaceHolder,
       {
         from: primaryOwner,
       }
     );
-
+    //Add these contracts itself in the whitelist
+    //add wallets
+    await this.whiteList.addNewWallet(JntrToken.address, flags, maxWallets, {
+      from: systemAddress,
+    });
+    await this.whiteList.addNewWallet(EtnToken.address, flags, maxWallets, {
+      from: systemAddress,
+    });
+    await this.whiteList.addNewWallet(StockToken.address, flags, maxWallets, {
+      from: systemAddress,
+    });
     //set currency prices
     await this.currencyPrices.setCurrencyPriceUSD(
-      [StockToken.address],
-      [stockTokenPrice],
-      {from: primaryOwner}
-    );
-    await this.currencyPrices.setCurrencyPriceUSD(
-      [JntrToken.address],
-      [JntrTokenPrice],
-      {from: primaryOwner}
-    );
-    await this.currencyPrices.setCurrencyPriceUSD(
-      [EtnToken.address],
-      [etnTokenPrice],
-      {from: primaryOwner}
+      [StockToken.address, JntrToken.address, EtnToken.address],
+      [stockTokenPrice, JntrTokenPrice, etnTokenPrice],
+      {from: systemAddress}
     );
   });
   describe("System should be  initialized correctly", async function () {
@@ -243,7 +244,7 @@ contract("~System works", function (accounts) {
       //before holdback days are over it should fail
       await expectRevert(
         JntrToken.transfer(accountB, transferAmount, {from: accountA}),
-        "ERR_ACTION_NOT_ALLOWED"
+        "ERR_TOKEN_HOLDBACK_NOT_OVER"
       );
 
       await advanceTime(86400 * tokenHoldBackDays);
@@ -275,7 +276,7 @@ contract("~System works", function (accounts) {
         JntrToken.transferFrom(accountA, accountB, approvedAmount, {
           from: accountB,
         }),
-        "ERR_ACTION_NOT_ALLOWED"
+        "ERR_TOKEN_HOLDBACK_NOT_OVER"
       );
       await advanceTime(86400 * tokenHoldBackDays);
       await expectRevert(
@@ -319,7 +320,7 @@ contract("~System works", function (accounts) {
       );
     });
   });
-  describe("EthnToken should work correctly", async function () {
+  describe("EtnToken should work correctly", async function () {
     it("should be able to buy tokens", async function () {
       //transferFrom of Stock won't work if tokenHoldbackDays are not over
 

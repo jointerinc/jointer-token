@@ -56,7 +56,9 @@ contract WhiteListStorage {
     uint256 public constant FROM_EU = 1 << 12;
     uint256 public constant IS_BYPASSED = 1 << 13;
 
+    //timestamp when hold back days are over
     mapping(uint8 => uint256) tokenToHoldBackDaysTimeStamp;
+    //timestamp when token matures
     mapping(uint8 => uint256) tokenToMaturityDaysTimeStamp;
 }
 
@@ -278,7 +280,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         returns (bool)
     {
         address investor = address_belongs[user];
-        require(investor != address(0), "ERR_ACTION_NOT_ALLOWED");
+        require(investor != address(0), "ERR_TRANSFER_CHECK_WHITELIST");
         uint256 flags = user_details[investor].flags;
         bool result;
         result = checkRule(
@@ -292,18 +294,30 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
 
     //@dev checks if transfer is allowed with according transferringRules of a token
     function _isTransferAllowed(
+        address _msgSender,
         address _from,
         address _to,
         uint8 token
     ) internal view returns (bool) {
-        bool result = _isReceiveAllowed(_to, token); // Check receiver at first
+        address to = address_belongs[_to];
+        address msgSender = address_belongs[_msgSender];
+        bool result;
+        //If transfer is happening to a bypassed address then check nothing
+        if (isAddressByPassed(to)) {
+            return true;
+        }
+        //If a byPassed Address calls a transfer or transferFrom function then just check if _to is whitelisted and return
+        if (isAddressByPassed(msgSender)) {
+            result = isWhiteListed(to);
+            return result;
+        }
+
+        result = _isReceiveAllowed(_to, token); // Check receiver at first
         if (!result) return false; // if receiver disallowed the transfer disallowed too.
         address from = address_belongs[_from];
-        address to = address_belongs[_to];
-        require(from != address(0), "ERR_ACTION_NOT_ALLOWED");
+        require(from != address(0), "ERR_TRANSFER_CHECK_WHITELIST");
         uint256 from_flags = user_details[from].flags;
         uint256 to_flags = user_details[to].flags;
-
         //makes sure that token is not mature
         if (tokenToMaturityDaysTimeStamp[token] != 0)
             require(
@@ -376,21 +390,21 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
     }
 
     //@dev check if transferring is allowed for main
-    function main_isTransferAllowed(address _from, address _to)
-        public
-        view
-        returns (bool)
-    {
-        return _isTransferAllowed(_from, _to, 0);
+    function main_isTransferAllowed(
+        address _msgSender,
+        address _from,
+        address _to
+    ) public view returns (bool) {
+        return _isTransferAllowed(_msgSender, _from, _to, 0);
     }
 
     //@dev check if transferring is allowed for etn
-    function etn_isTransferAllowed(address _from, address _to)
-        public
-        view
-        returns (bool)
-    {
-        return _isTransferAllowed(_from, _to, 1);
+    function etn_isTransferAllowed(
+        address _msgSender,
+        address _from,
+        address _to
+    ) public view returns (bool) {
+        return _isTransferAllowed(_msgSender, _from, _to, 1);
     }
 
     //@dev checks if address is allowed to recieve etn token
@@ -428,12 +442,12 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
     }
 
     //@dev check if transferring is allowed for stock
-    function stock_isTransferAllowed(address _from, address _to)
-        public
-        view
-        returns (bool)
-    {
-        return _isTransferAllowed(_from, _to, 2);
+    function stock_isTransferAllowed(
+        address _msgSender,
+        address _from,
+        address _to
+    ) public view returns (bool) {
+        return _isTransferAllowed(_msgSender, _from, _to, 2);
     }
 
     //@dev checks if address is allowed to recieve stock token

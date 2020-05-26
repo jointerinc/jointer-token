@@ -6,7 +6,6 @@ import "./TokenUtils.sol";
 
 contract TokenMinter is TokenUtils {
     modifier onlyAuthorizedAddress() {
-        address auctionAddress = getAddressOf(AUCTION);
         require(msg.sender == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
         _;
     }
@@ -25,14 +24,22 @@ contract MainToken is TokenMinter {
     mapping(address => uint256) lockedToken;
     mapping(address => uint256) lastLock;
 
+    /**
+     *@dev constructs contract and premints tokens
+     *@param _name name of the token
+     *@param _symbol symbol of the token
+     *@param _systemAddress address that acts as an admin of the system
+     *@param _authorityAddress address that can change the systemAddress
+     *@param _registeryAddress address of the registry contract the keeps track of all the contract Addresses
+     *@param _which array of address to mint tokens to
+     *@param _amount array of corresponding amount getting minted
+     **/
     constructor(
         string memory _name,
         string memory _symbol,
         address _systemAddress,
         address _authorityAddress,
         address _registeryAddress,
-        uint256 _tokenMaturityDays,
-        uint256 _tokenHoldBackDays,
         address[] memory _which,
         uint256[] memory _amount
     )
@@ -42,14 +49,10 @@ contract MainToken is TokenMinter {
             _symbol,
             _systemAddress,
             _authorityAddress,
-            _tokenMaturityDays,
-            _tokenHoldBackDays,
             _registeryAddress
         )
     {
         require(_which.length == _amount.length, "ERR_NOT_SAME_LENGTH");
-
-        address whiteListAddress = getAddressOf(WHITE_LIST);
 
         for (uint256 tempX = 0; tempX < _which.length; tempX++) {
             require(
@@ -65,14 +68,15 @@ contract MainToken is TokenMinter {
         view
         returns (bool)
     {
-        address whiteListAddress = getAddressOf(WHITE_LIST);
+        require(
+            IWhiteList(whiteListAddress).main_isTransferAllowed(
+                msg.sender,
+                _from,
+                _to
+            ),
+            "ERR_NOT_HAVE_PERMISSION_TO_TRANSFER"
+        );
 
-        if (_to != getAddressOf(SMART_SWAP)) {
-            require(
-                IWhiteList(whiteListAddress).main_isTransferAllowed(_from, _to),
-                "ERR_NOT_HAVE_PERMISSION_TO_TRANSFER"
-            );
-        }
         return true;
     }
 
@@ -91,10 +95,7 @@ contract MainToken is TokenMinter {
         address _to,
         uint256 _value
     ) external returns (bool) {
-        uint256 senderBalance = safeSub(
-            balances[msg.sender],
-            lockedToken[msg.sender]
-        );
+        uint256 senderBalance = safeSub(balances[_from], lockedToken[_from]);
         require(senderBalance >= _value, "ERR_NOT_ENOUGH_BALANCE");
         require(checkBeforeTransfer(_from, _to));
         return _transferFrom(_from, _to, _value);
@@ -111,10 +112,7 @@ contract MainToken is TokenMinter {
         uint256 _amount,
         uint256 _locktime
     ) external returns (bool) {
-        require(
-            msg.sender == getAddressOf(AUCTION),
-            ERR_AUTHORIZED_ADDRESS_ONLY
-        );
+        require(msg.sender == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
         if (_locktime > lastLock[_which]) {
             lockedToken[_which] = _amount;
             lastLock[_which] = _locktime;
@@ -135,6 +133,6 @@ contract MainToken is TokenMinter {
     }
 
     function() external payable {
-        revert();
+        revert("ERR_CAN'T_FORCE_ETH");
     }
 }

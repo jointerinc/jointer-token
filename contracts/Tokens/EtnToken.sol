@@ -5,14 +5,21 @@ import "../InterFaces/IWhiteList.sol";
 
 
 contract EtnToken is Exchangeable {
+    /**
+     *@dev constructs contract and premints tokens
+     *@param _name name of the token
+     *@param _symbol symbol of the token
+     *@param _systemAddress address that acts as an admin of the system
+     *@param _authorityAddress address that can change the systemAddress
+     *@param _registeryAddress address of the registry contract the keeps track of all the contract Addresses
+     *@param _returnToken address of the token user gets back when system forces them to convert(maintoken)
+     **/
     constructor(
         string memory _name,
         string memory _symbol,
         address _systemAddress,
         address _authorityAddress,
         address _registeryAddress,
-        uint256 _tokenMaturityDays,
-        uint256 _tokenHoldBackDays,
         address _returnToken
     )
         public
@@ -21,46 +28,50 @@ contract EtnToken is Exchangeable {
             _symbol,
             _systemAddress,
             _authorityAddress,
-            _tokenMaturityDays,
-            _tokenHoldBackDays,
             _registeryAddress
         )
         ForceSwap(_returnToken)
     {}
 
+    /**
+     *@dev checks before every transfer that takes place(except minting)
+     *@param _from address from which tokens are being transferred
+     *@param _to address to which tokens are being transfferred
+     */
     function checkBeforeTransfer(address _from, address _to)
         internal
         view
         returns (bool)
     {
-        address whiteListAddress = getAddressOf(WHITE_LIST);
+        require(
+            IWhiteList(whiteListAddress).etn_isTransferAllowed(
+                msg.sender,
+                _from,
+                _to
+            ),
+            "ERR_NOT_HAVE_PERMISSION_TO_TRANSFER"
+        );
 
-        if (_to != getAddressOf(SMART_SWAP)) {
-            require(
-                IWhiteList(whiteListAddress).etn_isTransferAllowed(_from, _to),
-                "ERR_NOT_HAVE_PERMISSION_TO_TRANSFER"
-            );
-        }
         return true;
     }
 
-    // Allows to buyTokens
+    /** @dev Allows users to buy tokens from other accepteble tokens prices as per prices in currencyPrices contract
+     *@param _fromToken the token user wants buy from
+     *@param _amount amount of token users wants buy with. It assumes that contract has been approved atleast _amount buy msg.sender
+     */
     function buyTokens(address _fromToken, uint256 _amount)
         external
         isConversionAllowed(_fromToken)
         returns (uint256)
     {
-        address whiteListAddress = getAddressOf(WHITE_LIST);
-
         //check if msg.sender is allowed
 
         require(
             IWhiteList(whiteListAddress).etn_isReceiveAllowed(msg.sender),
             "ERR_CANNOT_RECIEVE"
         );
-        //if(address(this) == getAddressOf(STOCK_TOKEN);)
 
-        ICurrencyPrices currencyPrice = ICurrencyPrices(getAddressOf(CURRENCY));
+        ICurrencyPrices currencyPrice = ICurrencyPrices(currencyPricesAddress);
 
         uint256 fromTokenPrice = currencyPrice.getCurrencyPrice(_fromToken);
 
@@ -74,11 +85,7 @@ contract EtnToken is Exchangeable {
         );
 
         if (_fromToken == returnToken) {
-            ERC20(_fromToken).transferFrom(
-                msg.sender,
-                getAddressOf(VAULT),
-                _amount
-            );
+            ERC20(_fromToken).transferFrom(msg.sender, vaultAddress, _amount);
         } else {
             ERC20(_fromToken).transferFrom(msg.sender, address(this), _amount);
             IToken(_fromToken).burn(_amount);
@@ -104,6 +111,6 @@ contract EtnToken is Exchangeable {
     }
 
     function() external payable {
-        revert();
+        revert("ERR_CAN'T_FORCE_ETH");
     }
 }

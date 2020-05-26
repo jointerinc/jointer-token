@@ -8,6 +8,9 @@ import "./TokenUtils.sol";
 import "../InterFaces/IWhiteList.sol";
 
 
+/**
+@dev ForeceSwap contains functionality for system to be able to convert tokens of anyone into returnToken at setted price
+ */
 contract ForceSwap is TokenUtils {
     // here returnToken means with mainToken
     address public returnToken;
@@ -16,6 +19,10 @@ contract ForceSwap is TokenUtils {
         returnToken = _returnToken;
     }
 
+    /**
+    @dev converts _which's _amount of tokens into returnTokens as per the price
+    @param _which address which tokens are being converted
+    @param _amount amount of tokens being converted */
     function _forceSwap(address _which, uint256 _amount)
         internal
         returns (bool)
@@ -24,9 +31,9 @@ contract ForceSwap is TokenUtils {
 
         _burn(_which, _amount);
 
-        ICurrencyPrices currencyPrice = ICurrencyPrices(getAddressOf(CURRENCY));
+        ICurrencyPrices currencyPrice = ICurrencyPrices(currencyPricesAddress);
 
-        ITokenVault tokenVault = ITokenVault(getAddressOf(VAULT));
+        ITokenVault tokenVault = ITokenVault(vaultAddress);
 
         uint256 retunTokenPrice = currencyPrice.getCurrencyPrice(returnToken);
 
@@ -42,6 +49,10 @@ contract ForceSwap is TokenUtils {
         return tokenVault.directTransfer(returnToken, msg.sender, _assignToken);
     }
 
+    /**
+    @dev converts _which's _amount of tokens into returnTokens as per the price, can be called only by the system
+    @param _which address which tokens are being converted
+    @param _amount amount of tokens being converted */
     function forceSwap(address _which, uint256 _amount)
         external
         onlySystem()
@@ -52,9 +63,12 @@ contract ForceSwap is TokenUtils {
 }
 
 
+/**@dev Exchangeble keeps track of token with which users are allowed to buy 'this' token from*/
 contract Exchangeable is ForceSwap {
+    //address of the token with which user can buy 'this' token from
     address public exchangeableToken;
 
+    /**@dev sets the address of the token with which user can buy 'this' token from by system only */
     function setExchangeableToken(address _which)
         external
         onlySystem()
@@ -72,6 +86,9 @@ contract Exchangeable is ForceSwap {
         _;
     }
 
+    /**@dev allows user to convert tokens into returnTokens at setted price
+    @param _amount amount of token being converted
+     */
     function swapTokens(uint256 _amount) external returns (bool) {
         return _forceSwap(msg.sender, _amount);
     }
