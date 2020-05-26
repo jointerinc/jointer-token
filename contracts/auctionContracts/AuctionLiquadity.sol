@@ -6,7 +6,6 @@ import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IAuctionTagAlong.sol";
 import "../InterFaces/ICurrencyPrices.sol";
 import "../InterFaces/IERC20Token.sol";
-import "../InterFaces/IAuctionFormula.sol";
 import "../InterFaces/IAuction.sol";
 import "../InterFaces/ITokenVault.sol";
 import "../InterFaces/IWhiteList.sol";
@@ -82,8 +81,6 @@ contract BancorConverter is Ownable, SafeMath {
     IERC20Token public mainToken;
 
     IERC20Token public relayToken;
-
-    uint256 public lastTokenPrice;
 
     constructor(
         address _converter,
@@ -180,7 +177,7 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
     function getAddressOf(bytes32 _contractName)
         internal
         view
-        returns (address)
+        returns (address payable)
     {
         return contractsRegistry.getAddressOf(_contractName);
     }
@@ -218,6 +215,10 @@ contract LiquadityUtils is BancorConverter, AuctionRegistery {
     uint256 public previousMainReserveContribution;
 
     uint256 public todayMainReserveContribution;
+
+    uint256 public tokenAuctionEndPrice;
+
+    uint256 public lastTokenPrice;
 
     modifier allowedAddressOnly(address _which) {
         require(allowedAddress[_which], ERR_AUTHORIZED_ADDRESS_ONLY);
@@ -269,7 +270,78 @@ contract LiquadityUtils is BancorConverter, AuctionRegistery {
 }
 
 
-contract Liquadity is LiquadityUtils {
+contract LiquadityFormula is LiquadityUtils {
+    function _getCurrentMarketPrice() internal view returns (uint256) {
+        (
+            uint256 _baseTokenBalance,
+            uint256 _mainTokenBalance
+        ) = getTokensReserveBalance();
+
+        (
+            uint256 _baseTokenRatio,
+            uint256 _mainTokenRatio
+        ) = getTokensReserveRatio();
+
+        uint256 _baseTokenPrice = ICurrencyPrices(getAddressOf(CURRENCY))
+            .getCurrencyPrice(address(baseToken));
+
+        uint256 ratio = safeDiv(
+            safeMul(
+                safeMul(_baseTokenBalance, _mainTokenRatio),
+                safeExponent(10, 6)
+            ),
+            safeMul(_mainTokenBalance, _baseTokenRatio)
+        );
+
+        return safeDiv(safeMul(ratio, _baseTokenPrice), safeExponent(10, 6));
+    }
+
+    function calculateLiquadityMainReserve(
+        uint256 yesterdayPrice,
+        uint256 dayBeforyesterdayPrice,
+        uint256 yesterDaycontibution,
+        uint256 yesterdayMainReserv
+    ) internal pure returns (uint256) {
+        // multiply 10**6 so we cant get zero value if amount come in float
+        uint256 _tempContrbution = safeDiv(
+            safeMul(yesterDaycontibution, safeExponent(10, 6)),
+            yesterdayMainReserv
+        );
+
+        uint256 _tempSupply = safeDiv(
+            safeMul(yesterdayPrice, safeExponent(10, 6)),
+            dayBeforyesterdayPrice
+        );
+
+        return safeMul(_tempContrbution, _tempSupply);
+    }
+
+    // we dont need divide it by decimal bcz we get
+    // return balance into decimal also
+    // we calculate how much reserver balance should be there
+    // for give price here we return balance of other token
+    // that should be balance in token to achive this price
+    function calculateRecoverPrice(
+        uint256 _reserveTokenBalance,
+        uint256 _reserveTokenRatio,
+        uint256 _reserveTokenPrice,
+        uint256 _findTokenRatio,
+        uint256 _findTokenPrice
+    ) internal pure returns (uint256) {
+        uint256 ratio = safeDiv(
+            safeMul(
+                safeMul(_reserveTokenBalance, _findTokenRatio),
+                safeExponent(10, 6)
+            ),
+            safeMul(_reserveTokenPrice, _reserveTokenRatio)
+        );
+
+        return safeDiv(safeMul(ratio, _findTokenPrice), safeExponent(10, 6));
+    }
+}
+
+
+contract Liquadity is LiquadityFormula {
     constructor(
         address _converter,
         address _baseToken,
@@ -351,7 +423,7 @@ contract Liquadity is LiquadityUtils {
 
     //This method return token base on wich is last address
     //If last address is ethtoken it will return ether
-    function _redempation(uint256 value, IERC20Token[] memory _path)
+    function _convertWithToken(uint256 value, IERC20Token[] memory _path)
         internal
         returns (bool)
     {
@@ -375,66 +447,13 @@ contract Liquadity is LiquadityUtils {
         return true;
     }
 
-    function _getCurrentMarketPrice() internal view returns (uint256) {
-        (
-            uint256 _baseTokenBalance,
-            uint256 _mainTokenBalance
-        ) = getTokensReserveBalance();
-
-        (
-            uint256 _baseTokenRatio,
-            uint256 _mainTokenRatio
-        ) = getTokensReserveRatio();
-
-        uint256 _baseTokenPrice = ICurrencyPrices(getAddressOf(CURRENCY))
-            .getCurrencyPrice(address(baseToken));
-
-        uint256 tokenCurrentPrice = IAuctionFormula(
-            getAddressOf(AUCTION_FORMULA)
-        )
-            .calculateTokenPrice(
-            _baseTokenBalance,
-            _baseTokenRatio,
-            _mainTokenBalance,
-            _mainTokenRatio,
-            _baseTokenPrice
-        );
-
-        return tokenCurrentPrice;
-    }
-
     function checkAppeciationLimit()
         internal
         returns (bool _isRedemptionReqiured)
     {
         _isRedemptionReqiured = false;
 
-        uint256 tokenAuctionEndPrice = IAuction(getAddressOf(AUCTION))
-            .tokenAuctionEndPrice();
-
-        (
-            uint256 _baseTokenBalance,
-            uint256 _mainTokenBalance
-        ) = getTokensReserveBalance();
-
-        (
-            uint256 _baseTokenRatio,
-            uint256 _mainTokenRatio
-        ) = getTokensReserveRatio();
-
-        uint256 _baseTokenPrice = ICurrencyPrices(getAddressOf(CURRENCY))
-            .getCurrencyPrice(address(baseToken));
-
-        uint256 tokenCurrentPrice = IAuctionFormula(
-            getAddressOf(AUCTION_FORMULA)
-        )
-            .calculateTokenPrice(
-            _baseTokenBalance,
-            _baseTokenRatio,
-            _mainTokenBalance,
-            _mainTokenRatio,
-            _baseTokenPrice
-        );
+        uint256 tokenCurrentPrice = _getCurrentMarketPrice();
 
         uint256 _appreciationReached = safeDiv(
             safeMul(tokenCurrentPrice, 100),
@@ -465,19 +484,25 @@ contract Liquadity is LiquadityUtils {
         returns (uint256)
     {
         address tagAlongAddress = getAddressOf(TAG_ALONG);
+
         if (address(this).balance < previousMainReserveContribution) {
-            if (tagAlongAddress.balance < previousMainReserveContribution) {
-                uint256 sellRelay = safeDiv(
-                    safeMul(relayToken.balanceOf(address(this)), 10),
-                    100
-                );
-                _liquadate(address(this), sellRelay, true);
-                IAuctionTagAlong(tagAlongAddress).contributeTowardLiquadity(
-                    safeSub(
-                        previousMainReserveContribution,
-                        tagAlongAddress.balance
-                    )
-                );
+            if (previousMainReserveContribution > tagAlongAddress.balance) {
+                while (
+                    previousMainReserveContribution >= tagAlongAddress.balance
+                ) {
+                    _liquadate(true);
+
+                    if (
+                        tagAlongAddress.balance >=
+                        previousMainReserveContribution
+                    ) {
+                        IAuctionTagAlong(tagAlongAddress)
+                            .contributeTowardLiquadity(
+                            previousMainReserveContribution
+                        );
+                        break;
+                    }
+                }
             } else {
                 IAuctionTagAlong(tagAlongAddress).contributeTowardLiquadity(
                     previousMainReserveContribution
@@ -560,10 +585,7 @@ contract Liquadity is LiquadityUtils {
             uint256 _mainTokenRatio
         ) = getTokensReserveRatio();
 
-        uint256 newReserverBalance = IAuctionFormula(
-            getAddressOf(AUCTION_FORMULA)
-        )
-            .calculateRecoverPrice(
+        uint256 newReserverBalance = calculateRecoverPrice(
             _baseTokenBalance,
             _baseTokenRatio,
             recoverPrice,
@@ -577,42 +599,24 @@ contract Liquadity is LiquadityUtils {
                 newReserverBalance,
                 _baseTokenBalance
             );
-
-            _reverseBalance = safeDiv(
-                safeMul(_reverseBalance, _mainTokenBalance),
-                _baseTokenBalance
-            );
-
-            if (_reverseBalance > mainToken.balanceOf(address(this))) {
-                uint256 vaultBalance = mainToken.balanceOf(vaultAddress);
-
-                if (vaultBalance >= _reverseBalance) {
-                    ITokenVault(vaultAddress).directTransfer(
-                        address(mainToken),
-                        address(this),
-                        _reverseBalance
-                    );
-                } else {
-                    uint256 sellRelay = safeDiv(
-                        safeMul(relayToken.balanceOf(address(this)), 10),
-                        100
-                    );
-                    ITokenVault(vaultAddress).directTransfer(
-                        address(mainToken),
-                        address(this),
-                        vaultBalance
-                    );
-                    _liquadate(address(this), sellRelay, false);
-                    return _recoverPriceWithBaseToken(recoverPrice);
-                }
+            uint256 vaultBalance = mainToken.balanceOf(vaultAddress);
+            if (vaultBalance >= _reverseBalance) {
+                ITokenVault(vaultAddress).directTransfer(
+                    address(mainToken),
+                    converter,
+                    _reverseBalance
+                );
+                lastTokenPrice = _getCurrentMarketPrice();
+                return true;
+            } else {
+                _liquadate(false);
+                return _recoverPriceWithBaseToken(recoverPrice);
             }
-
-            return _redempation(_reverseBalance, mainTokenTobaseToken);
         }
     }
 
     //recover price from basetoken
-    // if there is not enough main token sell 10% relay
+    // if there is not enough base token sell 10% relay
     function _recoverPriceWithBaseToken(uint256 recoverPrice)
         internal
         returns (bool)
@@ -632,10 +636,7 @@ contract Liquadity is LiquadityUtils {
 
         // we here need reverse from apprectiation
         // so what calculation applied on we have to reverse it
-        uint256 newReserverBalance = IAuctionFormula(
-            getAddressOf(AUCTION_FORMULA)
-        )
-            .calculateRecoverPrice(
+        uint256 newReserverBalance = calculateRecoverPrice(
             _mainTokenBalance,
             _mainTokenRatio,
             _baseTokenPrice,
@@ -644,42 +645,27 @@ contract Liquadity is LiquadityUtils {
         );
 
         if (newReserverBalance > _baseTokenBalance) {
-            address vaultAddress = addressOf(VAULT);
+            address tagAlongAddress = getAddressOf(TAG_ALONG);
+
             uint256 _reverseBalance = safeSub(
                 newReserverBalance,
                 _baseTokenBalance
             );
 
-            _reverseBalance = safeDiv(
-                safeMul(_reverseBalance, _mainTokenBalance),
-                _baseTokenBalance
-            );
+            uint256 tagAlongBalance = baseToken.balanceOf(tagAlongAddress);
 
-            if (_reverseBalance > baseToken.balanceOf(address(this))) {
-                uint256 vaultBalance = baseToken.balanceOf(vaultAddress);
-
-                if (vaultBalance >= _reverseBalance) {
-                    ITokenVault(vaultAddress).directTransfer(
-                        address(baseToken),
-                        address(this),
-                        _reverseBalance
-                    );
-                } else {
-                    uint256 sellRelay = safeDiv(
-                        safeMul(relayToken.balanceOf(address(this)), 10),
-                        100
-                    );
-                    ITokenVault(vaultAddress).directTransfer(
-                        address(baseToken),
-                        address(this),
-                        vaultBalance
-                    );
-                    _liquadate(address(this), sellRelay, false);
-                    return _recoverPriceWithBaseToken(recoverPrice);
-                }
+            if (tagAlongBalance >= _reverseBalance) {
+                IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
+                    baseToken,
+                    converter,
+                    _reverseBalance
+                );
+                lastTokenPrice = _getCurrentMarketPrice();
+                return true;
+            } else {
+                _liquadate(false);
+                return _recoverPriceWithBaseToken(recoverPrice);
             }
-
-            return _redempation(_reverseBalance, baseTokenToMainToken);
         }
     }
 
@@ -760,8 +746,6 @@ contract Liquadity is LiquadityUtils {
             uint256 _mainTokenBalance
         ) = getTokensReserveBalance();
 
-        delete _mainTokenBalance;
-
         uint256 _baseTokenPrice = ICurrencyPrices(getAddressOf(CURRENCY))
             .getCurrencyPrice(address(baseToken));
 
@@ -787,10 +771,7 @@ contract Liquadity is LiquadityUtils {
                 safeSub(auctionDay, 1)
             );
 
-            virtualReserverDivisor = IAuctionFormula(
-                getAddressOf(AUCTION_FORMULA)
-            )
-                .calculateLiquadityMainReserve(
+            virtualReserverDivisor = calculateLiquadityMainReserve(
                 _yesterdayPrice,
                 _dayBeforePrice,
                 _yesterdayContribution,
@@ -799,33 +780,47 @@ contract Liquadity is LiquadityUtils {
         }
         previousMainReserveContribution = todayMainReserveContribution;
         todayMainReserveContribution = 0;
+        tokenAuctionEndPrice = _getCurrentMarketPrice();
         return true;
     }
 
-    function _liquadate(
-        address payable _sender,
-        uint256 _amount,
-        bool _convertToEth
-    ) internal {
+    function _liquadate(bool _convertToEth) internal {
+        address vaultAddress = getAddressOf(VAULT);
+
+        address payable tagAlongAddress = getAddressOf(TAG_ALONG);
+
+        uint256 sellRelay = safeDiv(
+            safeMul(relayToken.balanceOf(address(tagAlongAddress)), 10),
+            100
+        );
+
+        IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
+            relayToken,
+            address(this),
+            sellRelay
+        );
+
         uint256 _mainTokenBalance = mainToken.balanceOf(address(this));
 
         //extract ether from BNTETH converter
         uint256 _baseTokenBalance = baseToken.balanceOf(address(this));
 
         //take out both side of token from the reserve
-        IBancorConverter(converter).liquidate(_amount);
+        IBancorConverter(converter).liquidate(sellRelay);
 
         ensureTransferFrom(
             mainToken,
             address(this),
-            _sender,
+            vaultAddress,
             safeSub(mainToken.balanceOf(address(this)), _mainTokenBalance)
         );
+
         _baseTokenBalance = safeSub(
             baseToken.balanceOf(address(this)),
             _baseTokenBalance
         );
 
+        // if we need ether it covert into eth and sent it to tagalong
         if (_convertToEth) {
             uint256 beforeEthBalance = address(this).balance;
             approveTransferFrom(baseToken, converter, _baseTokenBalance);
@@ -836,21 +831,18 @@ contract Liquadity is LiquadityUtils {
                 address(0),
                 0
             );
-            if (_sender != address(this))
-                _sender.transfer(
-                    safeSub(address(this).balance, beforeEthBalance)
-                );
+            tagAlongAddress.transfer(
+                safeSub(address(this).balance, beforeEthBalance)
+            );
             delete beforeEthBalance;
         } else {
             ensureTransferFrom(
                 baseToken,
                 address(this),
-                _sender,
+                tagAlongAddress,
                 _baseTokenBalance
             );
         }
-        delete _baseTokenBalance;
-        delete _mainTokenBalance;
     }
 
     function getCurrencyPrice() public view returns (uint256) {
