@@ -4,6 +4,17 @@ import "../InterFaces/IWhiteList.sol";
 
 
 contract StockToken is Exchangeable {
+    /**
+     *@dev constructs contract and premints tokens
+     *@param _name name of the token
+     *@param _symbol symbol of the token
+     *@param _systemAddress address that acts as an admin of the system
+     *@param _authorityAddress address that can change the systemAddress
+     *@param _registeryAddress address of the registry contract the keeps track of all the contract Addresses
+     *@param _returnToken address of the token user gets back when system forces them to convert(maintoken)
+     *@param _which array of address to mint tokens to
+     *@param _amount array of corresponding amount getting minted
+     **/
     constructor(
         string memory _name,
         string memory _symbol,
@@ -34,6 +45,11 @@ contract StockToken is Exchangeable {
         }
     }
 
+    /**
+     *@dev checks before every transfer that takes place(except minting)
+     *@param _from address from which tokens are being transferred
+     *@param _to address to which tokens are being transfferred
+     */
     function checkBeforeTransfer(address _from, address _to)
         internal
         view
@@ -51,7 +67,10 @@ contract StockToken is Exchangeable {
         return true;
     }
 
-    // Allows to buyTokens
+    /** @dev Allows users to buy tokens from other accepteble tokens prices as per prices in currencyPrices contract
+     *@param _fromToken the token user wants buy from
+     *@param _amount amount of token users wants buy with. It assumes that contract has been approved atleast _amount buy msg.sender
+     */
     function buyTokens(address _fromToken, uint256 _amount)
         external
         isConversionAllowed(_fromToken)
@@ -104,6 +123,6 @@ contract StockToken is Exchangeable {
     }
 
     function() external payable {
-        revert();
+        revert("ERR_CAN'T_FORCE_ETH");
     }
 }

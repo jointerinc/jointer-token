@@ -24,6 +24,16 @@ contract MainToken is TokenMinter {
     mapping(address => uint256) lockedToken;
     mapping(address => uint256) lastLock;
 
+    /**
+     *@dev constructs contract and premints tokens
+     *@param _name name of the token
+     *@param _symbol symbol of the token
+     *@param _systemAddress address that acts as an admin of the system
+     *@param _authorityAddress address that can change the systemAddress
+     *@param _registeryAddress address of the registry contract the keeps track of all the contract Addresses
+     *@param _which array of address to mint tokens to
+     *@param _amount array of corresponding amount getting minted
+     **/
     constructor(
         string memory _name,
         string memory _symbol,
@@ -128,6 +138,6 @@ contract MainToken is TokenMinter {
     }
 
     function() external payable {
-        revert();
+        revert("ERR_CAN'T_FORCE_ETH");
     }
 }
