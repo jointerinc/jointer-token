@@ -22,7 +22,10 @@ contract StandardToken is ERC20, SafeMath, Ownable {
         address _systemAddress,
         address _authorityAddress
     ) public Ownable(_systemAddress, _authorityAddress) {
-        require(bytes(_name).length > 0 && bytes(_symbol).length > 0);
+        require(
+            bytes(_name).length > 0 && bytes(_symbol).length > 0,
+            "ERR_NAME_OR_SYMBOL_EMPTY"
+        );
         name = _name;
         symbol = _symbol;
     }
@@ -41,10 +44,11 @@ contract StandardToken is ERC20, SafeMath, Ownable {
      * @param _to The address to transfer to.
      * @param _value The amount to be transferred.
      */
-    function _transfer(address _from, address _to, uint256 _value)
-        internal
-        returns (bool)
-    {
+    function _transfer(
+        address _from,
+        address _to,
+        uint256 _value
+    ) internal returns (bool) {
         uint256 senderBalance = balances[_from];
         require(senderBalance >= _value, "ERR_NOT_ENOUGH_BALANCE");
         senderBalance = safeSub(senderBalance, _value);
@@ -60,12 +64,11 @@ contract StandardToken is ERC20, SafeMath, Ownable {
      * @param _to address The address which you want to transfer tokens
      * @param _value uint256 the amount of tokens to be transferred
      */
-    function _transferFrom(address _from, address _to, uint256 _value)
-        internal
-        notThisAddress(_to)
-        notZeroAddress(_to)
-        returns (bool)
-    {
+    function _transferFrom(
+        address _from,
+        address _to,
+        uint256 _value
+    ) internal notThisAddress(_to) notZeroAddress(_to) returns (bool) {
         require(allowed[_from][msg.sender] >= _value, "ERR_NOT_ENOUGH_BALANCE");
         require(_transfer(_from, _to, _value));
         allowed[_from][msg.sender] = safeSub(
@@ -76,10 +79,11 @@ contract StandardToken is ERC20, SafeMath, Ownable {
         return true;
     }
 
-    function _approve(address owner, address spender, uint256 amount)
-        internal
-        notZeroAddress(spender)
-    {
+    function _approve(
+        address owner,
+        address spender,
+        uint256 amount
+    ) internal notZeroAddress(spender) {
         allowed[owner][spender] = amount;
         emit Approval(owner, spender, amount);
     }

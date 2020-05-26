@@ -56,7 +56,9 @@ contract WhiteListStorage {
     uint256 public constant FROM_EU = 1 << 12;
     uint256 public constant IS_BYPASSED = 1 << 13;
 
+    //timestamp when hold back days are over
     mapping(uint8 => uint256) tokenToHoldBackDaysTimeStamp;
+    //timestamp when token matures
     mapping(uint8 => uint256) tokenToMaturityDaysTimeStamp;
 }
 
