@@ -68,11 +68,13 @@ contract TokenUtils is StandardToken, AuctionRegistery {
         public
         StandardToken(_name, _symbol, _systemAddress, _authorityAddress)
         AuctionRegistery(_registeryAddress)
-    {}
+    {
+        updateAddresses();
+    }
 
     /**@dev updates all the address from the registry contract
     this decision was made to save gas that occurs from calling an external view function */
-    function updateAdresses() external {
+    function updateAddresses() public {
         whiteListAddress = getAddressOf(WHITE_LIST);
         smartSwapAddress = getAddressOf(SMART_SWAP);
         currencyPricesAddress = getAddressOf(CURRENCY);

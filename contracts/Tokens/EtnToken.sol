@@ -13,8 +13,6 @@ contract EtnToken is Exchangeable {
      *@param _authorityAddress address that can change the systemAddress
      *@param _registeryAddress address of the registry contract the keeps track of all the contract Addresses
      *@param _returnToken address of the token user gets back when system forces them to convert(maintoken)
-     *@param _which array of address to mint tokens to
-     *@param _amount array of corresponding amount getting minted
      **/
     constructor(
         string memory _name,

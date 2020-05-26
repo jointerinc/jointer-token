@@ -68,8 +68,6 @@ contract MainToken is TokenMinter {
         view
         returns (bool)
     {
-        address whiteListAddress = whiteListAddress;
-
         require(
             IWhiteList(whiteListAddress).main_isTransferAllowed(
                 msg.sender,
@@ -97,10 +95,7 @@ contract MainToken is TokenMinter {
         address _to,
         uint256 _value
     ) external returns (bool) {
-        uint256 senderBalance = safeSub(
-            balances[msg.sender],
-            lockedToken[msg.sender]
-        );
+        uint256 senderBalance = safeSub(balances[_from], lockedToken[_from]);
         require(senderBalance >= _value, "ERR_NOT_ENOUGH_BALANCE");
         require(checkBeforeTransfer(_from, _to));
         return _transferFrom(_from, _to, _value);
