@@ -6,7 +6,7 @@ import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IAuctionProtection.sol";
 import "../InterFaces/ICurrencyPrices.sol";
 import "../InterFaces/IERC20Token.sol";
-import "../InterFaces/IAuctionFormula.sol";
+import "../InterFaces/IAuctionLiquadity.sol";
 import "../InterFaces/IAuction.sol";
 import "../InterFaces/ITokenVault.sol";
 
