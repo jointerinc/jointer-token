@@ -5,6 +5,7 @@ import "../common/SafeMath.sol";
 import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IERC20Token.sol";
+import "../InterFaces/IAuctionProtection.sol";
 
 
 interface InitializeInterface {
@@ -140,20 +141,21 @@ contract TokenVault is Upgradeable, TokenSpenders, InitializeInterface {
         return true;
     }
 
-    function depositeToken(IERC20Token _token, address _from, uint256 _amount)
-        external
-        returns (bool)
-    {
+    function depositeToken(
+        IERC20Token _token,
+        address _from,
+        uint256 _amount
+    ) external returns (bool) {
         ensureTransferFrom(_token, _from, address(this), _amount);
         emit FundDeposited(address(0), _from, _amount);
         return true;
     }
 
-    function directTransfer(address _token, address _to, uint256 amount)
-        external
-        onlySpender()
-        returns (bool)
-    {
+    function directTransfer(
+        address _token,
+        address _to,
+        uint256 amount
+    ) external onlySpender() returns (bool) {
         ensureTransferFrom(IERC20Token(_token), address(this), _to, amount);
         emit FundTransfer(msg.sender, _to, _token, amount);
         return true;
@@ -167,5 +169,23 @@ contract TokenVault is Upgradeable, TokenSpenders, InitializeInterface {
         _to.transfer(amount);
         emit FundTransfer(msg.sender, _to, address(0), amount);
         return true;
+    }
+
+    // This method is auction protection methods called from here
+    // vault address set when contribution is 0
+    function unLockTokens() external onlySystem() returns (bool) {
+        return
+            IAuctionProtection(getAddressOf(AUCTION_PROTECTION)).unLockTokens();
+    }
+
+    function stackToken() external onlySystem() returns (bool) {
+        return
+            IAuctionProtection(getAddressOf(AUCTION_PROTECTION)).stackToken();
+    }
+
+    function cancelInvestment() external onlySystem() returns (bool) {
+        return
+            IAuctionProtection(getAddressOf(AUCTION_PROTECTION))
+                .cancelInvestment();
     }
 }

@@ -7,6 +7,7 @@ import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IAuctionTagAlong.sol";
 import "../InterFaces/ITokenVault.sol";
 import "../InterFaces/IERC20Token.sol";
+import "../InterFaces/Istacking.sol";
 
 
 interface InitializeInterface {
@@ -284,7 +285,7 @@ contract AuctionProtection is
     }
     
     
-    function _unLockTokens(address _which) internal returns(bool){
+    function _unLockTokens(address _which,bool isStacking) internal returns(bool){
         address tagAlongAdress = getAddressOf(TAG_ALONG);
         address payable fundWallet = getAddressOf(COMPANY_FUND_WALLET);
         
@@ -345,12 +346,19 @@ contract AuctionProtection is
          
         if (_tokenBalance > 0) {
             _token = IERC20Token(getAddressOf(MAIN_TOKEN));
-            ensureTransferFrom(
-                _token,
-                address(this),
-                _which,
-                _tokenBalance
-            );
+            if(isStacking){
+                address stackingAddress = getAddressOf(STACKING);
+                approveTransferFrom(_token,stackingAddress,_tokenBalance);
+                Istacking(stackingAddress).addFundToStacking(_which,_tokenBalance);
+                
+            }else{
+                ensureTransferFrom(
+                    _token,
+                    address(this),
+                    _which,
+                    _tokenBalance
+                );
+            }
             emit FundTransfer(_which, address(_token), _tokenBalance);
             lockedTokens[_which] = 0;
         }
@@ -360,7 +368,11 @@ contract AuctionProtection is
     
     // user unlock tokens and funds goes to compnay wallet
     function unLockTokens() external returns (bool) {
-        return _unLockTokens(msg.sender);
+        return _unLockTokens(msg.sender,false);
+    }
+    
+    function stackToken() external returns (bool) {
+        return _unLockTokens(msg.sender,true);
     }
 
     function unLockFundByAdmin(address _which)
@@ -369,7 +381,7 @@ contract AuctionProtection is
         returns (bool)
     {
         require(isTokenLockEndDay(lockedOn[_which]),"ERR_ADMIN_CANT_UNLOCK_FUND");
-        return _unLockTokens(_which);
+        return _unLockTokens(_which,false);
     }
 
 
