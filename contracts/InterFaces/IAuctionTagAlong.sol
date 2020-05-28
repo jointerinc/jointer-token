@@ -4,8 +4,6 @@ import "./IERC20Token.sol";
 
 
 contract IAuctionTagAlong {
-    function depositeEther() external payable;
-
     function depositeToken(
         IERC20Token _token,
         address _from,

@@ -14,6 +14,8 @@ import "../InterFaces/ITokenVault.sol";
 contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
     IAuctionRegistery public contractsRegistry;
 
+    address payable public liquadityAddress;
+
     function updateRegistery(address _address)
         external
         onlyAuthorized()
@@ -21,15 +23,23 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
         returns (bool)
     {
         contractsRegistry = IAuctionRegistery(_address);
+        updateAddresses();
         return true;
     }
 
     function getAddressOf(bytes32 _contractName)
         internal
         view
-        returns (address)
+        returns (address payable)
     {
         return contractsRegistry.getAddressOf(_contractName);
+    }
+
+    /**@dev updates all the address from the registry contract
+    this decision was made to save gas that occurs from calling an external view function */
+
+    function updateAddresses() public {
+        liquadityAddress = getAddressOf(LIQUADITY);
     }
 }
 
@@ -63,7 +73,9 @@ contract AuctionTagAlong is Utils {
     constructor(address _systemAddress, address _multisigAdress)
         public
         Ownable(_systemAddress, _multisigAdress)
-    {}
+    {
+        updateAddresses();
+    }
 
     event FundDeposited(address _token, address _from, uint256 _amount);
 
@@ -92,10 +104,7 @@ contract AuctionTagAlong is Utils {
         external
         returns (uint256)
     {
-        require(
-            msg.sender == getAddressOf(LIQUADITY),
-            "ERR_ONLY_AUCTION_ALLWOED"
-        );
+        require(msg.sender == liquadityAddress, "ERR_ONLY_AUCTION_ALLWOED");
 
         if (_amount > address(this).balance) {
             uint256 _newamount = address(this).balance;
@@ -113,10 +122,7 @@ contract AuctionTagAlong is Utils {
         address _reciver,
         uint256 _amount
     ) external returns (bool) {
-        require(
-            msg.sender == getAddressOf(LIQUADITY),
-            "ERR_ONLY_AUCTION_ALLWOED"
-        );
+        require(msg.sender == liquadityAddress, "ERR_ONLY_AUCTION_ALLWOED");
         ensureTransferFrom(_token, address(this), _reciver, _amount);
         return true;
     }

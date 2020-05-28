@@ -21,17 +21,23 @@ interface InitializeInterface {
 
 
 contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
-    
     IAuctionRegistery public contractsRegistry;
-    
+
+    address payable public vaultAddress;
+    address payable public auctionAddress;
+    address payable public tagAlongAddress;
+    address payable public mainTokenAddress;
+    address payable public companyFundWalletAddress;
+    address payable public stackingAddress;
+
     function updateRegistery(address _address)
         external
         onlyAuthorized()
         notZeroAddress(_address)
         returns (bool)
     {
-        
         contractsRegistry = IAuctionRegistery(_address);
+        updateAddresses();
         return true;
     }
 
@@ -42,39 +48,42 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     {
         return contractsRegistry.getAddressOf(_contractName);
     }
-    
+
+    /**@dev updates all the address from the registry contract
+    this decision was made to save gas that occurs from calling an external view function */
+
+    function updateAddresses() public {
+        vaultAddress = getAddressOf(VAULT);
+        stackingAddress = getAddressOf(STACKING);
+        mainTokenAddress = getAddressOf(MAIN_TOKEN);
+        companyFundWalletAddress = getAddressOf(COMPANY_FUND_WALLET);
+        tagAlongAddress = getAddressOf(TAG_ALONG);
+        auctionAddress = getAddressOf(AUCTION);
+    }
 }
 
 
 contract UtilsStorage {
-    
-    mapping(address => bool) public allowedAddress;
-
     uint256 public tokenLockDuration;
 
     address[] public allowedTokens;
 
     mapping(address => bool) public tokenAllowed;
 
-
     mapping(address => bool) public unLockBlock;
-    
+
     uint256 public vaultRatio = 90;
-    
-    
-    
 }
 
 
 contract Utils is SafeMath, UtilsStorage, AuctionRegistery {
-    
     modifier allowedTokenOnly(address _which) {
-        require(tokenAllowed[_which],"ERR_ONLY_ALLOWED_TOKEN");
+        require(tokenAllowed[_which], "ERR_ONLY_ALLOWED_TOKEN");
         _;
     }
 
     modifier allowedAddressOnly(address _which) {
-        require(allowedAddress[_which],ERR_AUTHORIZED_ADDRESS_ONLY);
+        require(_which == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
         _;
     }
 
@@ -90,27 +99,17 @@ contract Utils is SafeMath, UtilsStorage, AuctionRegistery {
         return true;
     }
 
-    function setAllowedAddress(address _address, bool _check)
-        external
-        onlyOneOfOnwer()
-        notZeroAddress(_address)
-        returns (bool)
-    {
-        allowedAddress[_address] = _check;
-        return true;
-    }
-
     function setVaultRatio(uint256 _vaultRatio)
         external
         onlyAuthorized()
         returns (bool)
     {
-        require( _vaultRatio < 100);
+        require(_vaultRatio < 100);
         vaultRatio = _vaultRatio;
         return true;
     }
-    
-     function setTokenLockDuration(uint256 _tokenLockDuration)
+
+    function setTokenLockDuration(uint256 _tokenLockDuration)
         external
         onlyAuthorized()
         returns (bool)
@@ -131,7 +130,7 @@ contract Utils is SafeMath, UtilsStorage, AuctionRegistery {
         if (now >= tokenLockEndDay) {
             return true;
         }
-        
+
         return false;
     }
 }
@@ -169,6 +168,7 @@ contract AuctionProtection is
             _systemAddress,
             _authorityAddress
         );
+        updateAddresses();
     }
 
     event TokenUnLocked(address indexed _from);
@@ -186,7 +186,7 @@ contract AuctionProtection is
         if (_from == address(this)) _token.transfer(_to, _amount);
         else _token.transferFrom(_from, _to, _amount);
         uint256 postBalance = _token.balanceOf(_to);
-        require(postBalance > prevBalance,"ERR_TRANSFER");
+        require(postBalance > prevBalance, "ERR_TRANSFER");
     }
 
     function approveTransferFrom(
@@ -197,10 +197,11 @@ contract AuctionProtection is
         _token.approve(_spender, _amount);
     }
 
-    function lockBalance(address _token, address _which, uint256 _amount)
-        internal
-        returns (bool)
-    {
+    function lockBalance(
+        address _token,
+        address _which,
+        uint256 _amount
+    ) internal returns (bool) {
         if (lockedOn[_which] == 0) lockedOn[_which] = now;
         uint256 currentBalance = currentLockedFunds[_which][_token];
         currentLockedFunds[_which][_token] = safeAdd(currentBalance, _amount);
@@ -233,9 +234,8 @@ contract AuctionProtection is
     }
 
     function cancelInvestment() external returns (bool) {
-        
         require(
-           !isTokenLockEndDay(lockedOn[msg.sender]),
+            !isTokenLockEndDay(lockedOn[msg.sender]),
             "ERR_INVESTMENT_CANCEL_PERIOD_OVER"
         );
 
@@ -265,60 +265,61 @@ contract AuctionProtection is
 
         _tokenBalance = lockedTokens[msg.sender];
         if (_tokenBalance > 0) {
-            _token = IERC20Token(getAddressOf(MAIN_TOKEN));
-            
-            address vaultAddress = getAddressOf(VAULT);
-            
+            _token = IERC20Token(mainTokenAddress);
+
             approveTransferFrom(_token, vaultAddress, _tokenBalance);
-            
+
             ITokenVault(vaultAddress).depositeToken(
                 _token,
                 address(this),
                 _tokenBalance
             );
-            
+
             emit FundTransfer(vaultAddress, address(_token), _tokenBalance);
             lockedTokens[msg.sender] = 0;
         }
         emit InvestMentCancelled(msg.sender);
         return true;
     }
-    
-    
-    function _unLockTokens(address _which,bool isStacking) internal returns(bool){
-        address tagAlongAdress = getAddressOf(TAG_ALONG);
-        address payable fundWallet = getAddressOf(COMPANY_FUND_WALLET);
-        
+
+    function _unLockTokens(address _which, bool isStacking)
+        internal
+        returns (bool)
+    {
         uint256 _tokenBalance;
         IERC20Token _token;
         uint256 walletAmount;
         uint256 tagAlongAmount;
-        
+
         for (uint256 tempX = 0; tempX < allowedTokens.length; tempX++) {
             _token = IERC20Token(allowedTokens[tempX]);
             _tokenBalance = lockedFunds[_which][address(_token)];
             if (_tokenBalance > 0) {
-                
-                walletAmount = safeDiv(safeMul(_tokenBalance,vaultRatio),100);
-                tagAlongAmount = safeSub(_tokenBalance,walletAmount);
-                
-                approveTransferFrom(_token, tagAlongAdress, tagAlongAmount);
-                
-                IAuctionTagAlong(tagAlongAdress).depositeToken(
+                walletAmount = safeDiv(safeMul(_tokenBalance, vaultRatio), 100);
+                tagAlongAmount = safeSub(_tokenBalance, walletAmount);
+
+                approveTransferFrom(_token, tagAlongAddress, tagAlongAmount);
+
+                IAuctionTagAlong(tagAlongAddress).depositeToken(
                     _token,
                     address(this),
                     tagAlongAmount
                 );
-                
-                ensureTransferFrom(_token,address(this),fundWallet,walletAmount);
-                
+
+                ensureTransferFrom(
+                    _token,
+                    address(this),
+                    companyFundWalletAddress,
+                    walletAmount
+                );
+
                 emit FundTransfer(
-                    tagAlongAdress,
+                    tagAlongAddress,
                     address(_token),
                     tagAlongAmount
                 );
                 emit FundTransfer(
-                    fundWallet,
+                    companyFundWalletAddress,
                     address(_token),
                     walletAmount
                 );
@@ -326,32 +327,35 @@ contract AuctionProtection is
             }
         }
         _tokenBalance = lockedFunds[_which][address(0)];
-        
+
         if (_tokenBalance > 0) {
-            walletAmount = safeDiv(safeMul(_tokenBalance,vaultRatio),100);
-            tagAlongAmount = safeSub(_tokenBalance,walletAmount);
-                
-            IAuctionTagAlong(tagAlongAdress).depositeEther.value(
-                tagAlongAmount
-            )();
-            
-            fundWallet.transfer(walletAmount);
-            
-            emit FundTransfer(tagAlongAdress, address(0), tagAlongAmount);
-            emit FundTransfer(fundWallet, address(0), walletAmount);
+            walletAmount = safeDiv(safeMul(_tokenBalance, vaultRatio), 100);
+            tagAlongAmount = safeSub(_tokenBalance, walletAmount);
+
+            tagAlongAddress.transfer(tagAlongAmount);
+
+            companyFundWalletAddress.transfer(walletAmount);
+
+            emit FundTransfer(tagAlongAddress, address(0), tagAlongAmount);
+            emit FundTransfer(
+                companyFundWalletAddress,
+                address(0),
+                walletAmount
+            );
             lockedFunds[_which][address(0)] = 0;
         }
-        
+
         _tokenBalance = lockedTokens[_which];
-         
+
         if (_tokenBalance > 0) {
-            _token = IERC20Token(getAddressOf(MAIN_TOKEN));
-            if(isStacking){
-                address stackingAddress = getAddressOf(STACKING);
-                approveTransferFrom(_token,stackingAddress,_tokenBalance);
-                Istacking(stackingAddress).addFundToStacking(_which,_tokenBalance);
-                
-            }else{
+            _token = IERC20Token(mainTokenAddress);
+            if (isStacking) {
+                approveTransferFrom(_token, stackingAddress, _tokenBalance);
+                Istacking(stackingAddress).addFundToStacking(
+                    _which,
+                    _tokenBalance
+                );
+            } else {
                 ensureTransferFrom(
                     _token,
                     address(this),
@@ -365,14 +369,14 @@ contract AuctionProtection is
 
         emit TokenUnLocked(_which);
     }
-    
+
     // user unlock tokens and funds goes to compnay wallet
     function unLockTokens() external returns (bool) {
-        return _unLockTokens(msg.sender,false);
+        return _unLockTokens(msg.sender, false);
     }
-    
+
     function stackToken() external returns (bool) {
-        return _unLockTokens(msg.sender,true);
+        return _unLockTokens(msg.sender, true);
     }
 
     function unLockFundByAdmin(address _which)
@@ -380,17 +384,19 @@ contract AuctionProtection is
         onlyOneOfOnwer()
         returns (bool)
     {
-        require(isTokenLockEndDay(lockedOn[_which]),"ERR_ADMIN_CANT_UNLOCK_FUND");
-        return _unLockTokens(_which,false);
+        require(
+            isTokenLockEndDay(lockedOn[_which]),
+            "ERR_ADMIN_CANT_UNLOCK_FUND"
+        );
+        return _unLockTokens(_which, false);
     }
 
-
-    function depositToken(address _from, address _which, uint256 _amount)
-        external
-        allowedAddressOnly(msg.sender)
-        returns (bool)
-    {
-        IERC20Token token = IERC20Token(getAddressOf(MAIN_TOKEN));
+    function depositToken(
+        address _from,
+        address _which,
+        uint256 _amount
+    ) external allowedAddressOnly(msg.sender) returns (bool) {
+        IERC20Token token = IERC20Token(mainTokenAddress);
         ensureTransferFrom(token, _from, address(this), _amount);
         lockedTokens[_which] = safeAdd(lockedTokens[_which], _amount);
 
@@ -420,5 +426,4 @@ contract AuctionProtection is
         emit FundLocked(address(token), _which, _amount);
         return true;
     }
-    
 }
