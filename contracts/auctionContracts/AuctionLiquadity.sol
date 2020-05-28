@@ -380,16 +380,19 @@ contract LiquadityFormula is LiquadityUtils {
             _mainTokenRatio,
             baseLinePrice
         );
+
         if (newReserverBalance > _mainTokenBalance) {
             uint256 _reverseBalance = safeSub(
                 newReserverBalance,
                 _mainTokenBalance
             );
+
             if (_convert)
                 _reverseBalance = safeDiv(
                     safeMul(_reverseBalance, _mainTokenBalance),
                     _baseTokenBalance
                 );
+
             return _reverseBalance;
         }
         return 0;
@@ -761,13 +764,14 @@ contract Liquadity is LiquadityFormula {
                 safeMul(safeSub(lastTokenPrice, currentPrice), 100),
                 currentPrice
             );
-            isMainToken = true;
+            isMainToken = false;
         }
 
         //bcz if volatilty is more then 50% we can recover it by take out 50% fund
         if (volatilty > 50) {
             volatilty = 50;
         }
+
         _liquadate(volatilty, false);
 
         if (isMainToken) {
@@ -798,6 +802,7 @@ contract Liquadity is LiquadityFormula {
 
     //recover price from main token
     // if there is not enough main token sell 10% relay
+    // this is very rare case where vault dont have balance
     function _priceRecoveryWithConvertMainToken(uint256 recoverPrice)
         internal
         returns (bool)
@@ -815,14 +820,18 @@ contract Liquadity is LiquadityFormula {
             return _convertWithToken(_reverseBalance, mainTokenTobaseToken);
         } else {
             uint256 converterBalance = mainToken.balanceOf(converter);
+
             uint256 relayPercent = 10;
+
             if (converterBalance > _reverseBalance)
                 relayPercent = safeDiv(
                     safeMul(safeSub(converterBalance, _reverseBalance), 100),
                     _reverseBalance
                 );
+
             _liquadate(relayPercent, false);
             // recalculate everything bcz resever changed
+
             return _priceRecoveryWithConvertMainToken(recoverPrice);
         }
     }
@@ -838,7 +847,7 @@ contract Liquadity is LiquadityFormula {
 
         uint256 totalEthAmount = safeAdd(ethAmount, fee);
 
-        // if side resever have ethe it will convert into bnt
+        // if side resever have ether it will convert into bnt
 
         if (address(this).balance >= totalEthAmount) {
             uint256 returnAmount = IBancorConverter(converter)
@@ -850,11 +859,6 @@ contract Liquadity is LiquadityFormula {
                 address(0),
                 0
             );
-
-            if (_amount > returnAmount) {
-                return _recoverAfterRedemption(_amount, _recoverPrice);
-            }
-
             return _convertWithToken(returnAmount, baseTokenToMainToken);
         } else {
             totalEthAmount = safeSub(totalEthAmount, address(this).balance);
@@ -894,12 +898,15 @@ contract Liquadity is LiquadityFormula {
 
                 _liquadate(relayPercent, false);
 
-                uint256 _reverseBalance = calculateRecoverPriceWithMainToken(
-                    _recoverPrice,
-                    true
+                _amount = safeSub(_amount, safeDiv(_amount, relayPercent));
+
+                IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
+                    baseToken,
+                    address(this),
+                    _amount
                 );
 
-                return _recoverAfterRedemption(_reverseBalance, _recoverPrice);
+                return _convertWithToken(_amount, baseTokenToMainToken);
             }
         }
     }
@@ -1004,13 +1011,16 @@ contract Liquadity is LiquadityFormula {
         return true;
     }
 
-    function _liquadate(uint256 _amount, bool _convertToEth) internal {
+    function _liquadate(uint256 _relayPercent, bool _convertToEth) internal {
         address vaultAddress = getAddressOf(VAULT);
 
         address payable tagAlongAddress = getAddressOf(TAG_ALONG);
 
         uint256 sellRelay = safeDiv(
-            safeMul(relayToken.balanceOf(address(tagAlongAddress)), _amount),
+            safeMul(
+                relayToken.balanceOf(address(tagAlongAddress)),
+                _relayPercent
+            ),
             100
         );
 
@@ -1043,7 +1053,9 @@ contract Liquadity is LiquadityFormula {
         // if we need ether it covert into eth and sent it to tagalong
         if (_convertToEth) {
             uint256 beforeEthBalance = address(this).balance;
+
             approveTransferFrom(baseToken, converter, _baseTokenBalance);
+
             IBancorConverter(converter).quickConvert2.value(0)(
                 baseTokenToEth,
                 _baseTokenBalance,
@@ -1051,6 +1063,7 @@ contract Liquadity is LiquadityFormula {
                 address(0),
                 0
             );
+
             tagAlongAddress.transfer(
                 safeSub(address(this).balance, beforeEthBalance)
             );
