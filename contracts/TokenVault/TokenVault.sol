@@ -21,6 +21,8 @@ interface InitializeInterface {
 contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     IAuctionRegistery public contractsRegistry;
 
+    address payable public auctionProtectionAddress;
+
     function updateRegistery(address _address)
         external
         onlyAuthorized()
@@ -34,9 +36,16 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     function getAddressOf(bytes32 _contractName)
         internal
         view
-        returns (address)
+        returns (address payable)
     {
         return contractsRegistry.getAddressOf(_contractName);
+    }
+
+    /**@dev updates all the address from the registry contract
+    this decision was made to save gas that occurs from calling an external view function */
+
+    function updateAddresses() public {
+        auctionProtectionAddress = getAddressOf(AUCTION_PROTECTION);
     }
 }
 
@@ -174,18 +183,14 @@ contract TokenVault is Upgradeable, TokenSpenders, InitializeInterface {
     // This method is auction protection methods called from here
     // vault address set when contribution is 0
     function unLockTokens() external onlySystem() returns (bool) {
-        return
-            IAuctionProtection(getAddressOf(AUCTION_PROTECTION)).unLockTokens();
+        return IAuctionProtection(auctionProtectionAddress).unLockTokens();
     }
 
     function stackToken() external onlySystem() returns (bool) {
-        return
-            IAuctionProtection(getAddressOf(AUCTION_PROTECTION)).stackToken();
+        return IAuctionProtection(auctionProtectionAddress).stackToken();
     }
 
     function cancelInvestment() external onlySystem() returns (bool) {
-        return
-            IAuctionProtection(getAddressOf(AUCTION_PROTECTION))
-                .cancelInvestment();
+        return IAuctionProtection(auctionProtectionAddress).cancelInvestment();
     }
 }

@@ -44,6 +44,7 @@ contract AuctionRegistery is AuctionRegisteryContracts, Ownable {
 /**@dev keeps track of all the addresses token needs which are fetched from registry contract
         Also is a standard ERC20 token*/
 contract TokenUtils is StandardToken, AuctionRegistery {
+    
     address public whiteListAddress;
     address public smartSwapAddress;
     address public currencyPricesAddress;

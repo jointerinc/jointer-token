@@ -173,6 +173,12 @@ contract BancorConverter is Ownable, SafeMath {
 contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
     IAuctionRegistery public contractsRegistry;
 
+    address payable public whiteListAddress;
+    address payable public vaultAddress;
+    address payable public auctionAddress;
+    address payable public tagAlongAddress;
+    address payable public currencyPricesAddress;
+
     function updateRegistery(address _address)
         external
         onlyAuthorized()
@@ -180,6 +186,7 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
         returns (bool)
     {
         contractsRegistry = IAuctionRegistery(_address);
+        updateAddresses();
         return true;
     }
 
@@ -189,6 +196,17 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
         returns (address payable)
     {
         return contractsRegistry.getAddressOf(_contractName);
+    }
+
+    /**@dev updates all the address from the registry contract
+    this decision was made to save gas that occurs from calling an external view function */
+
+    function updateAddresses() public {
+        whiteListAddress = getAddressOf(WHITE_LIST);
+        currencyPricesAddress = getAddressOf(CURRENCY);
+        vaultAddress = getAddressOf(VAULT);
+        tagAlongAddress = getAddressOf(TAG_ALONG);
+        auctionAddress = getAddressOf(AUCTION);
     }
 }
 
@@ -208,8 +226,6 @@ contract LiquadityUtils is BancorConverter, AuctionRegistery {
 
     // _path = 4
     IERC20Token[] public baseTokenToEth;
-
-    mapping(address => bool) public allowedAddress;
 
     mapping(address => uint256) lastReedeeDay;
 
@@ -236,18 +252,8 @@ contract LiquadityUtils is BancorConverter, AuctionRegistery {
     uint256 public baseLinePrice;
 
     modifier allowedAddressOnly(address _which) {
-        require(allowedAddress[_which], ERR_AUTHORIZED_ADDRESS_ONLY);
+        require(_which == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
         _;
-    }
-
-    function setAllowedAddress(address _address, bool _check)
-        public
-        onlySystem()
-        notZeroAddress(_address)
-        returns (bool)
-    {
-        allowedAddress[_address] = _check;
-        return true;
     }
 
     function setTokenPath(uint256 _pathNo, IERC20Token[] memory _path)
@@ -465,6 +471,7 @@ contract Liquadity is LiquadityFormula {
         mainTokenTobaseToken = _mainTokenTobaseToken;
         ethToBaseToken = _ethToBaseToken;
         baseLinePrice = _baseLinePrice;
+        updateAddresses();
     }
 
     event Contribution(address _token, uint256 _amount, uint256 returnAmount);
@@ -505,7 +512,7 @@ contract Liquadity is LiquadityFormula {
         ensureTransferFrom(
             ethToMainToken[safeSub(ethToMainToken.length, 1)],
             address(this),
-            getAddressOf(VAULT),
+            vaultAddress,
             returnAmount
         );
 
@@ -543,14 +550,14 @@ contract Liquadity is LiquadityFormula {
             ensureTransferFrom(
                 returnToken,
                 address(this),
-                getAddressOf(VAULT),
+                vaultAddress,
                 returnAmount
             );
         } else {
             ensureTransferFrom(
                 returnToken,
                 address(this),
-                getAddressOf(TAG_ALONG),
+                tagAlongAddress,
                 returnAmount
             );
         }
@@ -598,8 +605,6 @@ contract Liquadity is LiquadityFormula {
         allowedAddressOnly(msg.sender)
         returns (uint256)
     {
-        address tagAlongAddress = getAddressOf(TAG_ALONG);
-
         if (address(this).balance < previousMainReserveContribution) {
             if (previousMainReserveContribution > tagAlongAddress.balance) {
                 while (
@@ -660,7 +665,7 @@ contract Liquadity is LiquadityFormula {
 
         mainReserverAmount = _getMainReserveAmount(mainReserverAmount);
 
-        uint256 tagAlongContribution = IAuctionTagAlong(getAddressOf(TAG_ALONG))
+        uint256 tagAlongContribution = IAuctionTagAlong(tagAlongAddress)
             .contributeTowardLiquadity(mainReserverAmount);
 
         mainReserverAmount = safeAdd(tagAlongContribution, mainReserverAmount);
@@ -682,7 +687,7 @@ contract Liquadity is LiquadityFormula {
     }
 
     function recoverPriceVolatility() external onlySystem() returns (bool) {
-        uint256 baseTokenPrice = ICurrencyPrices(getAddressOf(CURRENCY))
+        uint256 baseTokenPrice = ICurrencyPrices(currencyPricesAddress)
             .getCurrencyPrice(address(baseToken));
 
         uint256 volatilty;
@@ -716,14 +721,17 @@ contract Liquadity is LiquadityFormula {
             );
 
             if (isMainToken) {
-                ITokenVault(getAddressOf(VAULT)).directTransfer(
+                ITokenVault(vaultAddress).directTransfer(
                     address(mainToken),
                     converter,
                     returnMain
                 );
             } else {
-                IAuctionTagAlong(getAddressOf(TAG_ALONG))
-                    .transferTokenLiquadity(baseToken, converter, returnBase);
+                IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
+                    baseToken,
+                    converter,
+                    returnBase
+                );
             }
         }
 
@@ -766,13 +774,13 @@ contract Liquadity is LiquadityFormula {
         (uint256 returnBase, uint256 returnMain) = _liquadate(volatilty, false);
 
         if (isMainToken) {
-            ITokenVault(getAddressOf(VAULT)).directTransfer(
+            ITokenVault(vaultAddress).directTransfer(
                 address(mainToken),
                 converter,
                 returnMain
             );
         } else {
-            IAuctionTagAlong(getAddressOf(TAG_ALONG)).transferTokenLiquadity(
+            IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
                 baseToken,
                 converter,
                 returnBase
@@ -791,8 +799,6 @@ contract Liquadity is LiquadityFormula {
         internal
         returns (bool)
     {
-        address vaultAddress = getAddressOf(VAULT);
-
         uint256 _reverseBalance = calculateRecoverPriceWithMainToken(
             recoverPrice,
             true
@@ -850,8 +856,6 @@ contract Liquadity is LiquadityFormula {
         } else {
             totalEthAmount = safeSub(totalEthAmount, address(this).balance);
 
-            address tagAlongAddress = getAddressOf(TAG_ALONG);
-
             // tag alogn transfer remainn eth and recall this function
             if (tagAlongAddress.balance >= totalEthAmount) {
                 IAuctionTagAlong(tagAlongAddress).contributeTowardLiquadity(
@@ -907,11 +911,12 @@ contract Liquadity is LiquadityFormula {
             "Redemption Only With MainToken"
         );
 
-        address primaryWallet = IWhiteList(getAddressOf(WHITE_LIST))
-            .address_belongs(msg.sender);
+        address primaryWallet = IWhiteList(whiteListAddress).address_belongs(
+            msg.sender
+        );
         require(primaryWallet != address(0), "ERR_WHITELIST");
 
-        uint256 auctionDay = IAuction(getAddressOf(AUCTION)).auctionDay();
+        uint256 auctionDay = IAuction(auctionAddress).auctionDay();
 
         require(
             auctionDay > lastReedeeDay[primaryWallet],
@@ -955,11 +960,11 @@ contract Liquadity is LiquadityFormula {
         return true;
     }
 
-    function auctionEnded() external returns (bool) {
-        require(
-            msg.sender == getAddressOf(AUCTION),
-            ERR_AUTHORIZED_ADDRESS_ONLY
-        );
+    function auctionEnded()
+        external
+        allowedAddressOnly(msg.sender)
+        returns (bool)
+    {
         (
             uint256 _baseTokenBalance,
             uint256 _mainTokenBalance
@@ -970,7 +975,7 @@ contract Liquadity is LiquadityFormula {
             safeExponent(10, baseToken.decimals())
         );
 
-        IAuction auction = IAuction(getAddressOf(AUCTION));
+        IAuction auction = IAuction(auctionAddress);
 
         uint256 auctionDay = auction.auctionDay();
 
@@ -1004,10 +1009,6 @@ contract Liquadity is LiquadityFormula {
         internal
         returns (uint256, uint256)
     {
-        address vaultAddress = getAddressOf(VAULT);
-
-        address payable tagAlongAddress = getAddressOf(TAG_ALONG);
-
         uint256 sellRelay = safeDiv(
             safeMul(
                 relayToken.balanceOf(address(tagAlongAddress)),
