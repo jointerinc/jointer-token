@@ -484,13 +484,20 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
     }
 
     /**@dev returns wallets associated with _whom */
-    function getUserWallets(address _whom)
+    function getUserWallets(address _which)
         public
         view
         returns (address[] memory)
     {
-        address primaryAddress = address_belongs[_whom];
+        address primaryAddress = address_belongs[_which];
         UserDetails storage details = user_details[primaryAddress];
         return details.wallets;
+    }
+
+    /**@dev checks if _which is allowed with buyback or not */
+    function isAllowedBuyBack(address _which) public view returns (bool) {
+        address primaryAddress = address_belongs[_which];
+        uint256 flags = user_details[primaryAddress].flags;
+        return _checkRule(flags, IS_ALLOWED_BUYBACK, IS_ALLOWED_BUYBACK);
     }
 }
