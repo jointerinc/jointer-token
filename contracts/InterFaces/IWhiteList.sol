@@ -8,6 +8,8 @@ contract IWhiteList {
 
     function isAddressByPassed(address _which) public view returns (bool);
 
+    function isBancorAddress(address _which) public view returns (bool);
+
     function isAllowedBuyBack(address _which) public view returns (bool);
 
     function main_isTransferAllowed(
