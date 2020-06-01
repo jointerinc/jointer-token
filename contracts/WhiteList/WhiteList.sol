@@ -55,7 +55,7 @@ contract WhiteListStorage {
     uint256 public constant FROM_CHINA = 1 << 11;
     uint256 public constant FROM_EU = 1 << 12;
     uint256 public constant IS_BYPASSED = 1 << 13;
-
+    uint256 public constant BANCOR_ADDRESS = 1 << 14;
     //timestamp when hold back days are over
     mapping(uint8 => uint256) public tokenToHoldBackDaysTimeStamp;
     //timestamp when token matures
@@ -145,6 +145,13 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         address primaryAddress = address_belongs[_which];
         uint256 flags = user_details[primaryAddress].flags;
         return _checkRule(flags, IS_BYPASSED, IS_BYPASSED);
+    }
+
+    /**@dev checks if address is bancor's*/
+    function isBancorAddress(address _which) public view returns (bool) {
+        address primaryAddress = address_belongs[_which];
+        uint256 flags = user_details[primaryAddress].flags;
+        return _checkRule(flags, BANCOR_ADDRESS, BANCOR_ADDRESS);
     }
 
     /**@dev whitelists an address*/
@@ -310,6 +317,9 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
             result = isWhiteListed(to);
             return result;
         }
+        //Added to make sure that bancor addresses transfer to bypassed addresses only
+        //if a bancor address calls a transfer or transferFrom function then return true only if to is Bypassed a
+        if (isBancorAddress(msgSender)) return isAddressByPassed(to);
 
         result = _isReceiveAllowed(_to, token); // Check receiver at first
         if (!result) return false; // if receiver disallowed the transfer disallowed too.
