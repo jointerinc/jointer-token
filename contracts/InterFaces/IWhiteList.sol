@@ -10,10 +10,6 @@ interface IWhiteList {
 
     function isAllowedBuyBack(address _which) external view returns (bool);
 
-    function isBancorAddress(address _which) public view returns (bool);
-
-    function isAllowedBuyBack(address _which) public view returns (bool);
-
     function main_isTransferAllowed(
         address _msgSender,
         address _from,
