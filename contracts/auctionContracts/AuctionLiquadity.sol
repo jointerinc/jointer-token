@@ -2,6 +2,7 @@ pragma solidity ^0.5.9;
 
 import "../common/SafeMath.sol";
 import "../common/Ownable.sol";
+import "../common/TokenTransfer.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IAuctionTagAlong.sol";
 import "../InterFaces/ICurrencyPrices.sol";
@@ -11,29 +12,29 @@ import "../InterFaces/ITokenVault.sol";
 import "../InterFaces/IWhiteList.sol";
 
 
-contract IBancorNetwork {
-    function etherTokens(address _address) public view returns (bool);
+interface IBancorNetwork {
+    function etherTokens(address _address) external view returns (bool);
 
-    function getReturnByPath(IERC20Token[] memory _path, uint256 _amount)
-        public
+    function getReturnByPath(IERC20Token[] calldata _path, uint256 _amount)
+        external
         view
         returns (uint256, uint256);
 }
 
 
-contract IContractRegistry {
-    function addressOf(bytes32 _contractName) public view returns (address);
+interface IContractRegistry {
+    function addressOf(bytes32 _contractName) external view returns (address);
 
     // deprecated, backward compatibility
-    function getAddress(bytes32 _contractName) public view returns (address);
+    function getAddress(bytes32 _contractName) external view returns (address);
 }
 
 
-contract IBancorConverter {
-    function registry() public view returns (address);
+interface IBancorConverter {
+    function registry() external view returns (address);
 
     function reserves(address _address)
-        public
+        external
         view
         returns (
             uint256,
@@ -47,22 +48,22 @@ contract IBancorConverter {
         IERC20Token _fromToken,
         IERC20Token _toToken,
         uint256 _amount
-    ) public view returns (uint256, uint256);
+    ) external view returns (uint256, uint256);
 
     function quickConvert2(
-        IERC20Token[] memory _path,
+        IERC20Token[] calldata _path,
         uint256 _amount,
         uint256 _minReturn,
         address _affiliateAccount,
         uint256 _affiliateFee
-    ) public payable returns (uint256);
+    ) external payable returns (uint256);
 
-    function fund(uint256 _amount) public;
+    function fund(uint256 _amount) external;
 
-    function liquidate(uint256 _amount) public;
+    function liquidate(uint256 _amount) external;
 
     function getReserveBalance(IERC20Token _reserveToken)
-        public
+        external
         view
         returns (uint256);
 }
@@ -86,8 +87,10 @@ contract BancorConverter is Ownable, SafeMath {
         address _converter,
         address _baseToken,
         address _mainToken,
-        address _relayToken
-    ) public {
+        address _relayToken,
+        address _systemAddress,
+        address _multisigAdress
+    ) public Ownable(_systemAddress, _multisigAdress) {
         converter = _converter;
         baseToken = IERC20Token(_baseToken);
         mainToken = IERC20Token(_mainToken);
@@ -103,7 +106,7 @@ contract BancorConverter is Ownable, SafeMath {
         return true;
     }
 
-    function addressOf(bytes32 _contractName) public view returns (address) {
+    function addressOf(bytes32 _contractName) internal view returns (address) {
         address _registry = IBancorConverter(converter).registry();
         IContractRegistry registry = IContractRegistry(_registry);
         return registry.addressOf(_contractName);
@@ -170,7 +173,7 @@ contract BancorConverter is Ownable, SafeMath {
 }
 
 
-contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
+contract AuctionRegistery is BancorConverter, AuctionRegisteryContracts {
     IAuctionRegistery public contractsRegistry;
 
     address payable public whiteListAddress;
@@ -179,6 +182,29 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
     address payable public tagAlongAddress;
     address payable public currencyPricesAddress;
 
+    constructor(
+        address _converter,
+        address _baseToken,
+        address _mainToken,
+        address _relayToken,
+        address _systemAddress,
+        address _multisigAdress,
+        address _registeryAddress
+    )
+        public
+        BancorConverter(
+            _converter,
+            _baseToken,
+            _mainToken,
+            _relayToken,
+            _systemAddress,
+            _multisigAdress
+        )
+    {
+        contractsRegistry = IAuctionRegistery(_registeryAddress);
+        _updateAddresses();
+    }
+
     function updateRegistery(address _address)
         external
         onlyAuthorized()
@@ -186,7 +212,7 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
         returns (bool)
     {
         contractsRegistry = IAuctionRegistery(_address);
-        updateAddresses();
+        _updateAddresses();
         return true;
     }
 
@@ -201,17 +227,21 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
     /**@dev updates all the address from the registry contract
     this decision was made to save gas that occurs from calling an external view function */
 
-    function updateAddresses() public {
+    function _updateAddresses() internal {
         whiteListAddress = getAddressOf(WHITE_LIST);
         currencyPricesAddress = getAddressOf(CURRENCY);
         vaultAddress = getAddressOf(VAULT);
         tagAlongAddress = getAddressOf(TAG_ALONG);
         auctionAddress = getAddressOf(AUCTION);
     }
+
+    function updateAddresses() external returns (bool) {
+        _updateAddresses();
+    }
 }
 
 
-contract LiquadityUtils is BancorConverter, AuctionRegistery {
+contract LiquadityUtils is AuctionRegistery {
     // _path = 0
     IERC20Token[] public ethToMainToken;
 
@@ -227,9 +257,11 @@ contract LiquadityUtils is BancorConverter, AuctionRegistery {
     // _path = 4
     IERC20Token[] public baseTokenToEth;
 
-    mapping(address => uint256) lastReedeeDay;
+    mapping(address => uint256) lastReedeemDay;
 
-    uint256 public constant NOMINATOR = 1000000;
+    uint256 public constant PERCENT_NOMINATOR = 10**6;
+
+    uint256 public constant DECIMAL_NOMINATOR = 10**18;
 
     uint256 public sideReseverRatio = 70;
 
@@ -237,7 +269,7 @@ contract LiquadityUtils is BancorConverter, AuctionRegistery {
 
     uint256 public reductionStartDay = 14;
 
-    uint256 public virtualReserverDivisor = 0;
+    uint256 public virtualReserverDivisor;
 
     uint256 public baseTokenVolatiltyRatio = 5;
 
@@ -250,6 +282,38 @@ contract LiquadityUtils is BancorConverter, AuctionRegistery {
     uint256 public lastReserveBalance;
 
     uint256 public baseLinePrice;
+
+    constructor(
+        address _converter,
+        address _baseToken,
+        address _mainToken,
+        address _relayToken,
+        address _systemAddress,
+        address _multisigAdress,
+        address _registeryAddress,
+        uint256 _baseLinePrice,
+        IERC20Token[] memory _ethToMainToken,
+        IERC20Token[] memory _baseTokenToMainToken,
+        IERC20Token[] memory _mainTokenTobaseToken,
+        IERC20Token[] memory _ethToBaseToken
+    )
+        public
+        AuctionRegistery(
+            _converter,
+            _baseToken,
+            _mainToken,
+            _relayToken,
+            _systemAddress,
+            _multisigAdress,
+            _registeryAddress
+        )
+    {
+        ethToMainToken = _ethToMainToken;
+        baseTokenToMainToken = _baseTokenToMainToken;
+        mainTokenTobaseToken = _mainTokenTobaseToken;
+        ethToBaseToken = _ethToBaseToken;
+        baseLinePrice = _baseLinePrice;
+    }
 
     modifier allowedAddressOnly(address _which) {
         require(_which == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
@@ -300,6 +364,37 @@ contract LiquadityUtils is BancorConverter, AuctionRegistery {
 
 
 contract LiquadityFormula is LiquadityUtils {
+    constructor(
+        address _converter,
+        address _baseToken,
+        address _mainToken,
+        address _relayToken,
+        address _systemAddress,
+        address _multisigAdress,
+        address _registeryAddress,
+        uint256 _baseLinePrice,
+        IERC20Token[] memory _ethToMainToken,
+        IERC20Token[] memory _baseTokenToMainToken,
+        IERC20Token[] memory _mainTokenTobaseToken,
+        IERC20Token[] memory _ethToBaseToken
+    )
+        public
+        LiquadityUtils(
+            _converter,
+            _baseToken,
+            _mainToken,
+            _relayToken,
+            _systemAddress,
+            _multisigAdress,
+            _registeryAddress,
+            _baseLinePrice,
+            _ethToMainToken,
+            _baseTokenToMainToken,
+            _mainTokenTobaseToken,
+            _ethToMainToken
+        )
+    {}
+
     // current market price calculate according to baseLinePrice
     // if baseToken Price differ from
     function _getCurrentMarketPrice() internal view returns (uint256) {
@@ -316,12 +411,12 @@ contract LiquadityFormula is LiquadityUtils {
         uint256 ratio = safeDiv(
             safeMul(
                 safeMul(_baseTokenBalance, _mainTokenRatio),
-                safeExponent(10, 6)
+                PERCENT_NOMINATOR
             ),
             safeMul(_mainTokenBalance, _baseTokenRatio)
         );
 
-        return safeDiv(safeMul(ratio, baseLinePrice), safeExponent(10, 6));
+        return safeDiv(safeMul(ratio, baseLinePrice), PERCENT_NOMINATOR);
     }
 
     function calculateLiquadityMainReserve(
@@ -332,12 +427,12 @@ contract LiquadityFormula is LiquadityUtils {
     ) internal pure returns (uint256) {
         // multiply 10**6 so we cant get zero value if amount come in float
         uint256 _tempContrbution = safeDiv(
-            safeMul(yesterDaycontibution, safeExponent(10, 6)),
+            safeMul(yesterDaycontibution, PERCENT_NOMINATOR),
             yesterdayMainReserv
         );
 
         uint256 _tempSupply = safeDiv(
-            safeMul(yesterdayPrice, safeExponent(10, 6)),
+            safeMul(yesterdayPrice, PERCENT_NOMINATOR),
             dayBeforyesterdayPrice
         );
 
@@ -359,12 +454,12 @@ contract LiquadityFormula is LiquadityUtils {
         uint256 ratio = safeDiv(
             safeMul(
                 safeMul(_reserveTokenBalance, _findTokenRatio),
-                safeExponent(10, 6)
+                PERCENT_NOMINATOR
             ),
             safeMul(_reserveTokenPrice, _reserveTokenRatio)
         );
 
-        return safeDiv(safeMul(ratio, _findTokenPrice), safeExponent(10, 6));
+        return safeDiv(safeMul(ratio, _findTokenPrice), PERCENT_NOMINATOR);
     }
 
     function calculateRecoverPriceWithMainToken(
@@ -445,7 +540,7 @@ contract LiquadityFormula is LiquadityUtils {
 }
 
 
-contract Liquadity is LiquadityFormula {
+contract Liquadity is LiquadityFormula, TokenTransfer {
     constructor(
         address _converter,
         address _baseToken,
@@ -461,17 +556,24 @@ contract Liquadity is LiquadityFormula {
         IERC20Token[] memory _ethToBaseToken
     )
         public
-        notZeroAddress(_systemAddress)
-        BancorConverter(_converter, _baseToken, _mainToken, _relayToken)
-        Ownable(_systemAddress, _multisigAddress)
+        LiquadityFormula(
+            _converter,
+            _baseToken,
+            _mainToken,
+            _relayToken,
+            _systemAddress,
+            _multisigAddress,
+            _registeryAddress,
+            _baseLinePrice,
+            _ethToMainToken,
+            _baseTokenToMainToken,
+            _mainTokenTobaseToken,
+            _ethToBaseToken
+        )
     {
-        contractsRegistry = IAuctionRegistery(_registeryAddress);
-        ethToMainToken = _ethToMainToken;
-        baseTokenToMainToken = _baseTokenToMainToken;
-        mainTokenTobaseToken = _mainTokenTobaseToken;
-        ethToBaseToken = _ethToBaseToken;
-        baseLinePrice = _baseLinePrice;
-        updateAddresses();
+        lastReserveBalance = IBancorConverter(converter).getReserveBalance(
+            baseToken
+        );
     }
 
     event Contribution(address _token, uint256 _amount, uint256 returnAmount);
@@ -480,29 +582,7 @@ contract Liquadity is LiquadityFormula {
 
     event Redemption(address _token, uint256 _amount, uint256 returnAmount);
 
-    event FundDeposited(address _token, address _from, uint256 _amount);
-
-    function ensureTransferFrom(
-        IERC20Token _token,
-        address _from,
-        address _to,
-        uint256 _amount
-    ) private {
-        uint256 prevBalance = _token.balanceOf(_to);
-
-        if (_from == address(this)) _token.transfer(_to, _amount);
-        else _token.transferFrom(_from, _to, _amount);
-        uint256 postBalance = _token.balanceOf(_to);
-        require(postBalance > prevBalance, "ERR_TOKEN_NOT_TRANSFERRED");
-    }
-
-    function approveTransferFrom(
-        IERC20Token _token,
-        address _spender,
-        uint256 _amount
-    ) private {
-        _token.approve(_spender, _amount);
-    }
+    event FundDeposited(address _token, address indexed _from, uint256 _amount);
 
     function _contributeWithEther(uint256 value) internal returns (uint256) {
         uint256 returnAmount = IBancorConverter(converter).quickConvert2.value(
@@ -610,7 +690,7 @@ contract Liquadity is LiquadityFormula {
                 while (
                     previousMainReserveContribution >= tagAlongAddress.balance
                 ) {
-                    _liquadate(safeMul(10, NOMINATOR), true);
+                    _liquadate(safeMul(10, PERCENT_NOMINATOR), true);
 
                     if (
                         tagAlongAddress.balance >=
@@ -641,7 +721,11 @@ contract Liquadity is LiquadityFormula {
     {
         if (virtualReserverDivisor > 0)
             mainReserverAmount = safeDiv(
-                safeMul(mainReserverAmount, safeExponent(10, 12)),
+                // we need here 10**12
+                safeMul(
+                    mainReserverAmount,
+                    safeMul(PERCENT_NOMINATOR, PERCENT_NOMINATOR)
+                ),
                 virtualReserverDivisor
             );
 
@@ -698,7 +782,7 @@ contract Liquadity is LiquadityFormula {
             volatilty = safeDiv(
                 safeMul(
                     safeSub(baseTokenPrice, baseLinePrice),
-                    safeMul(100, NOMINATOR)
+                    safeMul(100, PERCENT_NOMINATOR)
                 ),
                 baseLinePrice
             );
@@ -707,7 +791,7 @@ contract Liquadity is LiquadityFormula {
             volatilty = safeDiv(
                 safeMul(
                     safeSub(baseLinePrice, baseTokenPrice),
-                    safeMul(100, NOMINATOR)
+                    safeMul(100, PERCENT_NOMINATOR)
                 ),
                 baseTokenPrice
             );
@@ -734,7 +818,7 @@ contract Liquadity is LiquadityFormula {
                 );
             }
         }
-
+        baseLinePrice = baseTokenPrice;
         lastReserveBalance = IBancorConverter(converter).getReserveBalance(
             baseToken
         );
@@ -754,7 +838,7 @@ contract Liquadity is LiquadityFormula {
             volatilty = safeDiv(
                 safeMul(
                     safeSub(_baseTokenBalance, lastReserveBalance),
-                    safeMul(100, NOMINATOR)
+                    safeMul(100, PERCENT_NOMINATOR)
                 ),
                 lastReserveBalance
             );
@@ -764,7 +848,7 @@ contract Liquadity is LiquadityFormula {
             volatilty = safeDiv(
                 safeMul(
                     safeSub(lastReserveBalance, _baseTokenBalance),
-                    safeMul(100, NOMINATOR)
+                    safeMul(100, PERCENT_NOMINATOR)
                 ),
                 lastReserveBalance
             );
@@ -817,7 +901,7 @@ contract Liquadity is LiquadityFormula {
                 relayPercent = safeDiv(
                     safeMul(
                         safeSub(converterBalance, _reverseBalance),
-                        safeMul(100, NOMINATOR)
+                        safeMul(100, PERCENT_NOMINATOR)
                     ),
                     _reverseBalance
                 );
@@ -906,20 +990,23 @@ contract Liquadity is LiquadityFormula {
         public
         returns (bool)
     {
+        require(address(_path[0]) == address(mainToken), "ERR_MAIN_TOKEN");
+
         require(
-            address(_path[0]) == address(mainToken),
-            "Redemption Only With MainToken"
+            IWhiteList(whiteListAddress).isAllowedBuyBack(msg.sender),
+            "ERR_NOT_ALLOWED_BUYBACK"
         );
 
         address primaryWallet = IWhiteList(whiteListAddress).address_belongs(
             msg.sender
         );
+
         require(primaryWallet != address(0), "ERR_WHITELIST");
 
         uint256 auctionDay = IAuction(auctionAddress).auctionDay();
 
         require(
-            auctionDay > lastReedeeDay[primaryWallet],
+            auctionDay > lastReedeemDay[primaryWallet],
             "ERR_WALLET_ALREADY_REDEEM"
         );
 
@@ -944,7 +1031,7 @@ contract Liquadity is LiquadityFormula {
                 returnAmount
             );
 
-        lastReedeeDay[msg.sender] = auctionDay;
+        lastReedeemDay[msg.sender] = auctionDay;
         uint256 _afterBalance = baseToken.balanceOf(converter);
 
         emit Redemption(
@@ -1014,7 +1101,7 @@ contract Liquadity is LiquadityFormula {
                 relayToken.balanceOf(address(tagAlongAddress)),
                 _relayPercent
             ),
-            safeMul(100, NOMINATOR)
+            safeMul(100, PERCENT_NOMINATOR)
         );
 
         IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
@@ -1082,6 +1169,20 @@ contract Liquadity is LiquadityFormula {
         return _getCurrentMarketPrice();
     }
 
+    //return token and ether from here
+    function returnFund(
+        IERC20Token _token,
+        uint256 _value,
+        address payable _which
+    ) external onlyOwner() returns (bool) {
+        if (address(_token) == address(0)) {
+            _which.transfer(_value);
+        } else {
+            ensureTransferFrom(_token, address(this), _which, _value);
+        }
+        return true;
+    }
+
     function depositeToken(
         IERC20Token _token,
         address _from,
@@ -1089,20 +1190,6 @@ contract Liquadity is LiquadityFormula {
     ) external returns (bool) {
         ensureTransferFrom(_token, _from, address(this), _amount);
         emit FundDeposited(address(0), _from, _amount);
-        return true;
-    }
-
-    function returnTokens(
-        IERC20Token _tokens,
-        address _to,
-        uint256 _value
-    ) external onlyOwner() returns (bool) {
-        ensureTransferFrom(_tokens, address(this), _to, _value);
-        return true;
-    }
-
-    function withDraw(uint256 _value) external onlyOwner() returns (bool) {
-        msg.sender.transfer(_value);
         return true;
     }
 

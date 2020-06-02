@@ -7,6 +7,21 @@ import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IERC20Token.sol";
 
 
+interface InitializeInterface {
+    function initialize(
+        address _primaryOwner,
+        address _systemAddress,
+        address _authorityAddress,
+        uint256 _mainHoldBackDays,
+        uint256 _etnHoldBackDays,
+        uint256 _stockHoldBackDays,
+        uint256 _mainMaturityDays,
+        uint256 _etnMaturityDays,
+        uint256 _stockMaturityDays
+    ) external;
+}
+
+
 contract WhiteListStorage {
     struct UserDetails {
         uint256 flags; // bitmap, where each bit correspondent to some properties (additional flags can be added in future).
@@ -55,36 +70,39 @@ contract WhiteListStorage {
     uint256 public constant FROM_CHINA = 1 << 11;
     uint256 public constant FROM_EU = 1 << 12;
     uint256 public constant IS_BYPASSED = 1 << 13;
-
+    uint256 public constant BANCOR_ADDRESS = 1 << 14;
     //timestamp when hold back days are over
-    mapping(uint8 => uint256) tokenToHoldBackDaysTimeStamp;
+    mapping(uint8 => uint256) public tokenToHoldBackDaysTimeStamp;
     //timestamp when token matures
-    mapping(uint8 => uint256) tokenToMaturityDaysTimeStamp;
+    mapping(uint8 => uint256) public tokenToMaturityDaysTimeStamp;
 }
 
 
-contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
-    event AccountWhiteListed(address indexed which, uint256 walletType);
+contract WhiteList is
+    Upgradeable,
+    ProxyOwnable,
+    SafeMath,
+    WhiteListStorage,
+    InitializeInterface
+{
+    event AccountWhiteListed(address indexed which, uint256 flags);
     event WalletAdded(address indexed from, address indexed which);
     event WalletRemoved(address indexed from, address indexed which);
+    event FlagsChanged(address indexed which, uint256 flags);
 
-    //for testing only
-    constructor() public {
-        registry = IRegistry(msg.sender);
-        systemAddress = msg.sender;
-    }
-
-    //@dev converts _days into unix timestamp _days from now
+    /**@dev converts _days into unix timestamp _days from now*/
     function convertDaysToTimeStamp(uint256 _days)
         internal
         view
         returns (uint256)
     {
+        //no need to check if days are set to zero see _isTransferAllowed L#327
+        if (_days == 0) return 0;
         uint256 duration = safeMul(86400, _days);
         return safeAdd(now, duration);
     }
 
-    //@dev since its a proxy contract this is what will work as a constructor
+    /**@dev since its a proxy contract this is what will work as a constructor*/
     function initialize(
         address _primaryOwner,
         address _systemAddress,
@@ -97,11 +115,8 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         uint256 _stockMaturityDays
     ) public {
         super.initialize();
-        ProxyOwnable.initializeOwner(
-            _primaryOwner,
-            _systemAddress,
-            _authorityAddress
-        );
+
+        initializeOwner(_primaryOwner, _systemAddress, _authorityAddress);
         tokenToMaturityDaysTimeStamp[0] = convertDaysToTimeStamp(
             _mainMaturityDays
         );
@@ -123,7 +138,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         );
     }
 
-    //@dev whitelists an address
+    /**@dev whitelists an address*/
     function whiteListAccount(
         address _which,
         uint64 _flags,
@@ -133,23 +148,31 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         details.flags = _flags;
         details.maxWallets = _maxWallets;
         address_belongs[_which] = _which;
+        emit AccountWhiteListed(_which, _flags);
         return true;
     }
 
-    //@dev returns if address is whitelisted
+    /**@dev returns if address is whitelisted*/
     function isWhiteListed(address _which) public view returns (bool) {
         if (address_belongs[_which] == address(0)) return false;
         return true;
     }
 
-    //@dev checks if address is bypassed
+    /**@dev checks if address is bypassed*/
     function isAddressByPassed(address _which) public view returns (bool) {
         address primaryAddress = address_belongs[_which];
         uint256 flags = user_details[primaryAddress].flags;
-        return checkRule(flags, IS_BYPASSED, IS_BYPASSED);
+        return _checkRule(flags, IS_BYPASSED, IS_BYPASSED);
     }
 
-    //@dev whitelists an address
+    /**@dev checks if address is bancor's*/
+    function isBancorAddress(address _which) public view returns (bool) {
+        address primaryAddress = address_belongs[_which];
+        uint256 flags = user_details[primaryAddress].flags;
+        return _checkRule(flags, BANCOR_ADDRESS, BANCOR_ADDRESS);
+    }
+
+    /**@dev whitelists an address*/
     function addNewWallet(
         address _which,
         uint64 _flags,
@@ -159,7 +182,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         return whiteListAccount(_which, _flags, _maxWallets);
     }
 
-    //@dev updates the maximum wallets allowed for a primary whitelisted address
+    /**@dev updates the maximum wallets allowed for a primary whitelisted address*/
     function updateMaxWallet(address _which, uint256 _maxWallets)
         public
         onlyOwner
@@ -171,7 +194,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         return true;
     }
 
-    //@dev allows primary whitelisted address to add wallet address controlled by them(reverts if maximum wallets is reached)
+    /**@dev allows primary whitelisted address to add wallet address controlled by them(reverts if maximum wallets is reached)*/
     function addMoreWallets(address _which)
         public
         notZeroAddress(_which)
@@ -207,7 +230,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         return true;
     }
 
-    //@dev allows system to chage flags associated with an address
+    /**@dev allows system to chage flags associated with an address*/
     function changeFlags(address _which, uint64 _flags)
         public
         onlySystem()
@@ -217,14 +240,15 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         require(isWhiteListed(_which), "ERR_ACTION_NOT_ALLOWED");
         address primaryAddress = address_belongs[_which];
         user_details[primaryAddress].flags = _flags;
+        emit FlagsChanged(_which, _flags);
         return true;
     }
 
-    //@dev checks condition
-    //@param _flags on which conditions are being checked on
-    //@param _mask the bits we care about in a conditions
-    //@param _condition the pattern of bits which should be exactly same in _flags to be true
-    function checkRule(
+    /**@dev checks condition
+    @param _flags on which conditions are being checked on
+    @param _mask the bits we care about in a conditions
+    @param _condition the pattern of bits which should be exactly same in _flags to be true*/
+    function _checkRule(
         uint256 _flags,
         uint256 _mask,
         uint256 _condition
@@ -235,7 +259,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         return false;
     }
 
-    //@dev adds ReceivingRule of the token
+    /**@dev adds ReceivingRule of the token*/
     function _addReceivingRule(
         uint256 _mask,
         uint256 _condition,
@@ -244,8 +268,8 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         tokenToReceivingRule[_token] = ReceivingRule(_mask, _condition);
     }
 
-    //@dev adds transferring rule
-    //if from has from_conditions bits set(i.e. is from usa) and to has to_condition bits set(i.e. is from china) then we don't allow
+    /**@dev adds transferring rule
+    if from has from_conditions bits set(i.e. is from usa) and to has to_condition bits set(i.e. is from china) then we don't allow*/
     function _addTransferringRule(
         uint256 from_mask,
         uint256 from_condition,
@@ -273,7 +297,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         transferringRules.length = safeSub(transferringRules.length, 1);
     }
 
-    // @dev Check, if receiver is whitelisted (has all necessary flags). Require to pass all rules in the set.
+    /**@dev Check, if receiver is whitelisted (has all necessary flags). Require to pass all rules in the set*/
     function _isReceiveAllowed(address user, uint8 token)
         internal
         view
@@ -283,7 +307,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         require(investor != address(0), "ERR_TRANSFER_CHECK_WHITELIST");
         uint256 flags = user_details[investor].flags;
         bool result;
-        result = checkRule(
+        result = _checkRule(
             flags,
             tokenToReceivingRule[token].mask,
             tokenToReceivingRule[token].condition
@@ -292,7 +316,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         return true;
     }
 
-    //@dev checks if transfer is allowed with according transferringRules of a token
+    /**@dev checks if transfer is allowed with according transferringRules of a token*/
     function _isTransferAllowed(
         address _msgSender,
         address _from,
@@ -311,6 +335,9 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
             result = isWhiteListed(to);
             return result;
         }
+        //Added to make sure that bancor addresses transfer to bypassed addresses only
+        //if a bancor address calls a transfer or transferFrom function then return true only if to is Bypassed a
+        if (isBancorAddress(msgSender)) return isAddressByPassed(to);
 
         result = _isReceiveAllowed(_to, token); // Check receiver at first
         if (!result) return false; // if receiver disallowed the transfer disallowed too.
@@ -337,14 +364,14 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
             i++
         ) {
             // check the sender for restriction.
-            result = checkRule(
+            result = _checkRule(
                 from_flags,
                 tokenToTransferringRuleArray[token][i].from_mask,
                 tokenToTransferringRuleArray[token][i].from_condition
             );
             // check receiver only in case when sender has restriction.
             if (result) {
-                result = checkRule(
+                result = _checkRule(
                     to_flags,
                     tokenToTransferringRuleArray[token][i].to_mask,
                     tokenToTransferringRuleArray[token][i].to_condition
@@ -355,7 +382,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         return true;
     }
 
-    //@dev adds ReceivingRule for main token
+    /**@dev adds ReceivingRule for main token*/
     function addMainRecivingRule(uint256 mask, uint256 condition)
         public
         onlySystem()
@@ -363,12 +390,12 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         _addReceivingRule(mask, condition, 0);
     }
 
-    //@dev removes a specific rule from transferringRules for main token
+    /**@dev removes a specific rule from transferringRules for main token*/
     function removeMainTransferingRules(uint256 _index) public onlySystem() {
         _removeTransferingRule(_index, 0);
     }
 
-    //@dev add transferringRule for main token
+    /**@dev add transferringRule for main token*/
     function addMainTransferringRule(
         uint256 from_mask,
         uint256 from_condition,
@@ -384,12 +411,12 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         );
     }
 
-    //@dev checks if address is allowed to recieve main token
+    /**@dev checks if address is allowed to recieve main token*/
     function main_isReceiveAllowed(address user) public view returns (bool) {
         return _isReceiveAllowed(user, 0);
     }
 
-    //@dev check if transferring is allowed for main
+    /**@dev check if transferring is allowed for main*/
     function main_isTransferAllowed(
         address _msgSender,
         address _from,
@@ -398,7 +425,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         return _isTransferAllowed(_msgSender, _from, _to, 0);
     }
 
-    //@dev check if transferring is allowed for etn
+    /**@dev check if transferring is allowed for etn*/
     function etn_isTransferAllowed(
         address _msgSender,
         address _from,
@@ -407,12 +434,12 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         return _isTransferAllowed(_msgSender, _from, _to, 1);
     }
 
-    //@dev checks if address is allowed to recieve etn token
+    /**@dev checks if address is allowed to recieve etn token*/
     function etn_isReceiveAllowed(address user) public view returns (bool) {
         return _isReceiveAllowed(user, 1);
     }
 
-    //@dev adds ReceivingRule for etn token
+    /**@dev adds ReceivingRule for etn token*/
     function addEtnTransferringRule(
         uint256 from_mask,
         uint256 from_condition,
@@ -428,12 +455,12 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         );
     }
 
-    //@dev removes a specific rule from transferringRules for etn token
+    /**@dev removes a specific rule from transferringRules for etn token*/
     function removeEtnTransferingRules(uint256 _index) public onlySystem() {
         _removeTransferingRule(_index, 1);
     }
 
-    //@dev adds ReceivingRule for etn token
+    /**@dev adds ReceivingRule for etn token*/
     function addEtnRecivingRule(uint256 mask, uint256 condition)
         public
         onlySystem()
@@ -441,7 +468,7 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         _addReceivingRule(mask, condition, 1);
     }
 
-    //@dev check if transferring is allowed for stock
+    /**@dev check if transferring is allowed for stock*/
     function stock_isTransferAllowed(
         address _msgSender,
         address _from,
@@ -450,12 +477,12 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         return _isTransferAllowed(_msgSender, _from, _to, 2);
     }
 
-    //@dev checks if address is allowed to recieve stock token
+    /**@dev checks if address is allowed to recieve stock token*/
     function stock_isReceiveAllowed(address user) public view returns (bool) {
         return _isReceiveAllowed(user, 2);
     }
 
-    //@dev add transferringRule for stock token
+    /**@dev add transferringRule for stock token*/
     function addStockTransferringRule(
         uint256 from_mask,
         uint256 from_condition,
@@ -471,16 +498,34 @@ contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage {
         );
     }
 
-    //@dev removes a specific rule from transferringRules for stock token
+    //@dev removes a specific rule from transferringRules for stock token*/
     function removeStockTransferingRules(uint256 _index) public onlySystem() {
         _removeTransferingRule(_index, 2);
     }
 
-    //@dev adds ReceivingRule for stock token
+    /**@dev adds ReceivingRule for stock token*/
     function addStockRecivingRule(uint256 mask, uint256 condition)
         public
         onlySystem()
     {
         _addReceivingRule(mask, condition, 2);
+    }
+
+    /**@dev returns wallets associated with _whom */
+    function getUserWallets(address _which)
+        public
+        view
+        returns (address[] memory)
+    {
+        address primaryAddress = address_belongs[_which];
+        UserDetails storage details = user_details[primaryAddress];
+        return details.wallets;
+    }
+
+    /**@dev checks if _which is allowed with buyback or not */
+    function isAllowedBuyBack(address _which) public view returns (bool) {
+        address primaryAddress = address_belongs[_which];
+        uint256 flags = user_details[primaryAddress].flags;
+        return _checkRule(flags, IS_ALLOWED_BUYBACK, IS_ALLOWED_BUYBACK);
     }
 }

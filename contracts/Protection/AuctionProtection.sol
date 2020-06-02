@@ -2,6 +2,7 @@ pragma solidity ^0.5.9;
 
 import "../common/ProxyOwnable.sol";
 import "../common/SafeMath.sol";
+import "../common/TokenTransfer.sol";
 import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IAuctionTagAlong.sol";
@@ -152,7 +153,8 @@ contract AuctionProtection is
     Upgradeable,
     Utils,
     ProtectionStorage,
-    InitializeInterface
+    InitializeInterface,
+    TokenTransfer
 {
     function initialize(
         address _primaryOwner,
@@ -161,41 +163,20 @@ contract AuctionProtection is
         address _registeryAddress
     ) public {
         super.initialize();
+
         contractsRegistry = IAuctionRegistery(_registeryAddress);
         tokenLockDuration = 365;
-        ProxyOwnable.initializeOwner(
-            _primaryOwner,
-            _systemAddress,
-            _authorityAddress
-        );
+        initializeOwner(_primaryOwner, _systemAddress, _authorityAddress);
         updateAddresses();
     }
 
     event TokenUnLocked(address indexed _from);
+
     event InvestMentCancelled(address indexed _from);
-    event FundLocked(address _token, address _which, uint256 _amount);
+
+    event FundLocked(address _token, address indexed _which, uint256 _amount);
+
     event FundTransfer(address indexed _to, address _token, uint256 _amount);
-
-    function ensureTransferFrom(
-        IERC20Token _token,
-        address _from,
-        address _to,
-        uint256 _amount
-    ) internal {
-        uint256 prevBalance = _token.balanceOf(_to);
-        if (_from == address(this)) _token.transfer(_to, _amount);
-        else _token.transferFrom(_from, _to, _amount);
-        uint256 postBalance = _token.balanceOf(_to);
-        require(postBalance > prevBalance, "ERR_TRANSFER");
-    }
-
-    function approveTransferFrom(
-        IERC20Token _token,
-        address _spender,
-        uint256 _amount
-    ) internal {
-        _token.approve(_spender, _amount);
-    }
 
     function lockBalance(
         address _token,
@@ -257,6 +238,7 @@ contract AuctionProtection is
         }
 
         _tokenBalance = lockedFunds[msg.sender][address(0)];
+
         if (_tokenBalance > 0) {
             msg.sender.transfer(_tokenBalance);
             emit FundTransfer(msg.sender, address(0), _tokenBalance);
@@ -397,14 +379,19 @@ contract AuctionProtection is
         uint256 _amount
     ) external allowedAddressOnly(msg.sender) returns (bool) {
         IERC20Token token = IERC20Token(mainTokenAddress);
+
         ensureTransferFrom(token, _from, address(this), _amount);
+
         lockedTokens[_which] = safeAdd(lockedTokens[_which], _amount);
 
         uint256 _currentTokenBalance;
         IERC20Token _token;
+
         for (uint256 tempX = 0; tempX < allowedTokens.length; tempX++) {
             _token = IERC20Token(allowedTokens[tempX]);
+
             _currentTokenBalance = currentLockedFunds[_which][address(_token)];
+
             if (_currentTokenBalance > 0) {
                 lockedFunds[msg.sender][address(_token)] = safeAdd(
                     lockedFunds[msg.sender][address(_token)],
@@ -416,10 +403,12 @@ contract AuctionProtection is
 
         if (currentLockedFunds[_which][address(0)] > 0) {
             _currentTokenBalance = currentLockedFunds[_which][address(0)];
+
             lockedFunds[_which][address(0)] = safeAdd(
                 lockedFunds[_which][address(0)],
                 _currentTokenBalance
             );
+
             currentLockedFunds[_which][address(0)] = 0;
         }
 

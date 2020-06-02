@@ -1,26 +1,29 @@
 pragma solidity ^0.5.9;
 
-contract IERC20Token {
-    function name() public view returns (string memory);
 
-    function symbol() public view returns (string memory);
+interface IERC20Token {
+    function name() external view returns (string memory);
 
-    function decimals() public view returns (uint8);
+    function symbol() external view returns (string memory);
 
-    function totalSupply() public view returns (uint256);
+    function decimals() external view returns (uint8);
 
-    function balanceOf(address _owner) public view returns (uint256);
+    function totalSupply() external view returns (uint256);
+
+    function balanceOf(address _owner) external view returns (uint256);
 
     function allowance(address _owner, address _spender)
-        public
+        external
         view
         returns (uint256);
 
-    function transfer(address _to, uint256 _value) public returns (bool);
+    function transfer(address _to, uint256 _value) external returns (bool);
 
-    function transferFrom(address _from, address _to, uint256 _value)
-        public
-        returns (bool);
+    function transferFrom(
+        address _from,
+        address _to,
+        uint256 _value
+    ) external returns (bool);
 
-    function approve(address _spender, uint256 _value) public returns (bool);
+    function approve(address _spender, uint256 _value) external returns (bool);
 }

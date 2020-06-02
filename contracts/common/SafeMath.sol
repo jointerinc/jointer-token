@@ -1,38 +1,41 @@
 pragma solidity ^0.5.9;
 
+
 contract SafeMath {
-    
-  function safeMul(uint256 a, uint256 b) internal pure returns (uint256) {
-    if (a == 0) {
-      return 0;
+    function safeMul(uint256 a, uint256 b) internal pure returns (uint256) {
+        if (a == 0) {
+            return 0;
+        }
+        uint256 c = a * b;
+        assert(c / a == b);
+        return c;
     }
-    uint256 c = a * b;
-    assert(c / a == b);
-    return c;
-  }
 
-  function safeDiv(uint256 a, uint256 b) internal pure returns (uint256) {
-    uint256 c = a / b;
-    return c;
-  }
+    function safeDiv(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a / b;
+        return c;
+    }
 
-  function safeSub(uint256 a, uint256 b) internal pure returns (uint256) {
-    assert(b <= a);
-    return a - b;
-  }
+    function safeSub(uint256 a, uint256 b) internal pure returns (uint256) {
+        assert(b <= a);
+        return a - b;
+    }
 
-  function safeAdd(uint256 a, uint256 b) internal pure returns (uint256) {
-    uint256 c = a + b;
-    assert(c >= a);
-    return c;
-  }
-  
-  function safeExponent(uint256 a,uint256 b) internal pure returns (uint256) {
-      uint256 result;
-      assembly {
-          result:=exp(a, b)	
-      }
-      return result;
-  }
-  
+    function safeAdd(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        assert(c >= a);
+        return c;
+    }
+
+    function safeExponent(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256)
+    {
+        uint256 result;
+        assembly {
+            result := exp(a, b)
+        }
+        return result;
+    }
 }

@@ -2,6 +2,7 @@ pragma solidity ^0.5.9;
 
 import "../common/Ownable.sol";
 import "../common/SafeMath.sol";
+import "../common/TokenTransfer.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IAuctionTagAlong.sol";
 import "../InterFaces/IAuctionProtection.sol";
@@ -16,9 +17,10 @@ import "../InterFaces/Istacking.sol";
 
 
 contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
+    
     IAuctionRegistery public contractsRegistry;
-
-    address payable public whiteListAddress;
+    
+    address payable public  whiteListAddress;
     address payable public smartSwapAddress;
     address payable public currencyPricesAddress;
     address payable public vaultAddress;
@@ -29,7 +31,14 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
     address payable public companyFundWalletAddress;
     address payable public companyTokenWalletAddress;
     address payable public individualBonusAddress;
-
+    
+    constructor(address _systemAddress,
+                address _multisigAdress,
+                address _registeryAddress) public Ownable(_systemAddress,_multisigAdress){
+        contractsRegistry = IAuctionRegistery(_registeryAddress);
+        _updateAddresses();
+    }
+    
     function updateRegistery(address _address)
         external
         onlyAuthorized()
@@ -37,7 +46,7 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
         returns (bool)
     {
         contractsRegistry = IAuctionRegistery(_address);
-        updateAddresses();
+        _updateAddresses();
         return true;
     }
 
@@ -48,11 +57,11 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
     {
         return contractsRegistry.getAddressOf(_contractName);
     }
-
+    
     /**@dev updates all the address from the registry contract
     this decision was made to save gas that occurs from calling an external view function */
-
-    function updateAddresses() public {
+    
+    function _updateAddresses() internal {
         whiteListAddress = getAddressOf(WHITE_LIST);
         smartSwapAddress = getAddressOf(SMART_SWAP);
         currencyPricesAddress = getAddressOf(CURRENCY);
@@ -65,10 +74,21 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
         companyTokenWalletAddress = getAddressOf(COMPANY_MAIN_TOKEN_WALLET);
         individualBonusAddress = getAddressOf(INDIDUAL_BONUS);
     }
+    
+    function updateAddresses() external returns (bool) {
+        _updateAddresses();
+    }
+    
+   
 }
 
 
 contract AuctionUtils is AuctionRegistery {
+    
+    uint256 public constant PERCENT_NOMINATOR = 10**6;
+    
+    uint256 public constant DECIMAL_NOMINATOR = 10**18;
+    
     // allowed contarct limit the contribution
     uint256 public maxContributionAllowed = 150;
 
@@ -94,6 +114,13 @@ contract AuctionUtils is AuctionRegistery {
 
     //ByDefault it false
     bool public mainTokencheckOn;
+    
+    
+    constructor(address _systemAddress,
+                address _multisigAdress,
+                address _registeryAddress) public AuctionRegistery(_systemAddress,_multisigAdress,_registeryAddress){
+        
+    }
 
     function setGroupBonusRatio(uint256 _groupBonusRatio)
         external
@@ -171,7 +198,8 @@ contract AuctionUtils is AuctionRegistery {
 }
 
 
-contract AuctionFormula is AuctionUtils, SafeMath {
+contract AuctionFormula is  SafeMath,TokenTransfer {
+    
     function calcuateAuctionTokenDistrubution(
         uint256 dayWiseContributionByWallet,
         uint256 dayWiseSupplyCore,
@@ -259,7 +287,7 @@ contract AuctionFormula is AuctionUtils, SafeMath {
 }
 
 
-contract AuctionStorage is AuctionFormula {
+contract AuctionStorage is AuctionFormula,AuctionUtils {
     uint256 public auctionDay = 1;
 
     // address how much invested by them in auciton till date
@@ -295,58 +323,50 @@ contract AuctionStorage is AuctionFormula {
     //contributor Index
     mapping(uint256 => mapping(address => uint256)) public topContributiorIndex;
 
-    // check if daywiser token disturbuted
+    // check if daywise token disturbuted
     mapping(uint256 => mapping(address => bool)) public returnToken;
 
     // total contribution till date
-    uint256 public totalContribution = 2500000000000;
+    uint256 public totalContribution = 2500000 * PERCENT_NOMINATOR;
 
-    uint256 public todayContribution = 0;
+    uint256 public todayContribution;
 
-    uint256 public yesterdayContribution = 500000000;
+    uint256 public yesterdayContribution = 500 * PERCENT_NOMINATOR;
 
     uint256 public allowedMaxContribution = 850000000;
 
-    uint256 public yesterdaySupply = 0;
+    uint256 public yesterdaySupply;
 
-    uint256 public todaySupply = 50000000000000000000000;
+    uint256 public todaySupply = 50000 * DECIMAL_NOMINATOR;
 
     uint256 public tokenAuctionEndPrice = 10000;
 
-    bool public auctionSoldOut = false;
+    bool public auctionSoldOut;
+    
+    constructor(address _systemAddress,
+                address _multisigAdress,
+                address _registeryAddress) public AuctionUtils(_systemAddress,_multisigAdress,_registeryAddress){
+        dayWiseDownSideProtectionRatio[auctionDay] = downSideProtectionRatio;   
+    }
 }
 
 
 contract AuctionFundCollector is AuctionStorage {
+    
     event FundAdded(
         uint256 indexed _auctionDayId,
         uint256 _todayContribution,
         address indexed _fundBy,
-        address _fundToken,
+        address indexed _fundToken,
         uint256 _fundAmount,
         uint256 _fundValue,
         uint256 _marketPrice
     );
 
-    function ensureTransferFrom(
-        IERC20Token _token,
-        address _from,
-        address _to,
-        uint256 _amount
-    ) internal {
-        uint256 prevBalance = _token.balanceOf(_to);
-        if (_from == address(this)) _token.transfer(_to, _amount);
-        else _token.transferFrom(_from, _to, _amount);
-        uint256 postBalance = _token.balanceOf(_to);
-        require(postBalance > prevBalance);
-    }
-
-    function approveTransferFrom(
-        IERC20Token _token,
-        address _spender,
-        uint256 _amount
-    ) internal {
-        _token.approve(_spender, _amount);
+    constructor(address _systemAddress,
+                address _multisigAdress,
+                address _registeryAddress) public AuctionStorage(_systemAddress,_multisigAdress,_registeryAddress){
+        
     }
 
     // check before contribution
@@ -362,6 +382,44 @@ contract AuctionFundCollector is AuctionStorage {
         );
         return true;
     }
+    
+    function mainTokenCheck(address _from,uint256 _contributedAmount) internal returns(bool){
+        
+        IERC20Token mainToken = IERC20Token(mainTokenAddress);
+
+        uint256 _mainTokenPrice = ICurrencyPrices(currencyPricesAddress)
+            .getCurrencyPrice(mainTokenAddress);
+
+        uint256 _tokenAmount = safeDiv(
+            safeMul(
+                safeDiv(
+                    safeMul(mainToken.balanceOf(_from), mainTokenRatio),
+                    100
+                ),
+                _mainTokenPrice
+            ),
+            safeExponent(10, mainToken.decimals())
+        );
+
+        require(
+            _tokenAmount >=
+                safeAdd(
+                    walletDayWiseContribution[auctionDay][_from],
+                    _contributedAmount
+                ),
+            "ERR_USER_DONT_HAVE_ENOUGH_TOKEN"
+        );
+
+        uint256 lockToken = safeDiv(
+            safeAdd(
+                walletDayWiseContribution[auctionDay][_from],
+                _contributedAmount
+            ),
+            _mainTokenPrice
+        );
+
+        IToken(mainTokenAddress).lockToken(_from, lockToken, now);
+    }
 
     function fundAdded(
         address _token,
@@ -372,8 +430,7 @@ contract AuctionFundCollector is AuctionStorage {
     ) internal {
         require(auctionSoldOut == false, "ERR_AUCTION_SOLD_OUT");
 
-        uint256 _currencyPrices = ICurrencyPrices(currencyPricesAddress)
-            .getCurrencyPrice(_token);
+        uint256 _currencyPrices = ICurrencyPrices(currencyPricesAddress).getCurrencyPrice(_token);
 
         uint256 _contributedAmount = safeDiv(
             safeMul(_amount, _currencyPrices),
@@ -381,48 +438,12 @@ contract AuctionFundCollector is AuctionStorage {
         );
 
         if (mainTokencheckOn) {
-            IERC20Token mainToken = IERC20Token(mainTokenAddress);
-
-            uint256 _mainTokenPrice = ICurrencyPrices(currencyPricesAddress)
-                .getCurrencyPrice(address(mainToken));
-
-            uint256 _tokenAmount = safeDiv(
-                safeMul(
-                    safeDiv(
-                        safeMul(mainToken.balanceOf(_from), mainTokenRatio),
-                        100
-                    ),
-                    _mainTokenPrice
-                ),
-                safeExponent(10, mainToken.decimals())
-            );
-
-            require(
-                _tokenAmount >=
-                    safeAdd(
-                        walletDayWiseContribution[auctionDay][_from],
-                        _contributedAmount
-                    ),
-                "ERR_USER_DONT_HAVE_ENOUGH_TOKEN"
-            );
-
-            uint256 lockToken = safeDiv(
-                safeAdd(
-                    walletDayWiseContribution[auctionDay][_from],
-                    _contributedAmount
-                ),
-                _mainTokenPrice
-            );
-
-            IToken(mainTokenAddress).lockToken(_from, lockToken, now);
+            mainTokenCheck(_from,_contributedAmount);
         }
 
         // allow five percent more for buffer
         // Allow five percent more because of volatility in ether price
-        if (
-            allowedMaxContribution >=
-            safeAdd(todayContribution, _contributedAmount)
-        ) {
+        if (allowedMaxContribution >= safeAdd(todayContribution, _contributedAmount)) {
             require(
                 safeDiv(safeMul(allowedMaxContribution, bufferLimit), 100) >=
                     safeAdd(todayContribution, _contributedAmount),
@@ -431,12 +452,6 @@ contract AuctionFundCollector is AuctionStorage {
 
             auctionSoldOut = true;
         }
-
-        require(
-            allowedMaxContribution >=
-                safeAdd(todayContribution, _contributedAmount),
-            "ERR_CONTRIBUTION_LIMIT_REACH"
-        );
 
         todayContribution = safeAdd(todayContribution, _contributedAmount);
 
@@ -459,7 +474,7 @@ contract AuctionFundCollector is AuctionStorage {
         uint256 topContributior;
 
 
-            uint256 contributionByUser
+        uint256 contributionByUser
          = walletDayWiseContribution[auctionDay][_from];
         bool replaced = false;
         address replaceWith;
@@ -504,17 +519,14 @@ contract AuctionFundCollector is AuctionStorage {
             fundWalletRatio
         );
 
-        IAuctionProtection(auctionProtectionAddress).lockEther.value(
-            downSideAmount
-        )(_from);
+        IAuctionProtection(auctionProtectionAddress).lockEther.value(downSideAmount)(_from);
 
         uint256 currentMarketPrice = IAuctionLiquadity(liquadityAddress)
-            .contributeWithEther
-            .value(reserveAmount)();
+            .contributeWithEther.value(reserveAmount)();
 
         companyFundWalletAddress.transfer(fundWalletamount);
 
-        fundAdded(address(0), _value, 18, _from, currentMarketPrice);
+        fundAdded(address(0), _value,18, _from, currentMarketPrice);
     }
 
     function _contributeWithToken(
@@ -522,6 +534,7 @@ contract AuctionFundCollector is AuctionStorage {
         uint256 _value,
         address _from
     ) internal returns (bool) {
+        
         ensureTransferFrom(_token, _from, address(this), _value);
 
         (
@@ -534,7 +547,11 @@ contract AuctionFundCollector is AuctionStorage {
             fundWalletRatio
         );
 
-        approveTransferFrom(_token, auctionProtectionAddress, downSideAmount);
+        approveTransferFrom(
+            _token,
+            auctionProtectionAddress,
+            downSideAmount
+        );
 
         IAuctionProtection(auctionProtectionAddress).lockTokens(
             _token,
@@ -548,12 +565,7 @@ contract AuctionFundCollector is AuctionStorage {
         uint256 currentMarketPrice = IAuctionLiquadity(liquadityAddress)
             .contributeWithToken(_token, address(this), reserveAmount);
 
-        ensureTransferFrom(
-            _token,
-            address(this),
-            companyFundWalletAddress,
-            fundWalletamount
-        );
+        ensureTransferFrom(_token, address(this), companyFundWalletAddress, fundWalletamount);
 
         fundAdded(address(_token), _value, 18, _from, currentMarketPrice);
     }
@@ -580,6 +592,7 @@ contract AuctionFundCollector is AuctionStorage {
 
 
 contract Auction is AuctionFundCollector {
+    
     uint256 public MIN_AUCTION_END_TIME = 0; //epoch
 
     uint256 public LAST_AUCTION_START = 0;
@@ -590,12 +603,9 @@ contract Auction is AuctionFundCollector {
         address _systemAddress,
         address _multisigAddress,
         address _registeryAddress
-    ) public Ownable(_systemAddress, _multisigAddress) {
+    ) public AuctionFundCollector(_systemAddress, _multisigAddress,_registeryAddress) {
         LAST_AUCTION_START = _startTime;
         MIN_AUCTION_END_TIME = _minAuctionTime;
-        contractsRegistry = IAuctionRegistery(_registeryAddress);
-        dayWiseDownSideProtectionRatio[auctionDay] = downSideProtectionRatio;
-        updateAddresses();
     }
 
     event AuctionEnded(
@@ -609,28 +619,20 @@ contract Auction is AuctionFundCollector {
         uint256 _tokenPrice,
         uint256 _tokenMarketPrice
     );
-
+    
+    event FundDeposited(address _token, address indexed _from, uint256 _amount);
+    
     function auctionEnd() external onlySystem() returns (bool) {
         require(
             safeAdd(LAST_AUCTION_START, MIN_AUCTION_END_TIME) > now,
             "ERR_MIN_TIME_IS_NOT_OVER"
         );
 
-        // address payable[] memory _contractAddress = getAddressOfBatch(
-        //     [
-        //         VAULT,
-        //         LIQUADITY,
-        //         CURRENCY,
-        //         MAIN_TOKEN,
-        //         COMPANY_MAIN_TOKEN_WALLET,
-        //         STACKING
-        //     ]
-        // );
-
         uint256 _mainTokenPrice = ICurrencyPrices(currencyPricesAddress)
             .getCurrencyPrice(mainTokenAddress);
 
         if (todayContribution == 0) {
+            
             uint256 _ethPrice = ICurrencyPrices(currencyPricesAddress)
                 .getCurrencyPrice(address(0));
 
@@ -639,7 +641,7 @@ contract Auction is AuctionFundCollector {
 
             uint256 mainReserveAmountUsd = safeDiv(
                 safeMul(mainReserveAmount, _ethPrice),
-                safeExponent(10, 18)
+                DECIMAL_NOMINATOR
             );
 
             dayWiseContribution[auctionDay] = mainReserveAmountUsd;
@@ -672,7 +674,7 @@ contract Auction is AuctionFundCollector {
         if (todayContribution > yesterdayContribution) {
             uint256 _groupBonusRatio = safeMul(
                 safeDiv(
-                    safeMul(todayContribution, safeExponent(10, 18)),
+                    safeMul(todayContribution,DECIMAL_NOMINATOR),
                     yesterdayContribution
                 ),
                 groupBonusRatio
@@ -681,7 +683,7 @@ contract Auction is AuctionFundCollector {
             bonusSupply = safeSub(
                 safeDiv(
                     safeMul(todaySupply, _groupBonusRatio),
-                    safeExponent(10, 18)
+                    DECIMAL_NOMINATOR
                 ),
                 todaySupply
             );
@@ -740,14 +742,14 @@ contract Auction is AuctionFundCollector {
         Istacking(stackingAddress).stackFund(stackingAmount);
 
         uint256 _tokenPrice = safeDiv(
-            safeMul(todayContribution, safeExponent(10, 18)),
+            safeMul(todayContribution,DECIMAL_NOMINATOR),
             dayWiseSupply[auctionDay]
         );
 
         dayWiseMarketPrice[auctionDay] = _mainTokenPrice;
 
         todaySupply = safeDiv(
-            safeMul(todayContribution, safeExponent(10, 18)),
+            safeMul(todayContribution,DECIMAL_NOMINATOR),
             _mainTokenPrice
         );
 
@@ -803,14 +805,16 @@ contract Auction is AuctionFundCollector {
             dayWiseDownSideProtectionRatio[dayId]
         );
 
-        returnAmount = IIndividualBonus(individualBonusAddress).calucalteBonus(
-            topContributiorIndex[dayId][_which],
-            returnAmount
-        );
+        returnAmount = IIndividualBonus(individualBonusAddress)
+            .calucalteBonus(topContributiorIndex[dayId][_which], returnAmount);
 
         IToken(mainTokenAddress).mintTokens(returnAmount);
         // here we check with last auction bcz user can invest after auction start
-        IToken(mainTokenAddress).lockToken(_which, 0, LAST_AUCTION_START);
+        IToken(mainTokenAddress).lockToken(
+            _which,
+            0,
+            LAST_AUCTION_START
+        );
 
         ensureTransferFrom(
             IERC20Token(mainTokenAddress),
@@ -869,6 +873,7 @@ contract Auction is AuctionFundCollector {
     }
 
     function() external payable {
-        revert();
+       emit FundDeposited(address(0), msg.sender, msg.value); 
     }
+    
 }

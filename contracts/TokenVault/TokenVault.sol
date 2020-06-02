@@ -2,6 +2,7 @@ pragma solidity ^0.5.9;
 
 import "../common/ProxyOwnable.sol";
 import "../common/SafeMath.sol";
+import "../common/TokenTransfer.sol";
 import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IERC20Token.sol";
@@ -30,6 +31,7 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
         returns (bool)
     {
         contractsRegistry = IAuctionRegistery(_address);
+        _updateAddresses();
         return true;
     }
 
@@ -44,14 +46,18 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     /**@dev updates all the address from the registry contract
     this decision was made to save gas that occurs from calling an external view function */
 
-    function updateAddresses() public {
+    function _updateAddresses() internal {
         auctionProtectionAddress = getAddressOf(AUCTION_PROTECTION);
+    }
+
+    function updateAddresses() external returns (bool) {
+        _updateAddresses();
     }
 }
 
 
 contract TokenSpenders is AuctionRegistery, SafeMath {
-    mapping(address => bool) isSpender;
+    mapping(address => bool) public isSpender;
 
     mapping(address => uint256) public spenderIndex;
 
@@ -71,7 +77,7 @@ contract TokenSpenders is AuctionRegistery, SafeMath {
         onlyAuthorized()
         returns (bool)
     {
-        require(!isSpender[_which], ERR_AUTHORIZED_ADDRESS_ONLY);
+        require(isSpender[_which] == false, ERR_AUTHORIZED_ADDRESS_ONLY);
         isSpender[_which] = true;
         spenderIndex[_which] = spenders.length;
         spenders.push(_which);
@@ -90,14 +96,19 @@ contract TokenSpenders is AuctionRegistery, SafeMath {
         spenders[_spenderIndex] = _lastAdress;
         spenderIndex[_lastAdress] = _spenderIndex;
         delete isSpender[_which];
-        delete spenders[safeSub(spenders.length, 1)];
+        spenders.pop();
         emit TokenSpenderRemoved(_which);
         return true;
     }
 }
 
 
-contract TokenVault is Upgradeable, TokenSpenders, InitializeInterface {
+contract TokenVault is
+    Upgradeable,
+    TokenSpenders,
+    InitializeInterface,
+    TokenTransfer
+{
     event FundTransfer(
         address indexed _by,
         address _to,
@@ -114,40 +125,13 @@ contract TokenVault is Upgradeable, TokenSpenders, InitializeInterface {
         address _registeryAddress
     ) public {
         super.initialize();
-
         contractsRegistry = IAuctionRegistery(_registeryAddress);
 
-        ProxyOwnable.initializeOwner(
-            _primaryOwner,
-            _systemAddress,
-            _authorityAddress
-        );
+        initializeOwner(_primaryOwner, _systemAddress, _authorityAddress);
     }
 
-    function ensureTransferFrom(
-        IERC20Token _token,
-        address _from,
-        address _to,
-        uint256 _amount
-    ) internal {
-        uint256 prevBalance = _token.balanceOf(_to);
-        if (_from == address(this)) _token.transfer(_to, _amount);
-        else _token.transferFrom(_from, _to, _amount);
-        uint256 postBalance = _token.balanceOf(_to);
-        require(postBalance > prevBalance, "ERR_TRANSFER");
-    }
-
-    function approveTransferFrom(
-        IERC20Token _token,
-        address _spender,
-        uint256 _amount
-    ) internal {
-        _token.approve(_spender, _amount);
-    }
-
-    function depositeEther() external payable returns (bool) {
+    function() external payable {
         emit FundDeposited(address(0), msg.sender, msg.value);
-        return true;
     }
 
     function depositeToken(

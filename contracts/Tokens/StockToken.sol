@@ -1,4 +1,5 @@
 pragma solidity ^0.5.9;
+
 import "./Exchangeable.sol";
 import "../InterFaces/IWhiteList.sol";
 

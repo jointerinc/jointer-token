@@ -4,15 +4,14 @@ import "./Constant.sol";
 
 
 contract ProxyOwnable is Constant {
-    
-    address public primaryOwner = address(0);
+    address public primaryOwner;
 
-    address public authorityAddress = address(0);
+    address public authorityAddress;
 
-    address public newAuthorityAddress = address(0);
+    address public newAuthorityAddress;
 
-    address public systemAddress = address(0);
-    
+    address public systemAddress;
+
     bool public isOwnerInitialize = false;
 
     event OwnershipTransferred(
@@ -20,7 +19,7 @@ contract ProxyOwnable is Constant {
         address indexed previousOwner,
         address indexed newOwner
     );
-    
+
     event AuthorityAddressChnageCall(
         address indexed previousOwner,
         address indexed newOwner
@@ -35,12 +34,20 @@ contract ProxyOwnable is Constant {
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress
-    ) public notZeroAddress(_primaryOwner) notZeroAddress(_systemAddress) notZeroAddress(_authorityAddress) {
-        
-        require(!isOwnerInitialize,"ERR_OWNER_INTIALIZED_ALREADY");
+    )
+        internal
+        notZeroAddress(_primaryOwner)
+        notZeroAddress(_systemAddress)
+        notZeroAddress(_authorityAddress)
+    {
+        require(!isOwnerInitialize, "ERR_OWNER_INTIALIZED_ALREADY");
+
         require(_primaryOwner != _systemAddress, ERR_SAME_ADDRESS);
+
         require(_systemAddress != _authorityAddress, ERR_SAME_ADDRESS);
+
         require(_primaryOwner != _authorityAddress, ERR_SAME_ADDRESS);
+
         primaryOwner = _primaryOwner;
         systemAddress = _systemAddress;
         authorityAddress = _authorityAddress;

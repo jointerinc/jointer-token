@@ -1,48 +1,28 @@
 pragma solidity ^0.5.9;
 
-contract AuctionRegisteryContracts{
-    
+
+contract AuctionRegisteryContracts {
     bytes32 internal constant MAIN_TOKEN = "MAIN_TOKEN";
-    
     bytes32 internal constant ETN_TOKEN = "ETN_TOKEN";
-    
     bytes32 internal constant STOCK_TOKEN = "STOCK_TOKEN";
-    
-    
     bytes32 internal constant AUCTION_PROTECTION = "AUCTION_PROTECTION";
-    
     bytes32 internal constant WHITE_LIST = "WHITE_LIST";
-    
     bytes32 internal constant AUCTION = "AUCTION";
-    
     bytes32 internal constant LIQUADITY = "LIQUADITY";
-    
     bytes32 internal constant CURRENCY = "CURRENCY";
-    
     bytes32 internal constant INDIDUAL_BONUS = "INDIDUAL_BONUS";
-    
     bytes32 internal constant VAULT = "VAULT";
-
     bytes32 internal constant TAG_ALONG = "TAG_ALONG";
-    
     bytes32 internal constant COMPANY_FUND_WALLET = "COMPANY_FUND_WALLET";
-    
     bytes32 internal constant COMPANY_MAIN_TOKEN_WALLET = "COMPANY_MAIN_TOKEN_WALLET";
-    
     bytes32 internal constant STACKING = "STACKING";
-    
     bytes32 internal constant SMART_SWAP = "SMART_SWAP";
-      
-    bytes32 internal constant VOID = "VOID";
-    
-    
-    
 }
 
 
-contract IAuctionRegistery {
-    function getAddressOf(bytes32 _contractName) external view returns (address payable);
-    function getAddressOfBatch(bytes32[6] calldata _contractName)  external view returns (address payable[] memory);
+interface IAuctionRegistery {
+    function getAddressOf(bytes32 _contractName)
+        external
+        view
+        returns (address payable);
 }
-
-

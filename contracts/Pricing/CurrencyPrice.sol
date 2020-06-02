@@ -3,8 +3,8 @@ pragma solidity ^0.5.9;
 import "../common/Ownable.sol";
 
 
-contract IPrice {
-    function getCurrencyPrice() public view returns (uint256);
+interface IPrice {
+    function getCurrencyPrice() external view returns (uint256);
 }
 
 

@@ -2,6 +2,7 @@ pragma solidity ^0.5.9;
 
 import "../common/ProxyOwnable.sol";
 import "../common/SafeMath.sol";
+import "../common/TokenTransfer.sol";
 import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IAuctionTagAlong.sol";
@@ -10,11 +11,21 @@ import "../InterFaces/IERC20Token.sol";
 
 
 interface InitializeInterface {
-    function initialize(address _registeryAddress) external;
+    function initialize(
+        address _primaryOwner,
+        address _systemAddress,
+        address _authorityAddress,
+        address _registeryAddress
+    ) external;
 }
 
 
 contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
+    address payable public vaultAddress;
+    address payable public mainTokenAddress;
+    address payable public auctionAddress;
+    address payable public auctionProtectionAddress;
+
     IAuctionRegistery public contractsRegistry;
 
     function updateRegistery(address _address)
@@ -34,15 +45,27 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     {
         return contractsRegistry.getAddressOf(_contractName);
     }
+
+    function updateAddresses() public {
+        vaultAddress = getAddressOf(VAULT);
+        mainTokenAddress = getAddressOf(MAIN_TOKEN);
+        auctionProtectionAddress = getAddressOf(AUCTION_PROTECTION);
+        auctionAddress = getAddressOf(AUCTION);
+    }
 }
 
 
 contract StackingStorage is SafeMath {
     // We track Token only transfer by auction or downside
     // Reason for tracking this bcz someone can send token direclty
+
+    uint256 public constant PERCENT_NOMINATOR = 10**6;
+
+    uint256 public constant DECIMAL_NOMINATOR = 10**18;
+
     uint256 public totalTokenAmount;
 
-    uint256 stackRoundId = 1;
+    uint256 public stackRoundId;
 
     mapping(uint256 => uint256) dayWiseRatio;
 
@@ -54,7 +77,13 @@ contract StackingStorage is SafeMath {
 }
 
 
-contract Stacking is AuctionRegistery, StackingStorage, Upgradeable {
+contract Stacking is
+    AuctionRegistery,
+    Upgradeable,
+    StackingStorage,
+    TokenTransfer,
+    InitializeInterface
+{
     function initialize(
         address _primaryOwner,
         address _systemAddress,
@@ -67,11 +96,7 @@ contract Stacking is AuctionRegistery, StackingStorage, Upgradeable {
 
         stackRoundId = 1;
 
-        ProxyOwnable.initializeOwner(
-            _primaryOwner,
-            _systemAddress,
-            _authorityAddress
-        );
+        initializeOwner(_primaryOwner, _systemAddress, _authorityAddress);
     }
 
     event StackAdded(
@@ -86,55 +111,25 @@ contract Stacking is AuctionRegistery, StackingStorage, Upgradeable {
         uint256 _amount
     );
 
-    function ensureTransferFrom(
-        IERC20Token _token,
-        address _from,
-        address _to,
-        uint256 _amount
-    ) internal {
-        uint256 prevBalance = _token.balanceOf(_to);
-        if (_from == address(this)) _token.transfer(_to, _amount);
-        else _token.transferFrom(_from, _to, _amount);
-        uint256 postBalance = _token.balanceOf(_to);
-        require(postBalance > prevBalance, "ERR_TRANSFER");
-    }
-
-    function approveTransferFrom(
-        IERC20Token _token,
-        address _spender,
-        uint256 _amount
-    ) internal {
-        _token.approve(_spender, _amount);
-    }
-
     // stack fund called from auction contacrt
     // 1% of supply distributed among the stack token
     function stackFund(uint256 _amount) external returns (bool) {
-        require(
-            msg.sender == getAddressOf(AUCTION),
-            ERR_AUTHORIZED_ADDRESS_ONLY
-        );
+        require(msg.sender == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
 
-        IERC20Token mainToken = IERC20Token(getAddressOf(MAIN_TOKEN));
+        IERC20Token mainToken = IERC20Token(mainTokenAddress);
 
         if (totalTokenAmount > 0) {
             ensureTransferFrom(mainToken, msg.sender, address(this), _amount);
 
             uint256 ratio = safeDiv(
-                safeMul(_amount, safeExponent(10, 18)),
+                safeMul(_amount, DECIMAL_NOMINATOR),
                 totalTokenAmount
             );
 
-            dayWiseRatio[stackRoundId] = ratio;
-        } else
-            ensureTransferFrom(
-                mainToken,
-                msg.sender,
-                getAddressOf(VAULT),
-                _amount
-            );
+            totalTokenAmount = safeAdd(totalTokenAmount, _amount);
 
-        totalTokenAmount = safeAdd(totalTokenAmount, _amount);
+            dayWiseRatio[stackRoundId] = ratio;
+        } else ensureTransferFrom(mainToken, msg.sender, vaultAddress, _amount);
 
         stackRoundId = safeAdd(stackRoundId, 1);
 
@@ -149,12 +144,12 @@ contract Stacking is AuctionRegistery, StackingStorage, Upgradeable {
         returns (bool)
     {
         require(
-            msg.sender == getAddressOf(AUCTION_PROTECTION),
+            msg.sender == auctionProtectionAddress,
             ERR_AUTHORIZED_ADDRESS_ONLY
         );
 
         ensureTransferFrom(
-            IERC20Token(getAddressOf(MAIN_TOKEN)),
+            IERC20Token(mainTokenAddress),
             msg.sender,
             address(this),
             _amount
@@ -162,13 +157,16 @@ contract Stacking is AuctionRegistery, StackingStorage, Upgradeable {
 
         totalTokenAmount = safeAdd(totalTokenAmount, _amount);
 
+        // 0x -> 3 -> 2
         roundWiseToken[_whom][stackRoundId] = safeAdd(
             roundWiseToken[_whom][stackRoundId],
             _amount
         );
 
+        //0x -> 0 -> 4
         stackBalance[_whom] = safeAdd(stackBalance[_whom], _amount);
 
+        // 0 -> 2
         if (lastRound[_whom] == 0) {
             lastRound[_whom] = stackRoundId;
         }
@@ -187,11 +185,14 @@ contract Stacking is AuctionRegistery, StackingStorage, Upgradeable {
         if (_lastRound > 0) {
             for (uint256 x = _lastRound; x < stackRoundId; x++) {
                 _token = safeAdd(_token, roundWiseToken[_whom][x]);
+
                 uint256 _tempStack = safeDiv(
                     safeMul(dayWiseRatio[x], _token),
-                    safeExponent(10, 18)
+                    DECIMAL_NOMINATOR
                 );
+
                 _stackToken = safeAdd(_stackToken, _tempStack);
+
                 _token = safeAdd(_token, _tempStack);
             }
         }
@@ -201,8 +202,11 @@ contract Stacking is AuctionRegistery, StackingStorage, Upgradeable {
     // this method distribut token
     function _claimTokens(address _which) internal returns (bool) {
         uint256 _stackToken = calulcateStackFund(_which);
+
         lastRound[_which] = stackRoundId;
+
         stackBalance[_which] = safeAdd(stackBalance[_which], _stackToken);
+
         return true;
     }
 
@@ -230,7 +234,7 @@ contract Stacking is AuctionRegistery, StackingStorage, Upgradeable {
         uint256 actulToken = safeAdd(stackBalance[msg.sender], _stackToken);
 
         ensureTransferFrom(
-            IERC20Token(getAddressOf(MAIN_TOKEN)),
+            IERC20Token(mainTokenAddress),
             address(this),
             msg.sender,
             actulToken

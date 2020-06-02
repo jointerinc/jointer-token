@@ -3,15 +3,15 @@ pragma solidity ^0.5.9;
 import "./IERC20Token.sol";
 
 
-contract IAuctionTagAlong {
+interface IAuctionTagAlong {
     function depositeToken(
         IERC20Token _token,
         address _from,
         uint256 _amount
-    ) public;
+    ) external;
 
     function contributeTowardLiquadity(uint256 _amount)
-        public
+        external
         returns (uint256);
 
     function transferTokenLiquadity(
