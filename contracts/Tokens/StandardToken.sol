@@ -6,6 +6,8 @@ import "../common/Ownable.sol";
 
 
 contract StandardToken is ERC20, SafeMath, Ownable {
+    uint256 public totalSupply;
+
     string public name;
 
     string public symbol;
@@ -22,10 +24,7 @@ contract StandardToken is ERC20, SafeMath, Ownable {
         address _systemAddress,
         address _authorityAddress
     ) public Ownable(_systemAddress, _authorityAddress) {
-        require(
-            bytes(_name).length > 0 && bytes(_symbol).length > 0,
-            "ERR_NAME_OR_SYMBOL_EMPTY"
-        );
+        require(bytes(_name).length > 0 && bytes(_symbol).length > 0);
         name = _name;
         symbol = _symbol;
     }
@@ -110,7 +109,7 @@ contract StandardToken is ERC20, SafeMath, Ownable {
     /**
      * @dev Gets the balance of the specified address.
      * @param _who The address to query the the balance of.
-     * @return An uint256 representing the amount owned by the passed address.
+     * @return balance An uint256 representing the amount owned by the passed address.
      */
     function balanceOf(address _who) public view returns (uint256 balance) {
         return balances[_who];
@@ -120,7 +119,7 @@ contract StandardToken is ERC20, SafeMath, Ownable {
      * @dev `msg.sender` approves `spender` to spend `value` tokens
      * @param _spender The address of the account able to transfer the tokens
      * @param _value The amount of wei to be approved for transfer
-     * @return Whether the approval was successful or not
+     * @return ok Whether the approval was successful or not
      */
     function approve(address _spender, uint256 _value)
         external

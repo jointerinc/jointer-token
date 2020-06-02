@@ -1,12 +1,13 @@
 pragma solidity ^0.5.9;
 
 import './IRegistry.sol';
+import './Proxy.sol';
 
 /**
  * @title UpgradeabilityStorage
  * @dev This contract holds all the necessary state variables to support the upgrade functionality
  */
-contract UpgradeabilityStorage {
+contract UpgradeabilityStorage is Proxy {
     // Versions registry
     IRegistry public registry;
 

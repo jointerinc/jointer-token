@@ -10,12 +10,19 @@ import "../InterFaces/IAuctionRegistery.sol";
 contract AuctionRegistery is AuctionRegisteryContracts, Ownable {
     IAuctionRegistery public contractsRegistry;
 
+    address public whiteListAddress;
+    address public smartSwapAddress;
+    address public currencyPricesAddress;
+    address public vaultAddress;
+    address public auctionAddress;
+
     /**@dev sets the initial registry address */
     constructor(address _registeryAddress)
         public
         notZeroAddress(_registeryAddress)
     {
         contractsRegistry = IAuctionRegistery(_registeryAddress);
+        _updateAddresses();
     }
 
     /**@dev updates the address of the registry, called only by the system */
@@ -26,6 +33,7 @@ contract AuctionRegistery is AuctionRegisteryContracts, Ownable {
         returns (bool)
     {
         contractsRegistry = IAuctionRegistery(_address);
+        _updateAddresses();
         return true;
     }
 
@@ -38,19 +46,25 @@ contract AuctionRegistery is AuctionRegisteryContracts, Ownable {
     {
         return contractsRegistry.getAddressOf(_contractName);
     }
+
+    /**@dev updates all the address from the registry contract
+    this decision was made to save gas that occurs from calling an external view function */
+    function _updateAddresses() internal {
+        whiteListAddress = getAddressOf(WHITE_LIST);
+        smartSwapAddress = getAddressOf(SMART_SWAP);
+        currencyPricesAddress = getAddressOf(CURRENCY);
+        vaultAddress = getAddressOf(VAULT);
+        auctionAddress = getAddressOf(AUCTION);
+    }
+
+    function updateAddresses() external returns (bool) {
+        _updateAddresses();
+    }
 }
 
 
-/**@dev keeps track of all the addresses token needs which are fetched from registry contract
-        Also is a standard ERC20 token*/
+/**@dev Also is a standard ERC20 token*/
 contract TokenUtils is StandardToken, AuctionRegistery {
-    
-    address public whiteListAddress;
-    address public smartSwapAddress;
-    address public currencyPricesAddress;
-    address public vaultAddress;
-    address public auctionAddress;
-
     /**
      *@dev contructs standard erc20 token and auction registry
      *@param _name name of the token
@@ -69,17 +83,5 @@ contract TokenUtils is StandardToken, AuctionRegistery {
         public
         StandardToken(_name, _symbol, _systemAddress, _authorityAddress)
         AuctionRegistery(_registeryAddress)
-    {
-        updateAddresses();
-    }
-
-    /**@dev updates all the address from the registry contract
-    this decision was made to save gas that occurs from calling an external view function */
-    function updateAddresses() public {
-        whiteListAddress = getAddressOf(WHITE_LIST);
-        smartSwapAddress = getAddressOf(SMART_SWAP);
-        currencyPricesAddress = getAddressOf(CURRENCY);
-        vaultAddress = getAddressOf(VAULT);
-        auctionAddress = getAddressOf(AUCTION);
-    }
+    {}
 }

@@ -4,7 +4,6 @@ import "./SafeMath.sol";
 
 
 contract Constant {
-    
     string constant ERR_SAME_ADDRESS = "ERR_SAME_ADDRESS";
 
     string constant ERR_CONTRACT_SELF_ADDRESS = "ERR_CONTRACT_SELF_ADDRESS";
@@ -34,12 +33,10 @@ contract Constant {
         require(_which != address(0), ERR_ZERO_ADDRESS);
         _;
     }
-
 }
 
 
 contract Ownable is Constant, SafeMath {
-    
     uint256 public constant MAX_OWNERS_ALLOWED = 30;
 
     mapping(address => bool) public isOwner;
@@ -109,7 +106,7 @@ contract Ownable is Constant, SafeMath {
 
         ownerIndex[_lastAdress] = _ownerIndex;
 
-        multiSigOwners.length = safeSub(multiSigOwners.length, 1);
+        multiSigOwners.pop();
 
         if (minConfirmationsRequired > multiSigOwners.length)
             minConfirmationsRequired = multiSigOwners.length;
@@ -141,8 +138,6 @@ contract MultiSigGovernance is Ownable {
         bool executed;
         uint256 confirmationsRequired;
     }
-
-    uint256 public _gas = 34710;
 
     mapping(uint256 => Transaction) public transactions;
 
@@ -194,16 +189,6 @@ contract MultiSigGovernance is Ownable {
         minConfirmationsRequired = _minConfirmationsRequired;
     }
 
-    function updateGas(uint256 _newGas)
-        external
-        onlyAuthorized()
-        returns (bool)
-    {
-        require(_newGas > 0, ERR_ZERO_VALUE);
-        _gas = _newGas;
-        return true;
-    }
-
     function external_call(
         address destination,
         uint256 value,
@@ -211,19 +196,10 @@ contract MultiSigGovernance is Ownable {
         bytes memory data
     ) private returns (bool) {
         bool result;
-        uint256 newGas = _gas;
         assembly {
             let x := mload(0x40)
             let d := add(data, 32)
-            result := call(
-                sub(gas, newGas),
-                destination,
-                value,
-                d,
-                dataLength,
-                x,
-                0
-            )
+            result := call(gas(), destination, value, d, dataLength, x, 0)
         }
         return result;
     }
@@ -245,7 +221,7 @@ contract MultiSigGovernance is Ownable {
         );
 
         require(
-            multiSigOwners.length  >= _confirmationsRequired,
+            multiSigOwners.length >= _confirmationsRequired,
             ERR_OWNER_MAXIMUM_LIMIT
         );
 
@@ -275,16 +251,16 @@ contract MultiSigGovernance is Ownable {
             ERR_TRAN_ALREADY_SIGNED
         );
         confirmations[transactionId][msg.sender] = true;
-        
+
         confirmationsCount[transactionId] = safeAdd(
             confirmationsCount[transactionId],
             1
         );
-        
+
         emit TransactionConfirmed(transactionId, msg.sender);
-        
+
         executeTransaction(transactionId);
-        
+
         return true;
     }
 
@@ -310,7 +286,10 @@ contract MultiSigGovernance is Ownable {
         notExecuted(transactionId)
         returns (bool)
     {
-        if(confirmationsCount[transactionId]  >= transactions[transactionId].confirmationsRequired) {
+        if (
+            confirmationsCount[transactionId] >=
+            transactions[transactionId].confirmationsRequired
+        ) {
             Transaction storage txn = transactions[transactionId];
             bool result = external_call(
                 txn.destination,
@@ -323,14 +302,16 @@ contract MultiSigGovernance is Ownable {
         }
         return true;
     }
-    
-    function withDrawEth(uint256 balance,address payable _address) external onlyAuthorized() notZeroAddress(_address) returns(bool){
-        require(address(this).balance >= balance,ERR_TRAN_NOT_AVILABLE);
+
+    function withDrawEth(uint256 balance, address payable _address)
+        external
+        onlyAuthorized()
+        notZeroAddress(_address)
+        returns (bool)
+    {
+        require(address(this).balance >= balance, ERR_TRAN_NOT_AVILABLE);
         _address.transfer(balance);
     }
-    
-    function() external payable{
-    
-    }
-}
 
+    function() external payable {}
+}

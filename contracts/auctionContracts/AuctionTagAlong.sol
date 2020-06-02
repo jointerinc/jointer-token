@@ -2,6 +2,7 @@ pragma solidity ^0.5.9;
 
 import "../common/SafeMath.sol";
 import "../common/Ownable.sol";
+import "../common/TokenTransfer.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IAuctionProtection.sol";
 import "../InterFaces/ICurrencyPrices.sol";
@@ -16,6 +17,15 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
 
     address payable public liquadityAddress;
 
+    constructor(
+        address _systemAddress,
+        address _multisigAdress,
+        address _registeryAddress
+    ) public Ownable(_systemAddress, _multisigAdress) {
+        contractsRegistry = IAuctionRegistery(_registeryAddress);
+        _updateAddresses();
+    }
+
     function updateRegistery(address _address)
         external
         onlyAuthorized()
@@ -23,7 +33,7 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
         returns (bool)
     {
         contractsRegistry = IAuctionRegistery(_address);
-        updateAddresses();
+        _updateAddresses();
         return true;
     }
 
@@ -38,8 +48,12 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
     /**@dev updates all the address from the registry contract
     this decision was made to save gas that occurs from calling an external view function */
 
-    function updateAddresses() public {
+    function _updateAddresses() internal {
         liquadityAddress = getAddressOf(LIQUADITY);
+    }
+
+    function updateAddresses() external returns (bool) {
+        _updateAddresses();
     }
 }
 
@@ -48,6 +62,15 @@ contract Utils is AuctionRegistery, SafeMath {
     uint256 public liquadityRatio = 100;
 
     uint256 public contributionRatio = 100;
+
+    constructor(
+        address _systemAddress,
+        address _multisigAdress,
+        address _registeryAddress
+    )
+        public
+        AuctionRegistery(_systemAddress, _multisigAdress, _registeryAddress)
+    {}
 
     function setLiquadityRatio(uint256 _ratio)
         external
@@ -69,36 +92,14 @@ contract Utils is AuctionRegistery, SafeMath {
 }
 
 
-contract AuctionTagAlong is Utils {
-    constructor(address _systemAddress, address _multisigAdress)
-        public
-        Ownable(_systemAddress, _multisigAdress)
-    {
-        updateAddresses();
-    }
+contract AuctionTagAlong is Utils, TokenTransfer {
+    constructor(
+        address _systemAddress,
+        address _multisigAdress,
+        address _registeryAddress
+    ) public Utils(_systemAddress, _multisigAdress, _registeryAddress) {}
 
     event FundDeposited(address _token, address _from, uint256 _amount);
-
-    function ensureTransferFrom(
-        IERC20Token _token,
-        address _from,
-        address _to,
-        uint256 _amount
-    ) internal {
-        uint256 prevBalance = _token.balanceOf(_to);
-        if (_from == address(this)) _token.transfer(_to, _amount);
-        else _token.transferFrom(_from, _to, _amount);
-        uint256 postBalance = _token.balanceOf(_to);
-        require(postBalance > prevBalance);
-    }
-
-    function approveTransferFrom(
-        IERC20Token _token,
-        address _spender,
-        uint256 _amount
-    ) internal {
-        _token.approve(_spender, _amount);
-    }
 
     function contributeTowardLiquadity(uint256 _amount)
         external
@@ -111,7 +112,6 @@ contract AuctionTagAlong is Utils {
             msg.sender.transfer(_newamount);
             return _newamount;
         }
-
         msg.sender.transfer(_amount);
         return _amount;
     }
@@ -127,17 +127,17 @@ contract AuctionTagAlong is Utils {
         return true;
     }
 
-    function returnTokens(
-        IERC20Token _tokens,
-        address _to,
-        uint256 _value
+    //return token and ether from here
+    function returnFund(
+        IERC20Token _token,
+        uint256 _value,
+        address payable _which
     ) external onlyOwner() returns (bool) {
-        ensureTransferFrom(_tokens, address(this), _to, _value);
-        return true;
-    }
-
-    function withDraw(uint256 _value) external onlyOwner() returns (bool) {
-        msg.sender.transfer(_value);
+        if (address(_token) == address(0)) {
+            _which.transfer(_value);
+        } else {
+            ensureTransferFrom(_token, address(this), _which, _value);
+        }
         return true;
     }
 

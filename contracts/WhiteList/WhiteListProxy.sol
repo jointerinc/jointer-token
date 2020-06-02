@@ -1,5 +1,6 @@
 pragma solidity ^0.5.9;
-import "../common/RegisteryOwnable.sol";
+
+import "../common/Ownable.sol";
 import "../Proxy/IRegistry.sol";
 import "../Proxy/UpgradeabilityProxy.sol";
 
@@ -23,7 +24,7 @@ interface InitializeInterface {
  * @title Registry
  * @dev This contract works as a registry of versions, it holds the implementations for the registered versions.
  */
-contract WhiteListRegistery is RegisteryOwnable, IRegistry {
+contract WhiteListRegistery is Ownable, IRegistry {
     // Mapping of versions to implementations of different functions
     mapping(uint256 => address) internal versions;
 
@@ -35,7 +36,7 @@ contract WhiteListRegistery is RegisteryOwnable, IRegistry {
     //@param _systemAddress address of the system Owner
     constructor(address _systemAddress, address _multisigAddress)
         public
-        RegisteryOwnable(_systemAddress, _multisigAddress)
+        Ownable(_systemAddress, _multisigAddress)
     {}
 
     /**

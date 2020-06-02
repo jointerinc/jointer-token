@@ -4,11 +4,19 @@ import "../common/Ownable.sol";
 import "../common/SafeMath.sol";
 
 
+interface Icontract {
+    function updateAddresses() external returns (bool);
+}
+
+
 contract AuctionRegistery is Ownable, SafeMath {
+    // store all contract address with bytes32 representation
     mapping(bytes32 => address payable) private contractAddress;
 
+    // store contractIndex
     mapping(bytes32 => uint256) public contractIndex;
 
+    // store all contract Name
     string[] public contracts;
 
     event ContractAddressUpdated(
@@ -22,7 +30,7 @@ contract AuctionRegistery is Ownable, SafeMath {
         Ownable(_systemAddess, _multisig)
     {}
 
-    function contractsCount() external view returns (uint256) {
+    function totalContracts() external view returns (uint256) {
         return contracts.length;
     }
 
@@ -87,6 +95,7 @@ contract AuctionRegistery is Ownable, SafeMath {
             _contractAddress
         );
         contractAddress[_contractName] = _contractAddress;
+
         return true;
     }
 
@@ -121,7 +130,7 @@ contract AuctionRegistery is Ownable, SafeMath {
 
         delete contractIndex[_contractName];
 
-        delete contracts[safeSub(contracts.length, 1)];
+        contracts.pop();
 
         return true;
     }

@@ -45,21 +45,23 @@ interface IERC20 {
 
     function transfer(address to, uint256 value) external returns (bool);
 
-    function transferFrom(address from, address to, uint256 value)
-        external
-        returns (bool);
+    function transferFrom(
+        address from,
+        address to,
+        uint256 value
+    ) external returns (bool);
 }
 
 
 contract CustomERC20 is IERC20 {
     using SafeMath for uint256;
 
-    string public name;
-    string public symbol;
-    uint8 public constant decimals = 18;
-    uint256 public totalSupply;
-    mapping(address => uint256) public balanceOf;
-    mapping(address => mapping(address => uint256)) public allowance;
+    string  public name;
+    string  public symbol;
+    uint8  public constant decimals = 18;
+    uint256  public totalSupply;
+    mapping(address => uint256)  public balanceOf;
+    mapping(address => mapping(address => uint256))  public allowance;
 
     bytes32 public DOMAIN_SEPARATOR;
     // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
@@ -113,31 +115,40 @@ contract CustomERC20 is IERC20 {
         emit Transfer(from, address(0), value);
     }
 
-    function _approve(address owner, address spender, uint256 value) private {
+    function _approve(
+        address owner,
+        address spender,
+        uint256 value
+    ) private {
         allowance[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
 
-    function _transfer(address from, address to, uint256 value) private {
+    function _transfer(
+        address from,
+        address to,
+        uint256 value
+    ) private {
         balanceOf[from] = balanceOf[from].sub(value);
         balanceOf[to] = balanceOf[to].add(value);
         emit Transfer(from, to, value);
     }
 
-    function approve(address spender, uint256 value) external returns (bool) {
+    function approve(address spender, uint256 value) external  returns (bool) {
         _approve(msg.sender, spender, value);
         return true;
     }
 
-    function transfer(address to, uint256 value) external returns (bool) {
+    function transfer(address to, uint256 value) external  returns (bool) {
         _transfer(msg.sender, to, value);
         return true;
     }
 
-    function transferFrom(address from, address to, uint256 value)
-        external
-        returns (bool)
-    {
+    function transferFrom(
+        address from,
+        address to,
+        uint256 value
+    ) external  returns (bool) {
         if (allowance[from][msg.sender] != uint256(-1)) {
             allowance[from][msg.sender] = allowance[from][msg.sender].sub(
                 value

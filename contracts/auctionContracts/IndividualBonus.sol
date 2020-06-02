@@ -33,11 +33,11 @@ contract IndividualBonus is Ownable, SafeMath {
         }
     }
 
-    function updatePercentReturn(uint256 _from, uint256 _to, uint256 _percent)
-        public
-        onlySystem()
-        returns (bool)
-    {
+    function updatePercentReturn(
+        uint256 _from,
+        uint256 _to,
+        uint256 _percent
+    ) public onlySystem() returns (bool) {
         for (uint256 tempX = _from; tempX < _to; tempX++)
             indexReturn[tempX] = _percent;
         return true;
@@ -52,7 +52,6 @@ contract IndividualBonus is Ownable, SafeMath {
             safeMul(_returnAmount, indexReturn[_userIndex]),
             100
         );
-
         return returnAmount;
     }
 }

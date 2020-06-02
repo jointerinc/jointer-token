@@ -4,8 +4,8 @@ import "./provableAPI.sol";
 import "../common/Ownable.sol";
 
 
-contract EthPriceTicker is usingProvable, Ownable {
-    uint256 public priceETHUSD;
+contract BNTPriceTracker is usingProvable, Ownable {
+    uint256 public priceBNTUSD;
 
     uint256 public currentGasPrice = 4000000000; //4Gwei
 
@@ -54,14 +54,14 @@ contract EthPriceTicker is usingProvable, Ownable {
         require(msg.sender == provable_cbAddress());
         require(validIds[_myid]);
 
-        priceETHUSD = parseInt(_result);
+        priceBNTUSD = parseInt(_result);
         delete validIds[_myid];
-        emit LogNewEthPriceTicker(priceETHUSD);
+        emit LogNewEthPriceTicker(priceBNTUSD);
         emit LogProof(_proof);
     }
 
     function getCurrencyPrice() external view returns (uint256) {
-        return priceETHUSD;
+        return priceBNTUSD;
     }
 
     function update() public payable {

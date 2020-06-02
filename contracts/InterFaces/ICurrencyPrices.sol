@@ -1,5 +1,6 @@
 pragma solidity ^0.5.9;
 
-contract ICurrencyPrices {
-    function getCurrencyPrice(address _which) public view returns (uint256);
+
+interface ICurrencyPrices {
+    function getCurrencyPrice(address _which) external view returns (uint256);
 }
