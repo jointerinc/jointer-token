@@ -527,8 +527,8 @@ contract AuctionProtection is Upgradeable, Stacking {
             _currentTokenBalance = currentLockedFunds[_which][address(_token)];
 
             if (_currentTokenBalance > 0) {
-                lockedFunds[msg.sender][address(_token)] = safeAdd(
-                    lockedFunds[msg.sender][address(_token)],
+                lockedFunds[_which][address(_token)] = safeAdd(
+                    lockedFunds[_which][address(_token)],
                     _currentTokenBalance
                 );
                 currentLockedFunds[_which][address(_token)] = 0;
