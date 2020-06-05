@@ -82,8 +82,6 @@ contract("~Multisig works", function (accounts) {
         _minConfirmationsRequired,
         "value set correctly"
       );
-      let _gas = await multiSigIntstance._gas();
-      assert.equal(_gas, 34710, "value set correctly");
 
       for (var i = 0; i < owners.length; i++) {
         let owner = owners[i];
