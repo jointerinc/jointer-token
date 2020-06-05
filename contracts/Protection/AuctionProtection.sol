@@ -8,7 +8,6 @@ import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IAuctionTagAlong.sol";
 import "../InterFaces/ITokenVault.sol";
 import "../InterFaces/IERC20Token.sol";
-import "../InterFaces/Istacking.sol";
 
 
 interface InitializeInterface {
@@ -38,7 +37,7 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
         returns (bool)
     {
         contractsRegistry = IAuctionRegistery(_address);
-        updateAddresses();
+        _updateAddresses();
         return true;
     }
 
@@ -53,13 +52,17 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     /**@dev updates all the address from the registry contract
     this decision was made to save gas that occurs from calling an external view function */
 
-    function updateAddresses() public {
+    function _updateAddresses() internal {
         vaultAddress = getAddressOf(VAULT);
         stackingAddress = getAddressOf(STACKING);
         mainTokenAddress = getAddressOf(MAIN_TOKEN);
         companyFundWalletAddress = getAddressOf(COMPANY_FUND_WALLET);
         tagAlongAddress = getAddressOf(TAG_ALONG);
         auctionAddress = getAddressOf(AUCTION);
+    }
+
+    function updateAddresses() external returns (bool) {
+        _updateAddresses();
     }
 }
 
@@ -149,13 +152,149 @@ contract ProtectionStorage {
 }
 
 
-contract AuctionProtection is
-    Upgradeable,
+contract StackingStorage {
+    // We track Token only transfer by auction or downside
+    // Reason for tracking this bcz someone can send token direclty
+
+    uint256 public constant PERCENT_NOMINATOR = 10**6;
+
+    uint256 public constant DECIMAL_NOMINATOR = 10**18;
+
+    uint256 public totalTokenAmount;
+
+    uint256 public stackRoundId;
+
+    mapping(uint256 => uint256) dayWiseRatio;
+
+    mapping(address => uint256) lastRound;
+
+    mapping(address => mapping(uint256 => uint256)) roundWiseToken;
+
+    mapping(address => uint256) stackBalance;
+}
+
+
+contract Stacking is
     Utils,
     ProtectionStorage,
-    InitializeInterface,
-    TokenTransfer
+    StackingStorage,
+    TokenTransfer,
+    InitializeInterface
 {
+    event StackAdded(
+        uint256 indexed _roundId,
+        address indexed _whom,
+        uint256 _amount
+    );
+
+    event StackRemoved(
+        uint256 indexed _roundId,
+        address indexed _whom,
+        uint256 _amount
+    );
+
+    // stack fund called from auction contacrt
+    // 1% of supply distributed among the stack token
+    function stackFund(uint256 _amount)
+        external
+        allowedAddressOnly(msg.sender)
+        returns (bool)
+    {
+        IERC20Token mainToken = IERC20Token(mainTokenAddress);
+        if (totalTokenAmount > 0) {
+            ensureTransferFrom(mainToken, msg.sender, address(this), _amount);
+            uint256 ratio = safeDiv(
+                safeMul(_amount, DECIMAL_NOMINATOR),
+                totalTokenAmount
+            );
+            totalTokenAmount = safeAdd(totalTokenAmount, _amount);
+            dayWiseRatio[stackRoundId] = ratio;
+        } else ensureTransferFrom(mainToken, msg.sender, vaultAddress, _amount);
+        stackRoundId = safeAdd(stackRoundId, 1);
+        return true;
+    }
+
+    function addFundToStacking(address _whom, uint256 _amount)
+        internal
+        returns (bool)
+    {
+        totalTokenAmount = safeAdd(totalTokenAmount, _amount);
+        _claimTokens(_whom);
+        roundWiseToken[_whom][stackRoundId] = safeAdd(
+            roundWiseToken[_whom][stackRoundId],
+            _amount
+        );
+        stackBalance[_whom] = safeAdd(stackBalance[_whom], _amount);
+        if (lastRound[_whom] == 0) {
+            lastRound[_whom] = stackRoundId;
+        }
+
+        emit StackAdded(stackRoundId, _whom, _amount);
+    }
+
+    // calulcate actul fund user have
+    function calulcateStackFund(address _whom) internal view returns (uint256) {
+        uint256 _lastRound = lastRound[_whom];
+        uint256 _token;
+        uint256 _stackToken = 0;
+        if (_lastRound > 0) {
+            for (uint256 x = _lastRound; x < stackRoundId; x++) {
+                _token = safeAdd(_token, roundWiseToken[_whom][x]);
+                uint256 _tempStack = safeDiv(
+                    safeMul(dayWiseRatio[x], _token),
+                    DECIMAL_NOMINATOR
+                );
+                _stackToken = safeAdd(_stackToken, _tempStack);
+                _token = safeAdd(_token, _tempStack);
+            }
+        }
+        return _stackToken;
+    }
+
+    // this method distribut token
+    function _claimTokens(address _which) internal returns (bool) {
+        uint256 _stackToken = calulcateStackFund(_which);
+        lastRound[_which] = stackRoundId;
+        stackBalance[_which] = safeAdd(stackBalance[_which], _stackToken);
+        return true;
+    }
+
+    // every 5th Round system call this so token distributed
+    // user also can call this
+    function distributionStackInBatch(address[] calldata _which)
+        external
+        returns (bool)
+    {
+        for (uint8 x = 0; x < _which.length; x++) {
+            _claimTokens(_which[x]);
+        }
+    }
+
+    // show stack balace with what user get
+    function getStackBalance(address _whom) external view returns (uint256) {
+        uint256 _stackToken = calulcateStackFund(_whom);
+        return safeAdd(stackBalance[_whom], _stackToken);
+    }
+
+    // unlocking stack token
+    function unlockTokenFromStack() external returns (bool) {
+        uint256 _stackToken = calulcateStackFund(msg.sender);
+        uint256 actulToken = safeAdd(stackBalance[msg.sender], _stackToken);
+        ensureTransferFrom(
+            IERC20Token(mainTokenAddress),
+            address(this),
+            msg.sender,
+            actulToken
+        );
+        totalTokenAmount = safeSub(totalTokenAmount, actulToken);
+        stackBalance[msg.sender] = 0;
+        lastRound[msg.sender] = 0;
+        emit StackRemoved(stackRoundId, msg.sender, actulToken);
+    }
+}
+
+
+contract AuctionProtection is Upgradeable, Stacking {
     function initialize(
         address _primaryOwner,
         address _systemAddress,
@@ -166,13 +305,14 @@ contract AuctionProtection is
 
         contractsRegistry = IAuctionRegistery(_registeryAddress);
         tokenLockDuration = 365;
+        stackRoundId = 1;
         initializeOwner(_primaryOwner, _systemAddress, _authorityAddress);
-        updateAddresses();
+        _updateAddresses();
     }
 
-    event TokenUnLocked(address indexed _from);
+    event TokenUnLocked(address indexed _from, uint256 _tokenAmount);
 
-    event InvestMentCancelled(address indexed _from);
+    event InvestMentCancelled(address indexed _from, uint256 _tokenAmount);
 
     event FundLocked(address _token, address indexed _which, uint256 _amount);
 
@@ -260,7 +400,7 @@ contract AuctionProtection is
             emit FundTransfer(vaultAddress, address(_token), _tokenBalance);
             lockedTokens[msg.sender] = 0;
         }
-        emit InvestMentCancelled(msg.sender);
+        emit InvestMentCancelled(msg.sender, _tokenBalance);
         return true;
     }
 
@@ -315,9 +455,7 @@ contract AuctionProtection is
             tagAlongAmount = safeSub(_tokenBalance, walletAmount);
 
             tagAlongAddress.transfer(tagAlongAmount);
-
             companyFundWalletAddress.transfer(walletAmount);
-
             emit FundTransfer(tagAlongAddress, address(0), tagAlongAmount);
             emit FundTransfer(
                 companyFundWalletAddress,
@@ -332,11 +470,7 @@ contract AuctionProtection is
         if (_tokenBalance > 0) {
             _token = IERC20Token(mainTokenAddress);
             if (isStacking) {
-                approveTransferFrom(_token, stackingAddress, _tokenBalance);
-                Istacking(stackingAddress).addFundToStacking(
-                    _which,
-                    _tokenBalance
-                );
+                addFundToStacking(_which, _tokenBalance);
             } else {
                 ensureTransferFrom(
                     _token,
@@ -344,12 +478,11 @@ contract AuctionProtection is
                     _which,
                     _tokenBalance
                 );
+                emit TokenUnLocked(_which, _tokenBalance);
             }
             emit FundTransfer(_which, address(_token), _tokenBalance);
             lockedTokens[_which] = 0;
         }
-
-        emit TokenUnLocked(_which);
     }
 
     // user unlock tokens and funds goes to compnay wallet

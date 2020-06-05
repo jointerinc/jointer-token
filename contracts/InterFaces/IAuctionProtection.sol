@@ -4,6 +4,8 @@ import "./IERC20Token.sol";
 
 
 interface IAuctionProtection {
+    function stackFund(uint256 _amount) external returns (bool);
+
     function lockEther(address _which) external payable returns (bool);
 
     function depositToken(
