@@ -140,7 +140,7 @@ contract TokenVault is
         uint256 _amount
     ) external returns (bool) {
         ensureTransferFrom(_token, _from, address(this), _amount);
-        emit FundDeposited(address(0), _from, _amount);
+        emit FundDeposited(address(_token), _from, _amount);
         return true;
     }
 
