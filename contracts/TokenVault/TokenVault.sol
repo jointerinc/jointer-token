@@ -128,6 +128,7 @@ contract TokenVault is
         contractsRegistry = IAuctionRegistery(_registeryAddress);
 
         initializeOwner(_primaryOwner, _systemAddress, _authorityAddress);
+        _updateAddresses();
     }
 
     function() external payable {
