@@ -164,13 +164,13 @@ contract StackingStorage {
 
     uint256 public stackRoundId;
 
-    mapping(uint256 => uint256) dayWiseRatio;
+    mapping(uint256 => uint256) public dayWiseRatio;
 
-    mapping(address => uint256) lastRound;
+    mapping(address => uint256) public lastRound;
 
-    mapping(address => mapping(uint256 => uint256)) roundWiseToken;
+    mapping(address => mapping(uint256 => uint256)) public roundWiseToken;
 
-    mapping(address => uint256) stackBalance;
+    mapping(address => uint256) public stackBalance;
 }
 
 
@@ -219,7 +219,6 @@ contract Stacking is
         returns (bool)
     {
         totalTokenAmount = safeAdd(totalTokenAmount, _amount);
-        _claimTokens(_whom);
         roundWiseToken[_whom][stackRoundId] = safeAdd(
             roundWiseToken[_whom][stackRoundId],
             _amount
