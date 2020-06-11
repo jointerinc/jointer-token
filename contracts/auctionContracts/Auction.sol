@@ -327,13 +327,13 @@ contract AuctionStorage is AuctionFormula, AuctionUtils {
 
     uint256 public todayContribution;
 
-    uint256 public yesterdayContribution = 500 * PERCENT_NOMINATOR;
+    uint256 public yesterdayContribution = 333 * PERCENT_NOMINATOR;
 
-    uint256 public allowedMaxContribution = 850000000;
+    uint256 public allowedMaxContribution = 500 * PERCENT_NOMINATOR;
 
     uint256 public yesterdaySupply;
 
-    uint256 public todaySupply = 50000 * DECIMAL_NOMINATOR;
+    uint256 public todaySupply = 33300 * DECIMAL_NOMINATOR;
 
     uint256 public tokenAuctionEndPrice = 10000;
 

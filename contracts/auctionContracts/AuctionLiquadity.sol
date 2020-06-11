@@ -792,7 +792,8 @@ contract Liquadity is LiquadityFormula, TokenTransfer {
         return _getCurrentMarketPrice();
     }
 
-    function recoverPriceVolatility() external onlySystem() returns (bool) {
+    function recoverPriceVolatility() external returns (bool) {
+        
         uint256 baseTokenPrice = ICurrencyPrices(currencyPricesAddress)
             .getCurrencyPrice(address(baseToken));
 
@@ -802,45 +803,55 @@ contract Liquadity is LiquadityFormula, TokenTransfer {
 
         if (baseTokenPrice > baseLinePrice) {
             volatilty = safeDiv(
+                
                 safeMul(
                     safeSub(baseTokenPrice, baseLinePrice),
                     safeMul(100, PERCENT_NOMINATOR)
                 ),
-                baseLinePrice
+                
+                baseTokenPrice
             );
             isMainToken = true;
-        } else {
+        } else if(baseLinePrice > baseTokenPrice) {
+            
             volatilty = safeDiv(
                 safeMul(
                     safeSub(baseLinePrice, baseTokenPrice),
                     safeMul(100, PERCENT_NOMINATOR)
                 ),
-                baseTokenPrice
+                baseLinePrice
             );
             isMainToken = false;
         }
 
         if (volatilty >= baseTokenVolatiltyRatio) {
+            
             (uint256 returnBase, uint256 returnMain) = _liquadate(
                 volatilty,
                 false
             );
 
             if (isMainToken) {
+                
                 ITokenVault(vaultAddress).directTransfer(
                     address(mainToken),
                     converter,
                     returnMain
                 );
+                
             } else {
+                
                 IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
                     baseToken,
                     converter,
                     returnBase
                 );
+                
             }
         }
+        
         baseLinePrice = baseTokenPrice;
+        
         lastReserveBalance = IBancorConverter(converter).getReserveBalance(
             baseToken
         );
@@ -864,7 +875,7 @@ contract Liquadity is LiquadityFormula, TokenTransfer {
                     safeSub(_baseTokenBalance, lastReserveBalance),
                     safeMul(100, PERCENT_NOMINATOR)
                 ),
-                lastReserveBalance
+                _baseTokenBalance
             );
 
             isMainToken = true;
@@ -1170,6 +1181,7 @@ contract Liquadity is LiquadityFormula, TokenTransfer {
             mainToken.balanceOf(address(this)),
             _mainTokenBalance
         );
+        
         _baseTokenBalance = safeSub(
             baseToken.balanceOf(address(this)),
             _baseTokenBalance
@@ -1179,13 +1191,10 @@ contract Liquadity is LiquadityFormula, TokenTransfer {
             mainToken,
             address(this),
             vaultAddress,
-            safeSub(mainToken.balanceOf(address(this)), _mainTokenBalance)
+            _mainTokenBalance
         );
 
-        _baseTokenBalance = safeSub(
-            baseToken.balanceOf(address(this)),
-            _baseTokenBalance
-        );
+       
 
         // if we need ether it covert into eth and sent it to tagalong
         if (_convertToEth) {
@@ -1200,7 +1209,6 @@ contract Liquadity is LiquadityFormula, TokenTransfer {
                 address(0),
                 0
             );
-
             tagAlongAddress.transfer(
                 safeSub(address(this).balance, beforeEthBalance)
             );
