@@ -1,0 +1,487 @@
+{
+  "contractName": "ISmartTokenController",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_from",
+          "type": "address"
+        },
+        {
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "claimTokens",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "token",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity 0.4.26;\nimport './ISmartToken.sol';\n\n/*\n    Smart Token Controller interface\n*/\ncontract ISmartTokenController {\n    function claimTokens(address _from, uint256 _amount) public;\n    function token() public view returns (ISmartToken) {this;}\n}\n",
+  "sourcePath": "/home/safu/minddeft/jointerInc/bancorTry/temp/contracts/solidity/contracts/token/interfaces/ISmartTokenController.sol",
+  "ast": {
+    "absolutePath": "/home/safu/minddeft/jointerInc/bancorTry/temp/contracts/solidity/contracts/token/interfaces/ISmartTokenController.sol",
+    "exportedSymbols": {
+      "ISmartTokenController": [
+        13122
+      ]
+    },
+    "id": 13123,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 13105,
+        "literals": [
+          "solidity",
+          "0.4",
+          ".26"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:40"
+      },
+      {
+        "absolutePath": "/home/safu/minddeft/jointerInc/bancorTry/temp/contracts/solidity/contracts/token/interfaces/ISmartToken.sol",
+        "file": "./ISmartToken.sol",
+        "id": 13106,
+        "nodeType": "ImportDirective",
+        "scope": 13123,
+        "sourceUnit": 13104,
+        "src": "24:27:40",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 13122,
+        "linearizedBaseContracts": [
+          13122
+        ],
+        "name": "ISmartTokenController",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "id": 13113,
+            "implemented": false,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "claimTokens",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 13111,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 13108,
+                  "name": "_from",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 13113,
+                  "src": "154:13:40",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 13107,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "154:7:40",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 13110,
+                  "name": "_amount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 13113,
+                  "src": "169:15:40",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 13109,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "169:7:40",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "153:32:40"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 13112,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "192:0:40"
+            },
+            "scope": 13122,
+            "src": "133:60:40",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 13120,
+              "nodeType": "Block",
+              "src": "249:7:40",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 13118,
+                    "name": "this",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 14248,
+                    "src": "250:4:40",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ISmartTokenController_$13122",
+                      "typeString": "contract ISmartTokenController"
+                    }
+                  },
+                  "id": 13119,
+                  "nodeType": "ExpressionStatement",
+                  "src": "250:4:40"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 13121,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "token",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 13114,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "212:2:40"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 13117,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 13116,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 13121,
+                  "src": "236:11:40",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_ISmartToken_$13103",
+                    "typeString": "contract ISmartToken"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 13115,
+                    "name": "ISmartToken",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 13103,
+                    "src": "236:11:40",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ISmartToken_$13103",
+                      "typeString": "contract ISmartToken"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "235:13:40"
+            },
+            "scope": 13122,
+            "src": "198:58:40",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 13123,
+        "src": "96:162:40"
+      }
+    ],
+    "src": "0:259:40"
+  },
+  "legacyAST": {
+    "absolutePath": "/home/safu/minddeft/jointerInc/bancorTry/temp/contracts/solidity/contracts/token/interfaces/ISmartTokenController.sol",
+    "exportedSymbols": {
+      "ISmartTokenController": [
+        13122
+      ]
+    },
+    "id": 13123,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 13105,
+        "literals": [
+          "solidity",
+          "0.4",
+          ".26"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:40"
+      },
+      {
+        "absolutePath": "/home/safu/minddeft/jointerInc/bancorTry/temp/contracts/solidity/contracts/token/interfaces/ISmartToken.sol",
+        "file": "./ISmartToken.sol",
+        "id": 13106,
+        "nodeType": "ImportDirective",
+        "scope": 13123,
+        "sourceUnit": 13104,
+        "src": "24:27:40",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 13122,
+        "linearizedBaseContracts": [
+          13122
+        ],
+        "name": "ISmartTokenController",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "id": 13113,
+            "implemented": false,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "claimTokens",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 13111,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 13108,
+                  "name": "_from",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 13113,
+                  "src": "154:13:40",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 13107,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "154:7:40",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 13110,
+                  "name": "_amount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 13113,
+                  "src": "169:15:40",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 13109,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "169:7:40",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "153:32:40"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 13112,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "192:0:40"
+            },
+            "scope": 13122,
+            "src": "133:60:40",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 13120,
+              "nodeType": "Block",
+              "src": "249:7:40",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 13118,
+                    "name": "this",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 14248,
+                    "src": "250:4:40",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ISmartTokenController_$13122",
+                      "typeString": "contract ISmartTokenController"
+                    }
+                  },
+                  "id": 13119,
+                  "nodeType": "ExpressionStatement",
+                  "src": "250:4:40"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 13121,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "token",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 13114,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "212:2:40"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 13117,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 13116,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 13121,
+                  "src": "236:11:40",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_ISmartToken_$13103",
+                    "typeString": "contract ISmartToken"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 13115,
+                    "name": "ISmartToken",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 13103,
+                    "src": "236:11:40",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ISmartToken_$13103",
+                      "typeString": "contract ISmartToken"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "235:13:40"
+            },
+            "scope": 13122,
+            "src": "198:58:40",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 13123,
+        "src": "96:162:40"
+      }
+    ],
+    "src": "0:259:40"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.26+commit.4563c3fc.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.1.0",
+  "updatedAt": "2020-06-10T14:32:18.854Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}
