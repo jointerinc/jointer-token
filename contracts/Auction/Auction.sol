@@ -1,8 +1,9 @@
 pragma solidity ^0.5.9;
 
-import "../common/Ownable.sol";
+import "../common/ProxyOwnable.sol";
 import "../common/SafeMath.sol";
 import "../common/TokenTransfer.sol";
+import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IAuctionTagAlong.sol";
 import "../InterFaces/IAuctionProtection.sol";
@@ -14,8 +15,19 @@ import "../InterFaces/IToken.sol";
 import "../InterFaces/IIndividualBonus.sol";
 import "../InterFaces/IWhiteList.sol";
 
+interface InitializeInterface {
+    function initialize(
+        uint256 _startTime,
+        uint256 _minAuctionTime,
+        uint256 _interval,
+        address _primaryOwner,
+        address _systemAddress,
+        address _multisigAddress,
+        address _registeryAddress
+    ) external;
+}
 
-contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
+contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     IAuctionRegistery public contractsRegistry;
 
     address payable public whiteListAddress;
@@ -28,15 +40,6 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
     address payable public companyFundWalletAddress;
     address payable public companyTokenWalletAddress;
     address payable public individualBonusAddress;
-
-    constructor(
-        address _systemAddress,
-        address _multisigAdress,
-        address _registeryAddress
-    ) public Ownable(_systemAddress, _multisigAdress) {
-        contractsRegistry = IAuctionRegistery(_registeryAddress);
-        _updateAddresses();
-    }
 
     function updateRegistery(address _address)
         external
@@ -78,46 +81,47 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
     }
 }
 
-
 contract AuctionUtils is AuctionRegistery {
     uint256 public constant PERCENT_NOMINATOR = 10**6;
 
     uint256 public constant DECIMAL_NOMINATOR = 10**18;
 
     // allowed contarct limit the contribution
-    uint256 public maxContributionAllowed = 150;
+    uint256 public maxContributionAllowed;
 
     // managment fee to run auction cut from basesupply
-    uint256 public mangmentFee = 2;
+    uint256 public mangmentFee;
 
-    uint256 public stacking = 1;
+    uint256 public stacking;
 
     // fund that will be locked in contacrt
-    uint256 public downSideProtectionRatio = 90;
+    uint256 public downSideProtectionRatio;
 
     // Fund goes to companyWallet
-    uint256 public fundWalletRatio = 90;
+    uint256 public fundWalletRatio;
 
     // if contribution reach above yesterdayContribution groupBonus multiplyer
-    uint256 public groupBonusRatio = 2;
+    uint256 public groupBonusRatio;
 
     // user neeed this amount of mainToken to contribute
-    uint256 public mainTokenRatio = 100;
+    uint256 public mainTokenRatio;
 
     // how much buffer we allow to user contribute more
-    uint256 public bufferLimit = 105;
+    uint256 public bufferLimit;
 
     //ByDefault it false
     bool public mainTokencheckOn;
 
-    constructor(
-        address _systemAddress,
-        address _multisigAdress,
-        address _registeryAddress
-    )
-        public
-        AuctionRegistery(_systemAddress, _multisigAdress, _registeryAddress)
-    {}
+    function initializeUtils() internal {
+        maxContributionAllowed = 150;
+        mangmentFee = 2;
+        stacking = 1;
+        downSideProtectionRatio = 90;
+        fundWalletRatio = 90;
+        groupBonusRatio = 2;
+        mainTokenRatio = 100;
+        bufferLimit = 105;
+    }
 
     function setGroupBonusRatio(uint256 _groupBonusRatio)
         external
@@ -193,7 +197,6 @@ contract AuctionUtils is AuctionRegistery {
         return true;
     }
 }
-
 
 contract AuctionFormula is SafeMath, TokenTransfer {
     function calcuateAuctionTokenDistrubution(
@@ -282,9 +285,8 @@ contract AuctionFormula is SafeMath, TokenTransfer {
     }
 }
 
-
 contract AuctionStorage is AuctionFormula, AuctionUtils {
-    uint256 public auctionDay = 1;
+    uint256 public auctionDay;
 
     // address how much invested by them in auciton till date
     mapping(address => uint256) public userTotalFund;
@@ -311,7 +313,8 @@ contract AuctionStorage is AuctionFormula, AuctionUtils {
     mapping(uint256 => uint256) public dayWiseDownSideProtectionRatio;
 
     // address wise contribution each day
-    mapping(uint256 => mapping(address => uint256)) public walletDayWiseContribution;
+    mapping(uint256 => mapping(address => uint256))
+        public walletDayWiseContribution;
 
     // day wiser five top contributor
     mapping(uint256 => mapping(uint256 => address)) public topFiveContributior;
@@ -323,31 +326,31 @@ contract AuctionStorage is AuctionFormula, AuctionUtils {
     mapping(uint256 => mapping(address => bool)) public returnToken;
 
     // total contribution till date
-    uint256 public totalContribution = 2500000 * PERCENT_NOMINATOR;
+    uint256 public totalContribution;
 
     uint256 public todayContribution;
 
-    uint256 public yesterdayContribution = 333 * PERCENT_NOMINATOR;
+    uint256 public yesterdayContribution;
 
-    uint256 public allowedMaxContribution = 500 * PERCENT_NOMINATOR;
+    uint256 public allowedMaxContribution;
 
     uint256 public yesterdaySupply;
 
-    uint256 public todaySupply = 33300 * DECIMAL_NOMINATOR;
+    uint256 public todaySupply;
 
-    uint256 public tokenAuctionEndPrice = 10000;
+    uint256 public tokenAuctionEndPrice;
 
     bool public auctionSoldOut;
 
-    constructor(
-        address _systemAddress,
-        address _multisigAdress,
-        address _registeryAddress
-    ) public AuctionUtils(_systemAddress, _multisigAdress, _registeryAddress) {
-        dayWiseDownSideProtectionRatio[auctionDay] = downSideProtectionRatio;
+    function initializeStorage() internal {
+        auctionDay = 1;
+        totalContribution = 2500000 * PERCENT_NOMINATOR;
+        yesterdayContribution = 333 * PERCENT_NOMINATOR;
+        allowedMaxContribution = 500 * PERCENT_NOMINATOR;
+        todaySupply = 33300 * DECIMAL_NOMINATOR;
+        tokenAuctionEndPrice = 10000;
     }
 }
-
 
 contract AuctionFundCollector is AuctionStorage {
     event FundAdded(
@@ -359,15 +362,6 @@ contract AuctionFundCollector is AuctionStorage {
         uint256 _fundValue,
         uint256 _marketPrice
     );
-
-    constructor(
-        address _systemAddress,
-        address _multisigAdress,
-        address _registeryAddress
-    )
-        public
-        AuctionStorage(_systemAddress, _multisigAdress, _registeryAddress)
-    {}
 
     // check before contribution
     function _checkContribution(address _from) internal view returns (bool) {
@@ -589,13 +583,12 @@ contract AuctionFundCollector is AuctionStorage {
     }
 }
 
+contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
+    uint256 public MIN_AUCTION_END_TIME; //epoch
 
-contract Auction is AuctionFundCollector {
-    uint256 public MIN_AUCTION_END_TIME = 0; //epoch
+    uint256 public LAST_AUCTION_START;
 
-    uint256 public LAST_AUCTION_START = 0;
-
-    uint256 public INTERVAL = 0;
+    uint256 public INTERVAL;
 
     function changeTimings(uint256 _flag, uint256 _time)
         external
@@ -608,21 +601,23 @@ contract Auction is AuctionFundCollector {
         return true;
     }
 
-    constructor(
+    function initialize(
         uint256 _startTime,
         uint256 _minAuctionTime,
         uint256 _interval,
+        address _primaryOwner,
         address _systemAddress,
         address _multisigAddress,
         address _registeryAddress
-    )
-        public
-        AuctionFundCollector(
-            _systemAddress,
-            _multisigAddress,
-            _registeryAddress
-        )
-    {
+    ) public {
+        super.initialize();
+        initializeOwner(_primaryOwner, _systemAddress, _multisigAddress);
+        initializeStorage();
+        initializeUtils();
+        contractsRegistry = IAuctionRegistery(_registeryAddress);
+        _updateAddresses();
+
+        dayWiseDownSideProtectionRatio[auctionDay] = downSideProtectionRatio;
         LAST_AUCTION_START = _startTime;
         MIN_AUCTION_END_TIME = _minAuctionTime;
         INTERVAL = _interval;
