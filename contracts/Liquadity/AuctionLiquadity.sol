@@ -25,12 +25,7 @@ interface InitializeInterface {
         address _systemAddress,
         address _authorityAddress,
         address _registeryAddress,
-        uint256 _baseLinePrice,
-        IERC20Token[] calldata _ethToMainToken,
-        IERC20Token[] calldata _baseTokenToMainToken,
-        IERC20Token[] calldata _mainTokenTobaseToken,
-        IERC20Token[] calldata _ethToBaseToken,
-        IERC20Token[] calldata _baseTokenToEth
+        uint256 _baseLinePrice
     ) external;
 }
 
