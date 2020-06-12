@@ -6,7 +6,6 @@ import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IERC20Token.sol";
 
-
 interface InitializeInterface {
     function initialize(
         address _primaryOwner,
@@ -78,13 +77,7 @@ contract WhiteListStorage {
 }
 
 
-contract WhiteList is
-    Upgradeable,
-    ProxyOwnable,
-    SafeMath,
-    WhiteListStorage,
-    InitializeInterface
-{
+contract WhiteList is Upgradeable, ProxyOwnable, SafeMath, WhiteListStorage,InitializeInterface {
     event AccountWhiteListed(address indexed which, uint256 flags);
     event WalletAdded(address indexed from, address indexed which);
     event WalletRemoved(address indexed from, address indexed which);
@@ -115,8 +108,12 @@ contract WhiteList is
         uint256 _stockMaturityDays
     ) public {
         super.initialize();
-
-        initializeOwner(_primaryOwner, _systemAddress, _authorityAddress);
+        
+        initializeOwner(
+            _primaryOwner,
+            _systemAddress,
+            _authorityAddress
+        );
         tokenToMaturityDaysTimeStamp[0] = convertDaysToTimeStamp(
             _mainMaturityDays
         );
@@ -337,7 +334,12 @@ contract WhiteList is
         }
         //Added to make sure that bancor addresses transfer to bypassed addresses only
         //if a bancor address calls a transfer or transferFrom function then return true only if to is Bypassed a
-        if (isBancorAddress(msgSender)) return isAddressByPassed(to);
+        
+        if (isBancorAddress(msgSender)){
+            if(isBancorAddress(to)) return true;
+            else if(isAddressByPassed(to)) return true;
+            else return false;
+        }
 
         result = _isReceiveAllowed(_to, token); // Check receiver at first
         if (!result) return false; // if receiver disallowed the transfer disallowed too.
