@@ -1,4 +1,3 @@
-//It is still not done. will update soon
 const {
   constants,
   expectEvent,
