@@ -511,6 +511,7 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
             _systemAddress,
             _authorityAddress
         );
+        contractsRegistry = IAuctionRegistery(_registeryAddress);
         _updateAddresses();
         converter = _converter;
         baseLinePrice = _baseLinePrice;
@@ -521,7 +522,7 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
         baseToken = IERC20Token(_baseToken);
         mainToken = IERC20Token(_mainToken);
         relayToken = IERC20Token(_relayToken);
-        contractsRegistry = IAuctionRegistery(_registeryAddress);
+        
         tokenAuctionEndPrice = _getCurrentMarketPrice();
         lastReserveBalance = IBancorConverter(converter).getReserveBalance(
             baseToken
