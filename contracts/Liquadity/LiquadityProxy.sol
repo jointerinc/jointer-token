@@ -5,7 +5,6 @@ import "../common/Ownable.sol";
 import "../Proxy/UpgradeabilityProxy.sol";
 import "../InterFaces/IERC20Token.sol";
 
-
 interface InitializeInterface {
     function initialize(
         address _converter,
@@ -19,7 +18,6 @@ interface InitializeInterface {
         uint256 _baseLinePrice
     ) external;
 }
-
 
 /**
  * @title Registry
