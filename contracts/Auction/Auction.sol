@@ -82,8 +82,9 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
 }
 
 contract AuctionUtils is AuctionRegistery {
-    uint256 public constant PERCENT_NOMINATOR = 10**6;
-
+    
+    uint256 public constant PRICE_NOMINATOR = 10**9;
+    
     uint256 public constant DECIMAL_NOMINATOR = 10**18;
 
     // allowed contarct limit the contribution
@@ -132,14 +133,6 @@ contract AuctionUtils is AuctionRegistery {
         return true;
     }
 
-    function setMangmentFee(uint256 _mangmentFee)
-        external
-        onlyOwner()
-        returns (bool)
-    {
-        mangmentFee = _mangmentFee;
-        return true;
-    }
 
     function setBufferLimit(uint256 _bufferLimit)
         external
@@ -199,6 +192,7 @@ contract AuctionUtils is AuctionRegistery {
 }
 
 contract AuctionFormula is SafeMath, TokenTransfer {
+    
     function calcuateAuctionTokenDistrubution(
         uint256 dayWiseContributionByWallet,
         uint256 dayWiseSupplyCore,
@@ -206,19 +200,18 @@ contract AuctionFormula is SafeMath, TokenTransfer {
         uint256 dayWiseContribution,
         uint256 downSideProtectionRatio
     ) internal pure returns (uint256, uint256) {
+        
         uint256 _dayWiseSupplyCore = safeDiv(
             safeMul(dayWiseSupplyCore, dayWiseContributionByWallet),
             dayWiseContribution
         );
 
         uint256 _dayWiseSupplyBonus = 0;
-
         if (dayWiseSupplyBonus > 0)
             _dayWiseSupplyBonus = safeDiv(
                 safeMul(dayWiseSupplyBonus, dayWiseContributionByWallet),
                 dayWiseContribution
             );
-
         uint256 _returnAmount = safeAdd(
             _dayWiseSupplyCore,
             _dayWiseSupplyBonus
@@ -338,17 +331,14 @@ contract AuctionStorage is AuctionFormula, AuctionUtils {
 
     uint256 public todaySupply;
 
-    uint256 public tokenAuctionEndPrice;
-
     bool public auctionSoldOut;
 
     function initializeStorage() internal {
         auctionDay = 1;
-        totalContribution = 2500000 * PERCENT_NOMINATOR;
-        yesterdayContribution = 333 * PERCENT_NOMINATOR;
-        allowedMaxContribution = 500 * PERCENT_NOMINATOR;
-        todaySupply = 33300 * DECIMAL_NOMINATOR;
-        tokenAuctionEndPrice = 10000;
+        totalContribution = 2500000 * PRICE_NOMINATOR;
+        yesterdayContribution = 500 * PRICE_NOMINATOR;
+        allowedMaxContribution = 500 * PRICE_NOMINATOR;
+        todaySupply = 50000 * DECIMAL_NOMINATOR;
     }
 }
 
@@ -666,7 +656,7 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
             yesterdaySupply,
             todayContribution,
             yesterdayContribution,
-            safeAdd(totalContribution, todayContribution),
+            totalContribution,
             allowedMaxContribution,
             _mainTokenPrice
         );
@@ -764,18 +754,16 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         dayWiseSupplyCore[auctionDay] = todaySupply;
         dayWiseSupplyBonus[auctionDay] = bonusSupply;
         dayWiseSupply[auctionDay] = safeAdd(todaySupply, bonusSupply);
-
+        
+        
+        uint256 stackingAmount = safeDiv(
+            safeMul(dayWiseSupply[auctionDay],stacking),100
+        );
         uint256 fee = calculateSupplyPercent(
-            dayWiseSupply[auctionDay],
+            safeAdd(stackingAmount,dayWiseSupply[auctionDay]),
             mangmentFee
         );
-        uint256 stackingAmount = calculateSupplyPercent(
-            dayWiseSupply[auctionDay],
-            stacking
-        );
-
         IToken(mainTokenAddress).mintTokens(safeAdd(fee, stackingAmount));
-
         ensureTransferFrom(
             IERC20Token(mainTokenAddress),
             address(this),
@@ -808,8 +796,6 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         yesterdaySupply = dayWiseSupply[auctionDay];
 
         yesterdayContribution = todayContribution;
-
-        tokenAuctionEndPrice = _mainTokenPrice;
 
         auctionDay = safeAdd(auctionDay, 1);
 
@@ -864,16 +850,28 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
             dayWiseDownSideProtectionRatio[dayId]
         );
 
-        returnAmount = IIndividualBonus(individualBonusAddress).calucalteBonus(
+        uint256 newReturnAmount = IIndividualBonus(individualBonusAddress).calucalteBonus(
             topContributiorIndex[dayId][_which],
             returnAmount
         );
+        
+        uint256 fee = calculateSupplyPercent(
+            newReturnAmount,
+            mangmentFee
+        );
 
-        IToken(mainTokenAddress).mintTokens(returnAmount);
-
+        newReturnAmount = safeAdd(returnAmount,newReturnAmount);
+        
+        IToken(mainTokenAddress).mintTokens(safeAdd(newReturnAmount,fee));
+        
         // here we check with last auction bcz user can invest after auction start
         IToken(mainTokenAddress).lockToken(_which, 0, LAST_AUCTION_START);
-
+        ensureTransferFrom(
+            IERC20Token(mainTokenAddress),
+            address(this),
+            companyTokenWalletAddress,
+            fee
+        );
         ensureTransferFrom(
             IERC20Token(mainTokenAddress),
             address(this),
@@ -884,21 +882,21 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         approveTransferFrom(
             IERC20Token(mainTokenAddress),
             auctionProtectionAddress,
-            safeSub(returnAmount, _userAmount)
+            safeSub(newReturnAmount, _userAmount)
         );
 
         IAuctionProtection(auctionProtectionAddress).depositToken(
             address(this),
             _which,
-            safeSub(returnAmount, _userAmount)
+            safeSub(newReturnAmount, _userAmount)
         );
 
         returnToken[dayId][_which] = true;
         emit TokenDistrubuted(
             _which,
             dayId,
-            returnAmount,
-            safeSub(returnAmount, _userAmount),
+            newReturnAmount,
+            safeSub(newReturnAmount, _userAmount),
             _userAmount
         );
         return true;
