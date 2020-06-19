@@ -9,9 +9,9 @@ const {
   BN,
 } = require("@openzeppelin/test-helpers");
 
-const {ZERO_ADDRESS} = constants;
+const { ZERO_ADDRESS } = constants;
 
-const {expect} = require("chai");
+const { expect } = require("chai");
 
 const {
   advanceTimeAndBlock,
@@ -44,6 +44,7 @@ contract("~Protection works", function (accounts) {
     multiSigPlaceHolder,
     auctionPlaceHolder,
     companyFundWallet,
+    stakingCompanyWallet,
     accountA,
     accountB,
     accountC,
@@ -54,13 +55,13 @@ contract("~Protection works", function (accounts) {
     this.auctionRegistry = await AuctionRegisty.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     //the prtection
     var protectionRegistry = await ProtectionRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     let tempProtection = await Protection.new();
     await protectionRegistry.addVersion(1, tempProtection.address);
@@ -70,19 +71,19 @@ contract("~Protection works", function (accounts) {
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     let proxyAddress = await protectionRegistry.proxyAddress();
     this.protection = await Protection.at(proxyAddress);
     //some other token
-    this.erc20 = await TestERC20.new({from: primaryOwner});
+    this.erc20 = await TestERC20.new({ from: primaryOwner });
     //main token
-    this.mockMainToken = await TestERC20.new({from: primaryOwner});
+    this.mockMainToken = await TestERC20.new({ from: primaryOwner });
     //token vault
     var tokenVaultRegistry = await TokenVaultRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     let tempTokenVault = await TokenVault.new();
     await tokenVaultRegistry.addVersion(1, tempTokenVault.address);
@@ -92,7 +93,7 @@ contract("~Protection works", function (accounts) {
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     proxyAddress = await tokenVaultRegistry.proxyAddress();
     this.tokenVault = await TokenVault.at(proxyAddress);
@@ -102,7 +103,7 @@ contract("~Protection works", function (accounts) {
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
 
     //Add all the addresses to the auction registry
@@ -148,6 +149,14 @@ contract("~Protection works", function (accounts) {
         from: primaryOwner,
       }
     );
+    await this.auctionRegistry.registerContractAddress(
+      web3.utils.fromAscii("STACKING_TOKEN_WALLET"),
+      stakingCompanyWallet,
+      {
+        from: primaryOwner,
+      }
+    );
+
     //call updateAddresses in all the contracts
     await this.protection.updateAddresses();
     await this.tokenVault.updateAddresses();
@@ -164,7 +173,7 @@ contract("~Protection works", function (accounts) {
     });
 
     //Allow the token
-    await this.protection.allowToken(this.erc20.address, {from: systemAddress});
+    await this.protection.allowToken(this.erc20.address, { from: systemAddress });
 
     // console.log("protection: " + this.protection.address);
     // console.log("main token: " + this.mockMainToken.address);
@@ -305,7 +314,7 @@ contract("~Protection works", function (accounts) {
         auctionPlaceHolder,
         accountA,
         contributeAmount,
-        {from: auctionPlaceHolder}
+        { from: auctionPlaceHolder }
       )
     );
     await this.mockMainToken.approve(
@@ -320,7 +329,7 @@ contract("~Protection works", function (accounts) {
         auctionPlaceHolder,
         accountA,
         contributeAmount,
-        {from: other1}
+        { from: other1 }
       ),
       "ERR_AUTHORIZED_ADDRESS_ONLY"
     );
@@ -328,7 +337,7 @@ contract("~Protection works", function (accounts) {
       auctionPlaceHolder,
       accountA,
       contributeAmount,
-      {from: auctionPlaceHolder}
+      { from: auctionPlaceHolder }
     );
     expectEvent(receipt, "FundLocked", {
       _token: this.mockMainToken.address,
@@ -374,7 +383,7 @@ contract("~Protection works", function (accounts) {
       auctionPlaceHolder,
       accountA,
       contributeAmount,
-      {from: auctionPlaceHolder}
+      { from: auctionPlaceHolder }
     );
     let snapId = (await takeSnapshot()).result;
 
@@ -382,12 +391,12 @@ contract("~Protection works", function (accounts) {
     await advanceTimeAndBlock(365 * 86400);
 
     await expectRevert(
-      this.protection.cancelInvestment({from: accountA}),
+      this.protection.cancelInvestment({ from: accountA }),
       "ERR_INVESTMENT_CANCEL_PERIOD_OVER"
     );
 
     await revertToSnapshot(snapId);
-    let receipt = await this.protection.cancelInvestment({from: accountA});
+    let receipt = await this.protection.cancelInvestment({ from: accountA });
     expectEvent.inLogs(receipt.logs, "InvestMentCancelled", {
       _from: accountA,
       _tokenAmount: contributeAmount,
@@ -453,10 +462,10 @@ contract("~Protection works", function (accounts) {
       auctionPlaceHolder,
       accountA,
       contributeAmount,
-      {from: auctionPlaceHolder}
+      { from: auctionPlaceHolder }
     );
 
-    let receipt = await this.protection.unLockTokens({from: accountA});
+    let receipt = await this.protection.unLockTokens({ from: accountA });
     let vaultRatio = await this.protection.vaultRatio();
     let walletAmount = contributeAmount.mul(vaultRatio).div(new BN(100));
     let tagAlongAmount = contributeAmount.sub(walletAmount);
@@ -537,16 +546,16 @@ contract("~Protection works", function (accounts) {
       auctionPlaceHolder,
       accountA,
       contributeAmount,
-      {from: auctionPlaceHolder}
+      { from: auctionPlaceHolder }
     );
 
     await expectRevert(
-      this.protection.unLockFundByAdmin(accountA, {from: systemAddress}),
+      this.protection.unLockFundByAdmin(accountA, { from: systemAddress }),
       "ERR_ADMIN_CANT_UNLOCK_FUND"
     );
     await advanceTimeAndBlock(365 * 86400);
     await expectRevert(
-      this.protection.unLockFundByAdmin(accountA, {from: other1}),
+      this.protection.unLockFundByAdmin(accountA, { from: other1 }),
       "ERR_AUTHORIZED_ADDRESS_ONLY"
     );
     //the method we are testing
@@ -634,10 +643,10 @@ contract("~Protection works", function (accounts) {
         auctionPlaceHolder,
         accountA,
         contributeAmount,
-        {from: auctionPlaceHolder}
+        { from: auctionPlaceHolder }
       );
       let roundId = await this.protection.stackRoundId();
-      let receipt = await this.protection.stackToken({from: accountA});
+      let receipt = await this.protection.stackToken({ from: accountA });
       let vaultRatio = await this.protection.vaultRatio();
       let walletAmount = contributeAmount.mul(vaultRatio).div(new BN(100));
       let tagAlongAmount = contributeAmount.sub(walletAmount);
@@ -715,9 +724,9 @@ contract("~Protection works", function (accounts) {
       expect(await this.protection.stackRoundId()).to.be.bignumber.equal(
         roundId.add(new BN(1))
       );
-      //if nobody has stacked then it should go to the vault
+      //if nobody has stacked then it should go to the stakingCompanyWallet
       expect(
-        await this.mockMainToken.balanceOf(this.tokenVault.address)
+        await this.mockMainToken.balanceOf(stakingCompanyWallet)
       ).to.be.bignumber.equal(contributeAmount);
       //if somebody stacks it then...
       await this.protection.lockEther(accountA, {
@@ -747,9 +756,9 @@ contract("~Protection works", function (accounts) {
         auctionPlaceHolder,
         accountA,
         contributeAmount,
-        {from: auctionPlaceHolder}
+        { from: auctionPlaceHolder }
       );
-      await this.protection.stackToken({from: accountA});
+      await this.protection.stackToken({ from: accountA });
       expect(await this.protection.totalTokenAmount()).to.be.bignumber.equal(
         contributeAmount
       );
@@ -816,11 +825,11 @@ contract("~Protection works", function (accounts) {
             auctionPlaceHolder,
             accs[i],
             protectionBalance[day][i],
-            {from: auctionPlaceHolder}
+            { from: auctionPlaceHolder }
           );
           // console.log(protectionBalance[day][i].toString());
 
-          await this.protection.stackToken({from: accs[i]});
+          await this.protection.stackToken({ from: accs[i] });
           // console.log(":: " + (await this.protection.getStackBalance(accs[i])));
         }
         await this.protection.stackFund(rewards[day], {
@@ -847,9 +856,9 @@ contract("~Protection works", function (accounts) {
         auctionPlaceHolder,
         accountA,
         contributeAmount,
-        {from: auctionPlaceHolder}
+        { from: auctionPlaceHolder }
       );
-      await this.protection.stackToken({from: accountA});
+      await this.protection.stackToken({ from: accountA });
       let totalTokenAmount = await this.protection.totalTokenAmount();
       let roundId = await this.protection.stackRoundId();
       let reciept = await this.protection.unlockTokenFromStack({
