@@ -12,8 +12,6 @@ import "../InterFaces/IAuction.sol";
 import "../InterFaces/ITokenVault.sol";
 import "../InterFaces/IWhiteList.sol";
 
-
-
 interface InitializeInterface {
     function initialize(
         address _converter,
@@ -28,15 +26,14 @@ interface InitializeInterface {
     ) external;
 }
 
-
 interface IBancorNetwork {
     function etherTokens(address _address) external view returns (bool);
+
     function getReturnByPath(IERC20Token[] calldata _path, uint256 _amount)
         external
         view
         returns (uint256, uint256);
 }
-
 
 interface IContractRegistry {
     function addressOf(bytes32 _contractName) external view returns (address);
@@ -45,6 +42,13 @@ interface IContractRegistry {
     function getAddress(bytes32 _contractName) external view returns (address);
 }
 
+interface IEtherToken {
+    function deposit() external payable;
+
+    function withdraw(uint256 _amount) external;
+
+    function withdrawTo(address _to, uint256 _amount) external;
+}
 
 interface IBancorConverter {
     function registry() external view returns (address);
@@ -84,7 +88,6 @@ interface IBancorConverter {
         returns (uint256);
 }
 
-
 contract BancorConverter is ProxyOwnable, SafeMath {
     bytes32 internal constant BANCOR_FORMULA = "BancorFormula";
 
@@ -99,8 +102,6 @@ contract BancorConverter is ProxyOwnable, SafeMath {
 
     IERC20Token public relayToken;
 
-    
-
     function updateConverter(address _converter)
         public
         onlySystem()
@@ -114,20 +115,6 @@ contract BancorConverter is ProxyOwnable, SafeMath {
         address _registry = IBancorConverter(converter).registry();
         IContractRegistry registry = IContractRegistry(_registry);
         return registry.addressOf(_contractName);
-    }
-
-    function getTokensReserveBalance()
-        internal
-        view
-        returns (uint256 _baseTokenBalance, uint256 _mainTokenBalance)
-    {
-        _baseTokenBalance = IBancorConverter(converter).getReserveBalance(
-            baseToken
-        );
-        _mainTokenBalance = IBancorConverter(converter).getReserveBalance(
-            mainToken
-        );
-        return (_baseTokenBalance, _mainTokenBalance);
     }
 
     function getTokensReserveRatio()
@@ -148,19 +135,6 @@ contract BancorConverter is ProxyOwnable, SafeMath {
         return (_baseTokenRatio, _mainTokenRatio);
     }
 
-    function getReturn(
-        address _fromToken,
-        address _toToken,
-        uint256 _amount
-    ) public view returns (uint256, uint256) {
-        return
-            IBancorConverter(converter).getReturn(
-                IERC20Token(_fromToken),
-                IERC20Token(_toToken),
-                _amount
-            );
-    }
-
     function etherTokens(address _address) internal view returns (bool) {
         IBancorNetwork network = IBancorNetwork(addressOf(BANCOR_NETWORK));
         return network.etherTokens(_address);
@@ -176,7 +150,6 @@ contract BancorConverter is ProxyOwnable, SafeMath {
     }
 }
 
-
 contract AuctionRegistery is BancorConverter, AuctionRegisteryContracts {
     IAuctionRegistery public contractsRegistry;
 
@@ -185,7 +158,6 @@ contract AuctionRegistery is BancorConverter, AuctionRegisteryContracts {
     address payable public auctionAddress;
     address payable public tagAlongAddress;
     address payable public currencyPricesAddress;
-
 
     function updateRegistery(address _address)
         external
@@ -222,7 +194,6 @@ contract AuctionRegistery is BancorConverter, AuctionRegisteryContracts {
     }
 }
 
-
 contract LiquadityUtils is AuctionRegistery {
     // _path = 0
     IERC20Token[] public ethToMainToken;
@@ -239,26 +210,26 @@ contract LiquadityUtils is AuctionRegistery {
     // _path = 4
     IERC20Token[] public baseTokenToEth;
 
-    mapping(address => uint256) lastReedeemDay;
+    mapping(address => uint256) public lastReedeemDay;
 
     uint256 public constant BIG_NOMINATOR = 10**24;
-    
+
     uint256 public constant DECIMAL_NOMINATOR = 10**18;
-    
+
     uint256 public constant PRICE_NOMINATOR = 10**9;
 
     uint256 public sideReseverRatio;
-    
+
     uint256 public tagAlongRatio;
 
     uint256 public appreciationLimit;
-    
+
     uint256 public appreciationLimitWithDecimal;
 
     uint256 public reductionStartDay;
 
     uint256 public baseTokenVolatiltyRatio;
-    
+
     uint256 public virtualReserverDivisor;
 
     uint256 public previousMainReserveContribution;
@@ -270,26 +241,23 @@ contract LiquadityUtils is AuctionRegistery {
     uint256 public lastReserveBalance;
 
     uint256 public baseLinePrice;
-    
+
     uint256 public maxIteration;
-    
+
     bool public isAppreciationLimitReached;
-    
-    
-   
 
     modifier allowedAddressOnly(address _which) {
         require(_which == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
         _;
     }
-    
+
     function setAllPath(
         IERC20Token[] calldata _ethToMainToken,
         IERC20Token[] calldata _baseTokenToMainToken,
         IERC20Token[] calldata _mainTokenTobaseToken,
         IERC20Token[] calldata _ethToBaseToken,
-        IERC20Token[] calldata _baseTokenToEth ) external onlySystem() returns(bool){
-        
+        IERC20Token[] calldata _baseTokenToEth
+    ) external onlySystem() returns (bool) {
         ethToMainToken = _ethToMainToken;
         baseTokenToMainToken = _baseTokenToMainToken;
         mainTokenTobaseToken = _mainTokenTobaseToken;
@@ -297,7 +265,7 @@ contract LiquadityUtils is AuctionRegistery {
         baseTokenToEth = _baseTokenToEth;
         return true;
     }
-    
+
     function setTokenPath(uint256 _pathNo, IERC20Token[] memory _path)
         public
         onlySystem()
@@ -310,16 +278,15 @@ contract LiquadityUtils is AuctionRegistery {
         else if (_pathNo == 4) baseTokenToEth = _path;
         return true;
     }
-    
+
     function setMaxIteration(uint256 _maxIteration)
         public
         onlySystem()
         returns (bool)
     {
-        maxIteration= _maxIteration;
+        maxIteration = _maxIteration;
         return true;
     }
-    
 
     function setSideReseverRatio(uint256 _sideReseverRatio)
         public
@@ -330,7 +297,7 @@ contract LiquadityUtils is AuctionRegistery {
         sideReseverRatio = _sideReseverRatio;
         return true;
     }
-    
+
     function setTagAlongRatio(uint256 _tagAlongRatio)
         public
         onlyOwner()
@@ -339,15 +306,14 @@ contract LiquadityUtils is AuctionRegistery {
         tagAlongRatio = _tagAlongRatio;
         return true;
     }
-    
-    
+
     function setAppreciationLimit(uint256 _limit)
         public
         onlyOwner()
         returns (bool)
     {
         appreciationLimit = _limit;
-        appreciationLimitWithDecimal = safeMul(_limit,DECIMAL_NOMINATOR);
+        appreciationLimitWithDecimal = safeMul(_limit, DECIMAL_NOMINATOR);
         return true;
     }
 
@@ -359,22 +325,21 @@ contract LiquadityUtils is AuctionRegistery {
         baseTokenVolatiltyRatio = _baseTokenVolatiltyRatio;
         return true;
     }
-    
-    function setReductionStartDay(uint256 _reductionStartDay) public onlyOwner() returns(bool){
+
+    function setReductionStartDay(uint256 _reductionStartDay)
+        public
+        onlyOwner()
+        returns (bool)
+    {
         reductionStartDay = _reductionStartDay;
     }
 }
 
-
-contract LiquadityFormula is LiquadityUtils{
-    
+contract LiquadityFormula is LiquadityUtils {
     // current market price calculate according to baseLinePrice
     // if baseToken Price differ from
     function _getCurrentMarketPrice() internal view returns (uint256) {
-        (
-            uint256 _baseTokenBalance,
-            uint256 _mainTokenBalance
-        ) = getTokensReserveBalance();
+        uint256 _mainTokenBalance = mainToken.balanceOf(converter);
 
         (
             uint256 _baseTokenRatio,
@@ -383,7 +348,7 @@ contract LiquadityFormula is LiquadityUtils{
 
         uint256 ratio = safeDiv(
             safeMul(
-                safeMul(_baseTokenBalance, _mainTokenRatio),
+                safeMul(lastReserveBalance, _mainTokenRatio),
                 BIG_NOMINATOR
             ),
             safeMul(_mainTokenBalance, _baseTokenRatio)
@@ -399,7 +364,7 @@ contract LiquadityFormula is LiquadityUtils{
         uint256 yesterdayMainReserv
     ) internal pure returns (uint256) {
         // multiply 10**9 so we cant get zero value if amount come in float
-        
+
         uint256 _tempContrbution = safeDiv(
             safeMul(yesterDaycontibution, PRICE_NOMINATOR),
             yesterdayMainReserv
@@ -410,55 +375,22 @@ contract LiquadityFormula is LiquadityUtils{
             dayBeforyesterdayPrice
         );
 
-        _tempRatio =  safeMul(_tempContrbution, _tempRatio);
-        
-        if(_tempRatio > DECIMAL_NOMINATOR){
+        _tempRatio = safeMul(_tempContrbution, _tempRatio);
+
+        if (_tempRatio > DECIMAL_NOMINATOR) {
             return _tempRatio;
-        }else{
+        } else {
             return 0;
         }
     }
-
-    
-
-    // calculates a^(1/n) to dp decimal places
-    // maxIts bounds the number of iterations performed
-    function nthRoot(uint256 _a, uint256 _n, uint256 _dp, uint256 _maxIts) internal pure returns(uint256) {
-        assert (_n > 1);
-
-        // The scale factor is a crude way to turn everything into integer calcs.
-        // Actually do (a * (10 ^ ((dp + 1) * n))) ^ (1/n)
-        // We calculate to one extra dp and round at the end
-        uint256 one = 10 ** (1 + _dp);
-        uint256 a0 = one ** _n * _a;
-
-        // Initial guess: 1.0
-        uint256 xNew = one;
-        uint256 x;
-
-        uint iter = 0;
-        while (xNew != x && iter < _maxIts) {
-            x = xNew;
-            uint256 t0 = x ** (_n - 1);
-            if (x * t0 > a0) {
-                xNew = x - (x - a0 / t0) / _n;
-
-            } else {
-                xNew = x + (a0 / t0 - x) / _n;
-            }
-            ++iter;
-        }
-
-        // Round to nearest in the last dp.
-        return (xNew + 5) / 10;
-    }
-
-    
 }
 
-
-contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInterface {
-    
+contract Liquadity is
+    Upgradeable,
+    LiquadityFormula,
+    TokenTransfer,
+    InitializeInterface
+{
     function initialize(
         address _converter,
         address _baseToken,
@@ -468,16 +400,11 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
         address _systemAddress,
         address _authorityAddress,
         address _registeryAddress,
-        uint256 _baseLinePrice) public {
-            
-        
+        uint256 _baseLinePrice
+    ) public {
         super.initialize();
-        initializeOwner(
-            _primaryOwner,
-            _systemAddress,
-            _authorityAddress
-        );
-        
+        initializeOwner(_primaryOwner, _systemAddress, _authorityAddress);
+
         converter = _converter;
         baseLinePrice = _baseLinePrice;
         sideReseverRatio = 70;
@@ -485,22 +412,16 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
         tagAlongRatio = 100;
         reductionStartDay = 21;
         maxIteration = 35;
-        appreciationLimitWithDecimal = safeMul(120,DECIMAL_NOMINATOR);
+        appreciationLimitWithDecimal = safeMul(120, DECIMAL_NOMINATOR);
         baseTokenVolatiltyRatio = 5 * PRICE_NOMINATOR;
         baseToken = IERC20Token(_baseToken);
         mainToken = IERC20Token(_mainToken);
         relayToken = IERC20Token(_relayToken);
         contractsRegistry = IAuctionRegistery(_registeryAddress);
+        lastReserveBalance = baseToken.balanceOf(converter);
         tokenAuctionEndPrice = _getCurrentMarketPrice();
-        lastReserveBalance = IBancorConverter(converter).getReserveBalance(
-            baseToken
-        ); 
         _updateAddresses();
-        
-        
     }
-    
-    
 
     event Contribution(address _token, uint256 _amount, uint256 returnAmount);
 
@@ -511,17 +432,14 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
     event FundDeposited(address _token, address indexed _from, uint256 _amount);
 
     function _contributeWithEther(uint256 value) internal returns (uint256) {
-        
-        uint256 lastBalance = IBancorConverter(converter).getReserveBalance(
-            baseToken
-        );
-        
-        if(lastBalance != lastReserveBalance){
-            recoverPriceDueToManipulation();
+        uint256 lastBalance = baseToken.balanceOf(converter);
+        if (lastBalance != lastReserveBalance) {
+            _recoverPriceDueToManipulation();
         }
-        
-        uint256 returnAmount = IBancorConverter(converter).quickConvert2.value(value)
-        (ethToMainToken, value, 1, address(0), 0);
+
+        uint256 returnAmount = IBancorConverter(converter).quickConvert2.value(
+            value
+        )(ethToMainToken, value, 1, address(0), 0);
 
         ensureTransferFrom(
             ethToMainToken[safeSub(ethToMainToken.length, 1)],
@@ -539,9 +457,7 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
 
         checkAppeciationLimit();
 
-        lastReserveBalance = IBancorConverter(converter).getReserveBalance(
-            baseToken
-        );
+        lastReserveBalance = baseToken.balanceOf(converter);
 
         return returnAmount;
     }
@@ -552,34 +468,35 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
         internal
         returns (bool)
     {
-        
-        uint256 returnAmount ;
-        
-        if(etherTokens(address(_path[0]))){
-            returnAmount = IBancorConverter(converter).quickConvert2.value(value)
-            (_path, value, 1, address(0), 0);
-            
-        }else{
+        uint256 returnAmount;
+
+        if (etherTokens(address(_path[0]))) {
+            returnAmount = IBancorConverter(converter).quickConvert2.value(
+                value
+            )(_path, value, 1, address(0), 0);
+        } else {
             approveTransferFrom(_path[0], converter, value);
-             returnAmount = IBancorConverter(converter).quickConvert2.value(0)
-            (_path, value, 1, address(0), 0);
+            returnAmount = IBancorConverter(converter).quickConvert2.value(0)(
+                _path,
+                value,
+                1,
+                address(0),
+                0
+            );
         }
         IERC20Token returnToken = _path[safeSub(_path.length, 1)];
-        
+
         if (returnToken == mainToken) {
-            
             ensureTransferFrom(
                 returnToken,
                 address(this),
                 vaultAddress,
                 returnAmount
             );
-            
         } else {
-            
-            if(etherTokens(address(returnToken))){
+            if (etherTokens(address(returnToken))) {
                 tagAlongAddress.transfer(returnAmount);
-            }else{
+            } else {
                 ensureTransferFrom(
                     returnToken,
                     address(this),
@@ -589,21 +506,15 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
             }
         }
 
-        lastReserveBalance = IBancorConverter(converter).getReserveBalance(
-            baseToken
-        );
+        lastReserveBalance = baseToken.balanceOf(converter);
 
         return true;
     }
 
-    function checkAppeciationLimit()
-        internal
-        returns (bool)
-    {
-
+    function checkAppeciationLimit() internal returns (bool) {
         uint256 tokenCurrentPrice = _getCurrentMarketPrice();
         uint256 _appreciationReached = safeDiv(
-            safeMul(tokenCurrentPrice,safeMul(100,DECIMAL_NOMINATOR)),
+            safeMul(tokenCurrentPrice, safeMul(100, DECIMAL_NOMINATOR)),
             tokenAuctionEndPrice
         );
 
@@ -659,10 +570,7 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
     {
         if (virtualReserverDivisor > 0)
             mainReserverAmount = safeDiv(
-                safeMul(
-                    mainReserverAmount,
-                    DECIMAL_NOMINATOR
-                ),
+                safeMul(mainReserverAmount, DECIMAL_NOMINATOR),
                 virtualReserverDivisor
             );
 
@@ -683,17 +591,13 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
         );
 
         uint256 mainReserverAmount = safeSub(_amount, sideReseverAmount);
-        
         mainReserverAmount = _getMainReserveAmount(mainReserverAmount);
-        
-        if(isAppreciationLimitReached){
-           tagAlongAddress.transfer(mainReserverAmount);
-           return _getCurrentMarketPrice(); 
+        if (isAppreciationLimitReached) {
+            tagAlongAddress.transfer(mainReserverAmount);
+            return _getCurrentMarketPrice();
         }
-    
         uint256 tagAlongContribution = IAuctionTagAlong(tagAlongAddress)
             .contributeTowardLiquadity(mainReserverAmount);
-
         mainReserverAmount = safeAdd(tagAlongContribution, mainReserverAmount);
         _contributeWithEther(mainReserverAmount);
         return _getCurrentMarketPrice();
@@ -710,8 +614,7 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
         return _getCurrentMarketPrice();
     }
 
-    function recoverPriceVolatility() external returns (bool) {
-        
+    function recoverPriceVolatility() external onlySystem() returns (bool) {
         uint256 baseTokenPrice = ICurrencyPrices(currencyPricesAddress)
             .getCurrencyPrice(address(baseToken));
 
@@ -721,17 +624,14 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
 
         if (baseTokenPrice > baseLinePrice) {
             volatilty = safeDiv(
-                
                 safeMul(
                     safeSub(baseTokenPrice, baseLinePrice),
                     safeMul(100, PRICE_NOMINATOR)
                 ),
-                
                 baseTokenPrice
             );
             isMainToken = true;
-        } else if(baseLinePrice > baseTokenPrice) {
-            
+        } else if (baseLinePrice > baseTokenPrice) {
             volatilty = safeDiv(
                 safeMul(
                     safeSub(baseLinePrice, baseTokenPrice),
@@ -743,42 +643,34 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
         }
 
         if (volatilty >= baseTokenVolatiltyRatio) {
-            
             (uint256 returnBase, uint256 returnMain) = _liquadate(
                 volatilty,
                 false
             );
 
             if (isMainToken) {
-                
                 ITokenVault(vaultAddress).directTransfer(
                     address(mainToken),
                     converter,
                     returnMain
                 );
-                
             } else {
-                
                 IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
                     baseToken,
                     converter,
                     returnBase
                 );
-                
             }
         }
-        
+
         baseLinePrice = baseTokenPrice;
-        
-        lastReserveBalance = IBancorConverter(converter).getReserveBalance(
-            baseToken
-        );
+
+        lastReserveBalance = baseToken.balanceOf(converter);
 
         return true;
     }
 
-    function recoverPriceDueToManipulation() public returns (bool) {
-        
+    function _recoverPriceDueToManipulation() internal returns (bool) {
         uint256 volatilty;
 
         uint256 _baseTokenBalance = IBancorConverter(converter)
@@ -787,7 +679,6 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
         bool isMainToken;
 
         if (_baseTokenBalance > lastReserveBalance) {
-            
             volatilty = safeDiv(
                 safeMul(
                     safeSub(_baseTokenBalance, lastReserveBalance),
@@ -797,7 +688,7 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
             );
 
             isMainToken = true;
-        } 
+        }
 
         (uint256 returnBase, uint256 returnMain) = _liquadate(volatilty, false);
 
@@ -814,40 +705,48 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
                 returnBase
             );
         }
-        lastReserveBalance = IBancorConverter(converter).getReserveBalance(
-            baseToken
-        );
+        lastReserveBalance = baseToken.balanceOf(converter);
         return true;
+    }
+
+    function recoverPriceDueToManipulation()
+        external
+        onlySystem()
+        returns (bool)
+    {
+        return _recoverPriceDueToManipulation();
     }
 
     //recover price from main token
     // if there is not enough main token sell 10% relay
     // this is very rare case where vault dont have balance
-    // At 35th round we get excat value in fraction 
+    // At 35th round we get excat value in fraction
     // we dont value in decimal we already provide _percent with decimal
     function _priceRecoveryWithConvertMainToken(uint256 _percent)
         internal
         returns (bool)
     {
-        
-        uint256 tempX = safeDiv(_percent,appreciationLimit);
-        
-        uint256 root = nthRoot(tempX,2,0,maxIteration);
-        
-        uint256 _tempValue = safeSub(root,PRICE_NOMINATOR);
-        
+        uint256 tempX = safeDiv(_percent, appreciationLimit);
+
+        uint256 root = nthRoot(tempX, 2, 0, maxIteration);
+
+        uint256 _tempValue = safeSub(root, PRICE_NOMINATOR);
+
         uint256 _supply = mainToken.balanceOf(converter);
-        
-        uint256 _reverseBalance =  safeDiv(safeMul(_supply,_tempValue),PRICE_NOMINATOR);
-        
+
+        uint256 _reverseBalance = safeDiv(
+            safeMul(_supply, _tempValue),
+            PRICE_NOMINATOR
+        );
+
         uint256 vaultBalance = mainToken.balanceOf(vaultAddress);
-        
+
         if (vaultBalance >= _reverseBalance) {
-                ITokenVault(vaultAddress).directTransfer(
-                    address(mainToken),
-                    address(this),
-                    _reverseBalance
-                );
+            ITokenVault(vaultAddress).directTransfer(
+                address(mainToken),
+                address(this),
+                _reverseBalance
+            );
             return _convertWithToken(_reverseBalance, mainTokenTobaseToken);
         } else {
             uint256 converterBalance = mainToken.balanceOf(converter);
@@ -860,17 +759,13 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
                     ),
                     _reverseBalance
                 );
-            _liquadate(safeMul(relayPercent,PRICE_NOMINATOR), false);
+            _liquadate(safeMul(relayPercent, PRICE_NOMINATOR), false);
             return _priceRecoveryWithConvertMainToken(_percent);
         }
     }
 
-    function _recoverAfterRedemption(uint256 _amount)
-        internal
-        returns (bool)
-    {
-        
-        
+    function _recoverAfterRedemption(uint256 _amount) internal returns (bool) {
+        bool isEtherToken = false;
 
         (uint256 ethAmount, uint256 fee) = getReturnByPath(
             ethToBaseToken,
@@ -879,45 +774,49 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
 
         uint256 totalEthAmount = safeAdd(ethAmount, fee);
 
+        if (etherTokens(address(baseToken))) {
+            isEtherToken = true;
+            totalEthAmount = _amount;
+        }
+
         // if side resever have ether it will convert into bnt
 
         if (address(this).balance >= totalEthAmount) {
-            
-            uint256 returnAmount = IBancorConverter(converter)
-                .quickConvert2
-                .value(totalEthAmount)(
-                ethToBaseToken,
-                totalEthAmount,
-                1,
-                address(0),
-                0
-            );
-            
+            uint256 returnAmount = _amount;
+            if (isEtherToken)
+                IEtherToken(address(baseToken)).deposit.value(_amount)();
+            else
+                returnAmount = IBancorConverter(converter).quickConvert2.value(
+                    totalEthAmount
+                )(ethToBaseToken, totalEthAmount, 1, address(0), 0);
+
             return _convertWithToken(returnAmount, baseTokenToMainToken);
-            
         } else {
-            
             // tag alogn transfer remainn eth and recall this function
-            if (tagAlongAddress.balance >= safeSub(totalEthAmount, address(this).balance)) {
-                
+            if (
+                tagAlongAddress.balance >=
+                safeSub(totalEthAmount, address(this).balance)
+            ) {
                 IAuctionTagAlong(tagAlongAddress).contributeTowardLiquadity(
                     totalEthAmount
                 );
+                uint256 returnAmount = _amount;
 
-                uint256 returnAmount = IBancorConverter(converter)
-                    .quickConvert2
-                    .value(totalEthAmount)(
-                    ethToBaseToken,
-                    totalEthAmount,
-                    1,
-                    address(0),
-                    0
-                );
-            
-            return _convertWithToken(returnAmount, baseTokenToMainToken);
-                
+                if (isEtherToken)
+                    IEtherToken(address(baseToken)).deposit.value(_amount)();
+                else
+                    returnAmount = IBancorConverter(converter)
+                        .quickConvert2
+                        .value(totalEthAmount)(
+                        ethToBaseToken,
+                        totalEthAmount,
+                        1,
+                        address(0),
+                        0
+                    );
+
+                return _convertWithToken(returnAmount, baseTokenToMainToken);
             } else if (baseToken.balanceOf(tagAlongAddress) >= _amount) {
-                
                 //if tagAlong dont have eth we check baseToken
 
                 IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
@@ -927,7 +826,6 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
                 );
 
                 return _convertWithToken(_amount, baseTokenToMainToken);
-                
             } else {
                 // if taglong dont have that much we sell relay token
 
@@ -936,15 +834,15 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
 
                 uint256 relayPercent = 10;
 
-                if (converterBalance > _amount){
+                if (converterBalance > _amount) {
                     relayPercent = safeDiv(
                         safeMul(safeSub(converterBalance, _amount), 100),
                         _amount
                     );
-                    if(relayPercent > 99) relayPercent = 99 ;
+                    if (relayPercent > 99) relayPercent = 99;
                 }
 
-                _liquadate(safeMul(relayPercent,PRICE_NOMINATOR), false);
+                _liquadate(safeMul(relayPercent, PRICE_NOMINATOR), false);
 
                 _amount = safeSub(_amount, safeDiv(_amount, relayPercent));
 
@@ -963,38 +861,39 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
         public
         returns (bool)
     {
+        require(address(_path[0]) == address(mainToken), "ERR_MAIN_TOKEN");
+
         require(
-            address(_path[0]) == address(mainToken),
-            "ERR_MAIN_TOKEN"
+            IWhiteList(whiteListAddress).isAllowedBuyBack(msg.sender),
+            "ERR_NOT_ALLOWED_BUYBACK"
         );
-        
-        require(IWhiteList(whiteListAddress).isAllowedBuyBack(
-            msg.sender
-        ),"ERR_NOT_ALLOWED_BUYBACK");
-        
+
         address primaryWallet = IWhiteList(whiteListAddress).address_belongs(
             msg.sender
         );
-        
-        require(primaryWallet != address(0), "ERR_WHITELIST");
-        
-        
         uint256 auctionDay = IAuction(auctionAddress).auctionDay();
+
+        require(primaryWallet != address(0), "ERR_WHITELIST");
 
         require(
             auctionDay > lastReedeemDay[primaryWallet],
             "ERR_WALLET_ALREADY_REDEEM"
         );
 
+        uint256 _beforeBalance = baseToken.balanceOf(converter);
+
+        if (_beforeBalance != lastReserveBalance) {
+            _recoverPriceDueToManipulation();
+        }
+
         ensureTransferFrom(_path[0], msg.sender, address(this), _amount);
         approveTransferFrom(_path[0], converter, _amount);
 
-        uint256 _beforeBalance = baseToken.balanceOf(converter);
+        uint256 returnAmount = IBancorConverter(converter).quickConvert2.value(
+            0
+        )(_path, _amount, 1, address(0), 0);
 
-        uint256 returnAmount = IBancorConverter(converter).quickConvert2.value(0)
-        (_path, _amount, 1, address(0), 0);
-
-        if (etherTokens(address(_path[safeSub(_path.length,1)])))
+        if (etherTokens(address(_path[safeSub(_path.length, 1)])))
             msg.sender.transfer(returnAmount);
         else
             ensureTransferFrom(
@@ -1005,7 +904,7 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
             );
 
         lastReedeemDay[msg.sender] = auctionDay;
-        
+
         uint256 _afterBalance = baseToken.balanceOf(converter);
 
         emit Redemption(
@@ -1013,13 +912,11 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
             _amount,
             returnAmount
         );
-        
-        if(_beforeBalance > _afterBalance){
-            _recoverAfterRedemption(
-                safeSub(_beforeBalance, _afterBalance)
-            );
+
+        if (_beforeBalance > _afterBalance) {
+            _recoverAfterRedemption(safeSub(_beforeBalance, _afterBalance));
         }
-        
+
         return true;
     }
 
@@ -1028,8 +925,6 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
         allowedAddressOnly(msg.sender)
         returns (bool)
     {
-    
-        
         uint256 _baseTokenBalance = baseToken.balanceOf(converter);
 
         uint256 yesterdayMainReserv = safeDiv(
@@ -1072,6 +967,9 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
         internal
         returns (uint256, uint256)
     {
+        uint256 _mainTokenBalance = mainToken.balanceOf(address(this));
+        uint256 _baseTokenBalance = baseToken.balanceOf(address(this));
+
         uint256 sellRelay = safeDiv(
             safeMul(
                 relayToken.balanceOf(address(tagAlongAddress)),
@@ -1086,9 +984,6 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
             sellRelay
         );
 
-        uint256 _mainTokenBalance = mainToken.balanceOf(address(this));
-        uint256 _baseTokenBalance = baseToken.balanceOf(address(this));
-
         //take out both side of token from the reserve
         IBancorConverter(converter).liquidate(sellRelay);
 
@@ -1096,7 +991,7 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
             mainToken.balanceOf(address(this)),
             _mainTokenBalance
         );
-        
+
         _baseTokenBalance = safeSub(
             baseToken.balanceOf(address(this)),
             _baseTokenBalance
@@ -1109,13 +1004,15 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
             _mainTokenBalance
         );
 
-
         // if we need ether it covert into eth and sent it to tagalong
-        if (_convertToEth) {
+        if (etherTokens(address(baseToken))) {
+            IEtherToken(address(baseToken)).withdrawTo(
+                tagAlongAddress,
+                _baseTokenBalance
+            );
+        } else if (_convertToEth) {
             uint256 beforeEthBalance = address(this).balance;
-
             approveTransferFrom(baseToken, converter, _baseTokenBalance);
-
             IBancorConverter(converter).quickConvert2.value(0)(
                 baseTokenToEth,
                 _baseTokenBalance,
@@ -1140,9 +1037,13 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
     function getCurrencyPrice() public view returns (uint256) {
         return _getCurrentMarketPrice();
     }
-    
-    function liquidateFromSystem(uint256 _percent) external onlySystem() returns (bool) {
-        _liquadate(safeMul(_percent,PRICE_NOMINATOR), false);
+
+    function liquidateFromSystem(uint256 _percent)
+        external
+        onlySystem()
+        returns (bool)
+    {
+        _liquadate(safeMul(_percent, PRICE_NOMINATOR), false);
         return true;
     }
 
@@ -1169,15 +1070,12 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
         emit FundDeposited(address(_token), _from, _amount);
         return true;
     }
-    
-    
+
     //tesing purpose
-    function resetLiuqadity() external  onlyOwner() returns (bool) {
+    function resetLiuqadity() external onlyOwner() returns (bool) {
         tokenAuctionEndPrice = _getCurrentMarketPrice();
-        lastReserveBalance = IBancorConverter(converter).getReserveBalance(
-            baseToken
-        ); 
-        previousMainReserveContribution = 0;
+        lastReserveBalance = baseToken.balanceOf(converter);
+        previousMainReserveContribution = todayMainReserveContribution;
         todayMainReserveContribution = 0;
         tokenAuctionEndPrice = _getCurrentMarketPrice();
         isAppreciationLimitReached = false;
@@ -1186,7 +1084,6 @@ contract Liquadity is Upgradeable,LiquadityFormula, TokenTransfer,InitializeInte
 
     // emiting Event cause Problem in proxy
     function() external payable {
-      // emit FundDeposited(address(0), msg.sender, msg.value); 
+        // emit FundDeposited(address(0), msg.sender, msg.value);
     }
-
 }
