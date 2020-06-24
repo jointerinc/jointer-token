@@ -9,7 +9,6 @@ interface InitializeInterface {
     function initialize(
         uint256 _startTime,
         uint256 _minAuctionTime,
-        uint256 _interval,
         address _primaryOwner,
         address _systemAddress,
         address _multisigAddress,
@@ -72,7 +71,6 @@ contract AuctionRegistry is Ownable, IRegistry {
         uint256 version,
         uint256 _startTime,
         uint256 _minAuctionTime,
-        uint256 _interval,
         address _primaryOwner,
         address _systemAddress,
         address _multisigAddress,
@@ -85,7 +83,6 @@ contract AuctionRegistry is Ownable, IRegistry {
         InitializeInterface(address(proxy)).initialize(
             _startTime,
             _minAuctionTime,
-            _interval,
             _primaryOwner,
             _systemAddress,
             _multisigAddress,

@@ -1,4 +1,3 @@
-//It is work in progress. Not done yet
 const {
   constants,
   expectEvent,
@@ -7,9 +6,9 @@ const {
   BN,
 } = require("@openzeppelin/test-helpers");
 
-const {ZERO_ADDRESS} = constants;
+const { ZERO_ADDRESS } = constants;
 
-const {expect} = require("chai");
+const { expect } = require("chai");
 
 const {
   advanceTimeAndBlock,
@@ -27,6 +26,9 @@ const AuctionRegisty = artifacts.require("TestAuctionRegistery");
 const CurrencyPrices = artifacts.require("TestCurrencyPrices");
 const TokenVault = artifacts.require("TokenVault");
 const TokenVaultRegistry = artifacts.require("TokenVaultRegistery");
+const whiteListContract = artifacts.require("WhiteList");
+const WhiteListRegistry = artifacts.require("WhiteListRegistery");
+const TestAuction = artifacts.require("TestAuction")
 
 var SmartToken = require("./bancorArtifacts/SmartToken.json");
 var BancorConverterFactory = require("./bancorArtifacts/BancorConverterFactory.json");
@@ -40,6 +42,7 @@ var BancorNetworkPathFinder = require("./bancorArtifacts/BancorNetworkPathFinder
 var BancorConverterRegistry = require("./bancorArtifacts/BancorConverterRegistry.json");
 var BancorConverterRegistryData = require("./bancorArtifacts/BancorConverterRegistry.json");
 var EtherToken = require("./bancorArtifacts/EtherToken.json");
+const { italic } = require("ansi-colors");
 
 ContractRegistry = TruffleContract(ContractRegistry);
 SmartToken = TruffleContract(SmartToken);
@@ -73,11 +76,15 @@ const denominator = new BN(10).pow(new BN(18));
 const getWithDeimals = function (amount) {
   return new BN(amount).mul(denominator);
 };
+
 var one;
 var thousand;
 var hundread;
 var bancorNetwork;
 var ethToMainToken;
+var mainTokenTobaseToken
+var ethToBaseToken
+var baseTokenToMainToken
 var BNTToken;
 contract("~liquidity works", function (accounts) {
   const [
@@ -101,23 +108,23 @@ contract("~liquidity works", function (accounts) {
     bancorContracts.forEach((element) => {
       element.setProvider(web3.currentProvider);
     });
-    var contractRegistry = await ContractRegistry.new({from: accounts[0]});
-    var bancorFormula = await BancorFormula.new({from: accounts[0]});
-    var contractFeatures = await ContractFeatures.new({from: accounts[0]});
+    var contractRegistry = await ContractRegistry.new({ from: accounts[0] });
+    var bancorFormula = await BancorFormula.new({ from: accounts[0] });
+    var contractFeatures = await ContractFeatures.new({ from: accounts[0] });
     bancorNetwork = await BancorNetwork.new(contractRegistry.address, {
       from: accounts[0],
     });
     var bancorNetworkPathFinder = await BancorNetworkPathFinder.new(
       contractRegistry.address,
-      {from: accounts[0]}
+      { from: accounts[0] }
     );
     var bancorConverterRegistry = await BancorConverterRegistry.new(
       contractRegistry.address,
-      {from: accounts[0]}
+      { from: accounts[0] }
     );
     var bancorConverterRegistryData = await BancorConverterRegistryData.new(
       contractRegistry.address,
-      {from: accounts[0]}
+      { from: accounts[0] }
     );
     var etherToken = await EtherToken.new("ETHTOKEN", "ETHTOKEN", {
       from: accounts[0],
@@ -130,42 +137,42 @@ contract("~liquidity works", function (accounts) {
     await contractRegistry.registerAddress(
       web3.utils.asciiToHex("ContractRegistry"),
       contractRegistry.address,
-      {from: accounts[0]}
+      { from: accounts[0] }
     );
     await contractRegistry.registerAddress(
       web3.utils.asciiToHex("ContractFeatures"),
       contractFeatures.address,
-      {from: accounts[0]}
+      { from: accounts[0] }
     );
     await contractRegistry.registerAddress(
       web3.utils.asciiToHex("BancorFormula"),
       bancorFormula.address,
-      {from: accounts[0]}
+      { from: accounts[0] }
     );
     await contractRegistry.registerAddress(
       web3.utils.asciiToHex("BancorNetwork"),
       bancorNetwork.address,
-      {from: accounts[0]}
+      { from: accounts[0] }
     );
     await contractRegistry.registerAddress(
       web3.utils.asciiToHex("BancorNetworkPathFinder"),
       bancorNetworkPathFinder.address,
-      {from: accounts[0]}
+      { from: accounts[0] }
     );
     await contractRegistry.registerAddress(
       web3.utils.asciiToHex("BancorConverterRegistry"),
       bancorConverterRegistry.address,
-      {from: accounts[0]}
+      { from: accounts[0] }
     );
     await contractRegistry.registerAddress(
       web3.utils.asciiToHex("BancorConverterRegistryData"),
       bancorConverterRegistryData.address,
-      {from: accounts[0]}
+      { from: accounts[0] }
     );
     await contractRegistry.registerAddress(
       web3.utils.asciiToHex("BNTToken"),
       BNTToken.address,
-      {from: accounts[0]}
+      { from: accounts[0] }
     );
     //the etheretoken
     await bancorNetwork.registerEtherToken(etherToken.address, true, {
@@ -187,19 +194,19 @@ contract("~liquidity works", function (accounts) {
       30000,
       BNTToken.address,
       500000,
-      {from: accounts[0]}
+      { from: accounts[0] }
     );
 
     await converterEthBnt.addReserve(etherToken.address, 500000, {
       from: accounts[0],
     });
-    await converterEthBnt.setConversionFee(1000, {from: accounts[0]});
+    await converterEthBnt.setConversionFee(1000, { from: accounts[0] });
     //fund the EthBnt Pool woth initial tokens
     //to do that first get those two tokens
     await BNTToken.issue(accounts[0], thousand, {
       from: accounts[0],
     });
-    await etherToken.deposit({from: accounts[0], value: one});
+    await etherToken.deposit({ from: accounts[0], value: one });
     //now fund the pool
 
     await BNTToken.transfer(converterEthBnt.address, one, {
@@ -224,8 +231,8 @@ contract("~liquidity works", function (accounts) {
     });
 
     //Let's try and see if this eth-bnt pool works
-    await etherToken.deposit({from: accounts[3], value: 10});
-    await etherToken.approve(converterEthBnt.address, 10, {from: accounts[3]});
+    await etherToken.deposit({ from: accounts[3], value: 10 });
+    await etherToken.approve(converterEthBnt.address, 10, { from: accounts[3] });
 
     await converterEthBnt.quickConvert2(
       [etherToken.address, smartTokenEthBnt.address, BNTToken.address],
@@ -233,7 +240,7 @@ contract("~liquidity works", function (accounts) {
       1,
       ZERO_ADDRESS,
       0,
-      {from: accounts[3]}
+      { from: accounts[3] }
     );
 
     // console.log(
@@ -306,7 +313,7 @@ contract("~liquidity works", function (accounts) {
       30000,
       BNTToken.address,
       500000,
-      {from: accounts[0]}
+      { from: accounts[0] }
     );
 
     this.converter = await BancorConverter.at(receipt.logs[0].args._converter, {
@@ -432,17 +439,17 @@ contract("~liquidity works", function (accounts) {
       this.jntrToken.address,
     ];
 
-    let baseTokenToMainToken = [
+    baseTokenToMainToken = [
       BNTToken.address,
       this.smartToken.address,
       this.jntrToken.address,
     ];
-    let mainTokenTobaseToken = [
+    mainTokenTobaseToken = [
       this.jntrToken.address,
       this.smartToken.address,
       BNTToken.address,
     ];
-    let ethToBaseToken = [
+    ethToBaseToken = [
       etherToken.address,
       smartTokenEthBnt.address,
       BNTToken.address,
@@ -458,22 +465,22 @@ contract("~liquidity works", function (accounts) {
     this.auctionRegistry = await AuctionRegisty.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     //tagAlong
     this.tagAlong = await AuctionTagAlong.new(
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     //the TokenVault
     var tokenVaultRegistry = await TokenVaultRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
-    let tempTokenVault = await TokenVault.new({from: primaryOwner});
+    let tempTokenVault = await TokenVault.new({ from: primaryOwner });
     await tokenVaultRegistry.addVersion(1, tempTokenVault.address, {
       from: primaryOwner,
     });
@@ -483,7 +490,7 @@ contract("~liquidity works", function (accounts) {
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     let proxyAddress = await tokenVaultRegistry.proxyAddress();
     this.tokenVault = await TokenVault.at(proxyAddress);
@@ -492,8 +499,40 @@ contract("~liquidity works", function (accounts) {
     this.currencyPrices = await CurrencyPrices.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
+
+    //the whiteList
+    let stockTokenMaturityDays = 3560;
+    let tokenMaturityDays = 0;
+    let tokenHoldBackDays = 90;
+    var whiteListRegistry = await WhiteListRegistry.new(
+      systemAddress,
+      multiSigPlaceHolder,
+      { from: primaryOwner }
+    );
+    let tempWhiteList = await whiteListContract.new();
+    await whiteListRegistry.addVersion(1, tempWhiteList.address, {
+      from: primaryOwner,
+    });
+
+    // txTimestamp = (await web3.eth.getBlock("latest")).timestamp;
+    await whiteListRegistry.createProxy(
+      1,
+      primaryOwner,
+      systemAddress,
+      multiSigPlaceHolder,
+      tokenHoldBackDays,
+      tokenHoldBackDays,
+      tokenHoldBackDays,
+      tokenMaturityDays,
+      tokenMaturityDays,
+      stockTokenMaturityDays,
+      { from: primaryOwner }
+    );
+
+    proxyAddress = await whiteListRegistry.proxyAddress();
+    this.whiteList = await whiteListContract.at(proxyAddress);
 
     await this.auctionRegistry.registerContractAddress(
       web3.utils.fromAscii("TAG_ALONG"),
@@ -523,14 +562,21 @@ contract("~liquidity works", function (accounts) {
         from: primaryOwner,
       }
     );
+    await this.auctionRegistry.registerContractAddress(
+      web3.utils.fromAscii("WHITE_LIST"),
+      this.whiteList.address,
+      {
+        from: primaryOwner,
+      }
+    );
     //deploying the liquidity
     let baseLinePrice = 1000000; //1$
     var liquidityRegistry = await LiquidityRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
-    let tempLiquidity = await Liquidity.new({from: primaryOwner});
+    let tempLiquidity = await Liquidity.new({ from: primaryOwner });
     await liquidityRegistry.addVersion(1, tempLiquidity.address, {
       from: primaryOwner,
     });
@@ -545,17 +591,17 @@ contract("~liquidity works", function (accounts) {
       multiSigPlaceHolder,
       this.auctionRegistry.address,
       baseLinePrice,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     proxyAddress = await liquidityRegistry.proxyAddress();
     this.liquidity = await Liquidity.at(proxyAddress);
 
     //set the paths
-    this.liquidity.setTokenPath(0, ethToMainToken, {from: systemAddress});
-    this.liquidity.setTokenPath(1, baseTokenToMainToken, {from: systemAddress});
-    this.liquidity.setTokenPath(2, mainTokenTobaseToken, {from: systemAddress});
-    this.liquidity.setTokenPath(3, ethToBaseToken, {from: systemAddress});
-    this.liquidity.setTokenPath(4, baseTokenToEth, {from: systemAddress});
+    this.liquidity.setTokenPath(0, ethToMainToken, { from: systemAddress });
+    this.liquidity.setTokenPath(1, baseTokenToMainToken, { from: systemAddress });
+    this.liquidity.setTokenPath(2, mainTokenTobaseToken, { from: systemAddress });
+    this.liquidity.setTokenPath(3, ethToBaseToken, { from: systemAddress });
+    this.liquidity.setTokenPath(4, baseTokenToEth, { from: systemAddress });
 
     // this.liquidity = await Liquidity.new(
     //   this.converter.address,
@@ -585,111 +631,481 @@ contract("~liquidity works", function (accounts) {
     await this.liquidity.updateAddresses();
     await this.tokenVault.updateAddresses();
     await this.tagAlong.updateAddresses();
+    //Add liquidity address as a spender in tokenVault
+    await this.tokenVault.addSpender(this.liquidity.address, {
+      from: multiSigPlaceHolder,
+    });
   });
-  it("Bancor should setup correctly", async function () {});
-  // it("contributing with Eth should work correctly", async function () {
-  //   let contributeAmount = new BN(1000);
-  //   //only auction should be able to call this function
-  //   await expectRevert(
-  //     this.liquidity.contributeWithEther({
-  //       from: other1,
-  //       value: contributeAmount,
-  //     }),
-  //     "ERR_AUTHORIZED_ADDRESS_ONLY"
-  //   );
-  //   let receipt = await this.liquidity.contributeWithEther({
-  //     from: auctionPlaceHolder,
-  //     value: contributeAmount,
-  //   });
-  //   let sideReserveRatio = await this.liquidity.sideReseverRatio();
-  //   let sideReserveAmount = contributeAmount
-  //     .mul(sideReserveRatio)
-  //     .div(new BN(100));
-  //   let mainReserveAmount = contributeAmount.sub(sideReserveAmount);
-
-  //   mainReserveAmount = mainReserveAmount.add(
-  //     await balance.current(this.tokenVault.address)
-  //   );
-
-  //   let tempAmounts = await bancorNetwork.getReturnByPath(
-  //     ethToMainToken,
-  //     mainReserveAmount
-  //   );
-
-  //   let vaultBalanceJntr = await this.jntrToken.balanceOf(
-  //     this.tokenVault.address
-  //   );
-  //   expect(tempAmounts[0]).to.be.bignumber.equal(vaultBalanceJntr);
-  //   expectEvent(receipt, "Contribution", {
-  //     _token: ZERO_ADDRESS,
-  //     _amount: mainReserveAmount,
-  //     returnAmount: tempAmounts[0],
-  //   });
-  //   //The checkAppreciationLimit function is very complecated
-  //   //need to understand it
-
-  //   // expect(await this.liquidity.lastReserveBalance()).to.be.bignumber.equal(
-  //   //   await this.converter.getReserveBalance(this.jntrToken.address)
-  //   // );
-  // });
-  it("recovering price volatility should work", async function () {
-    //Alright what we are doing here is recoving JNTR price to 1$
-    //Lets do it as per the example in the TD
-
-    //the baseLine price is set to 1000000(1$)
-
-    //First get the price of Jntr
-    let baseReserveBefore = await this.converter.getReserveBalance(
-      BNTToken.address
+  it("Bancor should setup correctly", async function () { });
+  it("contributing with Eth should work correctly", async function () {
+    let contributeAmount = new BN(1000);
+    //only auction should be able to call this function
+    await expectRevert(
+      this.liquidity.contributeWithEther({
+        from: other1,
+        value: contributeAmount,
+      }),
+      "ERR_AUTHORIZED_ADDRESS_ONLY"
     );
-    let mainReserveBefore = await this.converter.getReserveBalance(
-      this.jntrToken.address
-    );
-    let tempBaseReserveRatioBefore = await this.converter.reserves(
-      BNTToken.address
-    );
-    let tempMainReserveRatioBefore = await this.converter.reserves(
-      this.jntrToken.address
-    );
-    console.log("before");
-    console.log(tempBaseReserveRatioBefore[1].toString());
-    console.log(tempMainReserveRatioBefore[1].toString());
+    let receipt = await this.liquidity.contributeWithEther({
+      from: auctionPlaceHolder,
+      value: contributeAmount,
+    });
+    let sideReserveRatio = await this.liquidity.sideReseverRatio();
+    let sideReserveAmount = contributeAmount
+      .mul(sideReserveRatio)
+      .div(new BN(100));
+    let mainReserveAmount = contributeAmount.sub(sideReserveAmount);
 
-    console.log(baseReserveBefore.toString());
-    console.log(mainReserveBefore.toString());
+    //Here we are taking and extra mainReserveAmount out of the tokenVault
+    let tagAlongEthBalance = await balance.current(this.tagAlong.address);
 
-    //lets set the price as 1.03$ and nothing should change
-    await this.currencyPrices.setCurrencyPriceUSD(
-      [BNTToken.address],
-      [1030000],
-      {from: systemAddress}
-    );
-    console.log(await this.liquidity.currencyPricesAddress());
+    if (mainReserveAmount <= tagAlongEthBalance)
+      mainReserveAmount = mainReserveAmount.add(mainReserveAmount);
+    else mainReserveAmount = mainReserveAmount.add(tagAlongEthBalance);
 
-    await this.liquidity.recoverPriceVolatility();
+    //mainReserveAmount + whatever tagAlong gave us gets converted into JNTR through bancor
+    let tempAmounts = await bancorNetwork.getReturnByPath(
+      ethToMainToken,
+      mainReserveAmount
+    );
+    console.log(await this.liquidity.isAppreciationLimitReached())
+    //Now we have added eth and taken out jntr and given them to the tokenVault
+    let vaultBalanceJntr = await this.jntrToken.balanceOf(
+      this.tokenVault.address
+    );
+    expect(tempAmounts[0]).to.be.bignumber.equal(vaultBalanceJntr);
+    expectEvent(receipt, "Contribution", {
+      _token: ZERO_ADDRESS,
+      _amount: mainReserveAmount,
+      returnAmount: tempAmounts[0],
+    });
+    //The checkAppreciationLimit function is very complecated
+    //need to understand it
 
-    console.log("after");
-    baseReserveAfter = await this.converter.getReserveBalance(BNTToken.address);
-    mainReserveAfter = await this.converter.getReserveBalance(
-      this.jntrToken.address
-    );
-    tempBaseReserveRatioAfter = await this.converter.reserves(BNTToken.address);
-    tempMainReserveRatioAfter = await this.converter.reserves(
-      this.jntrToken.address
-    );
-    expect(baseReserveBefore).to.be.bignumber.equal(baseReserveAfter);
-    expect(mainReserveBefore).to.be.bignumber.equal(mainReserveAfter);
-    expect(tempBaseReserveRatioBefore[1]).to.be.bignumber.equal(
-      tempBaseReserveRatioAfter[1]
-    );
-    expect(tempMainReserveRatioBefore[1]).to.be.bignumber.equal(
-      tempBaseReserveRatioAfter[1]
-    );
-
-    console.log(tempBaseReserveRatioAfter[1].toString());
-    console.log(tempMainReserveRatioAfter[1].toString());
-
-    console.log(baseReserveAfter.toString());
-    console.log(mainReserveAfter.toString());
+    // expect(await this.liquidity.lastReserveBalance()).to.be.bignumber.equal(
+    //   await this.converter.getReserveBalance(this.jntrToken.address)
+    // );
   });
+  describe("Jntr price recovery", async function () {
+    const calculateJntrPrice = async function (
+      baseReserve,
+      mainReserve,
+      BaseReserveRatio,
+      MainReserveRatio,
+      bntPrice
+    ) {
+      let bntRatio = baseReserve.div(BaseReserveRatio);
+      let jntrRatio = mainReserve.div(MainReserveRatio);
+      // console.log("bntRatio\t" + bntRatio);
+      // console.log("jntrRatio\t" + jntrRatio);
+
+      let jntrPrice;
+      //the constant one is 10^18 to prevent the loss of precision
+      nominator = one;
+      // console.log(nominator.toString());
+      // console.log(bntPrice.toString());
+      jntrPrice = bntPrice
+        .mul(bntRatio.mul(nominator).div(jntrRatio))
+        .div(nominator);
+
+      return jntrPrice;
+    };
+    var baseReserveRatio;
+    var mainReserveRatio;
+    var bntPriceBefore;
+    var snapId;
+    beforeEach(async function () {
+      let tempBaseReserveRatio = await this.converter.reserves(
+        BNTToken.address
+      );
+      let tempMainReserveRatio = await this.converter.reserves(
+        this.jntrToken.address
+      );
+      baseReserveRatio = tempBaseReserveRatio[1];
+      mainReserveRatio = tempMainReserveRatio[1];
+      bntPriceBefore = new BN(1000000);
+      await this.currencyPrices.setCurrencyPriceUSD(
+        [BNTToken.address],
+        [bntPriceBefore],
+        { from: systemAddress }
+      );
+      //Lets give the tagAlong all the relay tokens(all two of them)
+      await this.smartToken.approve(this.tagAlong.address, one.mul(new BN(2)), {
+        from: accounts[0],
+      });
+      await this.tagAlong.depositeToken(
+        this.smartToken.address,
+        accounts[0],
+        one.mul(new BN(2)),
+        {
+          from: accounts[0],
+        }
+      );
+      // console.log(snapId);
+      if (snapId == undefined) snapId = (await takeSnapshot()).result;
+    });
+    it("recovering price volatility should work", async function () {
+      //Alright what we are doing here is recoving JNTR price to 1$
+      //Lets do it as per the example in the TD
+
+      //the baseLine price is set to 1000000(1$)
+
+      //First get the price of Jntr
+      //Case I: price of Bnt is not increased or decreased more than 5%
+      let baseReserveBefore = await this.converter.getReserveBalance(
+        BNTToken.address
+      );
+      let mainReserveBefore = await this.converter.getReserveBalance(
+        this.jntrToken.address
+      );
+
+      //lets set the price as 1.03$ and nothing should change
+      await this.currencyPrices.setCurrencyPriceUSD(
+        [BNTToken.address],
+        [1030000],
+        { from: systemAddress }
+      );
+
+      await this.liquidity.recoverPriceVolatility();
+
+      let baseReserveAfter = await this.converter.getReserveBalance(
+        BNTToken.address
+      );
+      let mainReserveAfter = await this.converter.getReserveBalance(
+        this.jntrToken.address
+      );
+
+      expect(baseReserveBefore).to.be.bignumber.equal(baseReserveAfter);
+      expect(mainReserveBefore).to.be.bignumber.equal(mainReserveAfter);
+
+      // //case-II Price of BNT is increased more than 5%
+      // //What should happen?? The price of bnt increases meaning the same jntr got by x$ bnt now costs more
+      // //Meaning the price of jntr also increased
+      // //What should happen? Price of jntr should reamin the same
+      // //What we do?
+      // //We need to sell the realy tokens i.e. supply of both jntr and bnt is decreased
+      // //Now increase the suplly of jntr get back the price jntr to expected one
+      // baseReserveBefore = await this.converter.getReserveBalance(
+      //   BNTToken.address
+      // );
+      // mainReserveBefore = await this.converter.getReserveBalance(
+      //   this.jntrToken.address
+      // );
+
+      // console.log("before");
+
+      // console.log(baseReserveBefore.toString());
+      // console.log(mainReserveBefore.toString());
+
+      //for the test to work in current condition we have to take the snapshot
+      //Which we should not have to
+
+      //calculate the jntr price
+      let jntrPriceBefore = await calculateJntrPrice(
+        baseReserveBefore,
+        mainReserveBefore,
+        baseReserveRatio,
+        mainReserveRatio,
+        bntPriceBefore
+      );
+      // console.log("jntrPrcie:" + jntrPriceBefore);
+      let bntPriceAfter = new BN(1060000);
+      //lets set the price as 1.06$
+      await this.currencyPrices.setCurrencyPriceUSD(
+        [BNTToken.address],
+        [bntPriceAfter],
+        { from: systemAddress }
+      );
+      // console.log(
+      //   "Before balance of tagalong of bnt" +
+      //     (await BNTToken.balanceOf(this.tagAlong.address)).toString()
+      // );
+
+      await this.liquidity.recoverPriceVolatility();
+
+      // console.log("after");
+
+      baseReserveAfter = await this.converter.getReserveBalance(
+        BNTToken.address
+      );
+      mainReserveAfter = await this.converter.getReserveBalance(
+        this.jntrToken.address
+      );
+      let jntrPriceAfter = await calculateJntrPrice(
+        baseReserveAfter,
+        mainReserveAfter,
+        baseReserveRatio,
+        mainReserveRatio,
+        bntPriceAfter
+      );
+      //the price after should almost 1 $
+      expect(jntrPriceAfter).to.be.bignumber.closeTo(
+        new BN(999998),
+        new BN(1111111)
+      );
+
+      // console.log(
+      //   "After balance of tagalong of bnt(should be increased)" +
+      //     (await BNTToken.balanceOf(this.tagAlong.address)).toString()
+      // );
+      //lets get back
+      await revertToSnapshot(snapId);
+      //case-III Price of jntr is decresed more than 6%
+      baseReserveBefore = await this.converter.getReserveBalance(
+        BNTToken.address
+      );
+      mainReserveBefore = await this.converter.getReserveBalance(
+        this.jntrToken.address
+      );
+
+      // console.log("before");
+
+      // console.log(baseReserveBefore.toString());
+      // console.log(mainReserveBefore.toString());
+
+      //calculate the jntr price
+      jntrPriceBefore = await calculateJntrPrice(
+        baseReserveBefore,
+        mainReserveBefore,
+        baseReserveRatio,
+        mainReserveRatio,
+        bntPriceBefore
+      );
+      // console.log("jntrPrcie:" + jntrPriceBefore);
+      bntPriceAfter = new BN(940000);
+      //lets set the price as 1.06$
+      await this.currencyPrices.setCurrencyPriceUSD(
+        [BNTToken.address],
+        [bntPriceAfter],
+        { from: systemAddress }
+      );
+      // console.log(
+      //   "Before balance of tagalong of bnt" +
+      //     (await BNTToken.balanceOf(this.tagAlong.address)).toString()
+      // );
+
+      await this.liquidity.recoverPriceVolatility();
+
+      // console.log("after");
+
+      baseReserveAfter = await this.converter.getReserveBalance(
+        BNTToken.address
+      );
+      mainReserveAfter = await this.converter.getReserveBalance(
+        this.jntrToken.address
+      );
+      jntrPriceAfter = await calculateJntrPrice(
+        baseReserveAfter,
+        mainReserveAfter,
+        baseReserveRatio,
+        mainReserveRatio,
+        bntPriceAfter
+      );
+      expect(jntrPriceAfter).to.be.bignumber.closeTo(
+        new BN(999998),
+        new BN(1111111)
+      );
+      // console.log("jntrPrcie:" + jntrPriceAfter);
+
+      // console.log(baseReserveAfter.toString());
+      // console.log(mainReserveAfter.toString());
+
+      // console.log(
+      //   "After balance of vault of bnt(should be increased)"
+      //
+      // );
+    });
+
+    it("should recover price correctly when attacker adds bnt to the pool", async function () {
+      //lets get back first
+      await revertToSnapshot(snapId);
+      let baseReserveBefore = await this.converter.getReserveBalance(
+        BNTToken.address
+      );
+      let mainReserveBefore = await this.converter.getReserveBalance(
+        this.jntrToken.address
+      );
+
+      // console.log("before");
+
+      // console.log(baseReserveBefore.toString());
+      // console.log(mainReserveBefore.toString());
+
+      //calculate the jntr price
+      let jntrPriceBefore = await calculateJntrPrice(
+        baseReserveBefore,
+        mainReserveBefore,
+        baseReserveRatio,
+        mainReserveRatio,
+        bntPriceBefore
+      );
+      // console.log("jntrPrice:" + jntrPriceBefore);
+
+      //lets add transfer some bnt to the pool by a supposed attacked
+      BNTToken.transfer(this.converter.address, one.div(new BN(10)), {
+        from: accounts[0],
+      });
+      let lastReserveBalance = await this.liquidity.lastReserveBalance();
+      // console.log(lastReserveBalance.toString());
+
+      await this.liquidity.recoverPriceDueToManipulation();
+
+      // console.log("after");
+
+      let baseReserveAfter = await this.converter.getReserveBalance(
+        BNTToken.address
+      );
+      let mainReserveAfter = await this.converter.getReserveBalance(
+        this.jntrToken.address
+      );
+      let jntrPriceAfter = await calculateJntrPrice(
+        baseReserveAfter,
+        mainReserveAfter,
+        baseReserveRatio,
+        mainReserveRatio,
+        bntPriceBefore //same as last time becuse here manipulation is due to pool
+      );
+      //because there may be precision loss but it should be close to 1$
+      expect(jntrPriceAfter).to.be.bignumber.closeTo(
+        new BN(999998),
+        new BN(1000001)
+      );
+      // console.log("jntrPrcie:" + jntrPriceAfter);
+
+      // console.log(baseReserveAfter.toString());
+      // console.log(mainReserveAfter.toString());
+    });
+
+
+  });
+
+  //tests for redemption
+  //What does the _recoverAfterRedemption do
+  //This test is still remianing
+  describe("Redemption works", async function () {
+    const IS_ALLOWED_BUYBACK = 1 << 5;
+    const KYC = 1 << 0; //0x01
+    const AML = 1 << 1; //0x02
+
+    var auction;
+    const contributeAmount = new BN(10000);
+    beforeEach(async function () {
+      //lets deploy test auction for when liquidity calls it for auctionDay()
+      auction = await TestAuction.new()
+      await this.auctionRegistry.updateContractAddress(
+        web3.utils.fromAscii("AUCTION"),
+        auction.address,
+        {
+          from: multiSigPlaceHolder,
+        }
+      );
+      await this.liquidity.updateAddresses()
+      //Account should be whiteListed and it should be allowed to buy back
+      let flags1 = IS_ALLOWED_BUYBACK | KYC | AML;
+      let flags2 = KYC | AML
+      let maxWallets = 10;
+      await this.whiteList.addNewWallet(accountA, flags1, maxWallets, { from: systemAddress })
+      //the accountB is just to check one negative condition of isAllowedBuyBack()
+      await this.whiteList.addNewWallet(accountB, flags2, maxWallets, { from: systemAddress })
+
+      //lets give these guys some jntr
+      await this.jntrToken.transfer(accountA, contributeAmount, { from: accounts[0] })
+      await this.jntrToken.transfer(accountB, contributeAmount, { from: accounts[0] })
+
+
+      await this.jntrToken.approve(this.liquidity.address, contributeAmount, { from: accountA })
+      await this.jntrToken.approve(this.liquidity.address, contributeAmount, { from: accountB })
+
+
+    })
+    //case-I side reserve has enough ether
+
+    it("When side reserve has enough ether", async function () {
+      // let baseReserveBefore = await this.converter.getReserveBalance(
+      //   BNTToken.address
+      // );
+      // let mainReserveBefore = await this.converter.getReserveBalance(
+      //   this.jntrToken.address
+      // );
+
+      // console.log("before");
+
+      // console.log(baseReserveBefore.toString());
+      // console.log(mainReserveBefore.toString());
+      // console.log((await BNTToken.balanceOf(accountA)).toString())
+
+      ///here the side reserve has some ether
+      await this.liquidity.sendTransaction({ from: other1, value: contributeAmount })
+      //I need to know first how many BNT are we taking out
+      //To calculate the exact things
+
+      //should revert if address is not allowed to buyback
+      await expectRevert(this.liquidity.redemption(mainTokenTobaseToken, contributeAmount, { from: accountB }), "ERR_NOT_ALLOWED_BUYBACK")
+
+      //accountA comes for redemption of its JNTR
+      //He wants to convert JNTR into either BNT or ether 
+      //In this case BNT
+      let receipt = await this.liquidity.redemption(mainTokenTobaseToken, contributeAmount, { from: accountA })
+
+      let balanceBNTAccountA = await BNTToken.balanceOf(accountA)
+      //redemption event should be fired
+      expectEvent(receipt, "Redemption", { _token: BNTToken.address, _amount: contributeAmount, returnAmount: balanceBNTAccountA })
+
+
+
+
+      // let baseReserveAfter = await this.converter.getReserveBalance(
+      //   BNTToken.address
+      // );
+      // let mainReserveAfter = await this.converter.getReserveBalance(
+      //   this.jntrToken.address
+      // );
+      // console.log(baseReserveAfter.toString());
+      // console.log(mainReserveAfter.toString());
+
+      // //lets check what happens internally is correct or not
+      // let a = await bancorNetwork.getReturnByPath(ethToBaseToken, balanceBNTAccountA)
+      // console.log(a[0].toString())
+      // console.log(a[1].toString())
+
+      // let b = await bancorNetwork.getReturnByPath(baseTokenToMainToken, a[0] + a[1])
+      // console.log((b[0]).toString())
+
+      // console.log((await balance.current(this.liquidity.address)).toString())
+
+      // let tagAlongBalanceJntr = await this.jntrToken.balanceOf(this.tokenVault.address)
+      // console.log(tagAlongBalanceJntr.toString())
+    })
+    it("when side reserve does not have enough eth (we take them from tagAlong)", async function () {
+      console.log((await balance.current(this.tagAlong.address)).toString())
+
+      await this.tagAlong.sendTransaction({ from: other1, value: contributeAmount })
+      let receipt = await this.liquidity.redemption(mainTokenTobaseToken, contributeAmount, { from: accountA })
+      // expectEvent(receipt, "Redemption", { _token: BNTToken.address, _amount: contributeAmount, returnAmount: balanceBNTAccountA })
+    })
+    //case-III when tagAlong does not enough eth either but has bnt we require
+    it("when tagAlong does not have enough eth either", async function () {
+      await BNTToken.transfer(this.tagAlong.address, contributeAmount, { from: accounts[0] })
+
+      let receipt = await this.liquidity.redemption(mainTokenTobaseToken, contributeAmount, { from: accountA })
+    })
+    // case-IV when tagAlogn does not have ether or bnt we sell 10% relay
+    it("when tagAlong does not have ether or bnt(we sell 10% relay)", async function () {
+      //Lets give the tagAlong all the relay tokens(all two of them)
+      await this.smartToken.approve(this.tagAlong.address, one.mul(new BN(2)), {
+        from: accounts[0],
+      });
+      await this.tagAlong.depositeToken(
+        this.smartToken.address,
+        accounts[0],
+        one.mul(new BN(2)),
+        {
+          from: accounts[0],
+        }
+      );
+
+      let receipt = await this.liquidity.redemption(mainTokenTobaseToken, contributeAmount, { from: accountA })
+    })
+  })
 });

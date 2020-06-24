@@ -72,7 +72,7 @@ contract UtilsStorage {
     mapping(address => bool) public tokenAllowed;
 
     mapping(address => bool) public unLockBlock;
-
+    
     uint256 public vaultRatio;
 }
 
@@ -308,7 +308,11 @@ contract AuctionProtection is Upgradeable, Stacking {
         contractsRegistry = IAuctionRegistery(_registeryAddress);
         tokenLockDuration = 365;
         stackRoundId = 1;
-        initializeOwner(_primaryOwner, _systemAddress, _authorityAddress);
+        initializeOwner(
+            _primaryOwner,
+            _systemAddress,
+            _authorityAddress
+        );
         _updateAddresses();
         vaultRatio = 90;
     }
