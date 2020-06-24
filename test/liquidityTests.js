@@ -1,4 +1,3 @@
-//It is work in progress. Not done yet
 const {
   constants,
   expectEvent,
@@ -27,6 +26,9 @@ const AuctionRegisty = artifacts.require("TestAuctionRegistery");
 const CurrencyPrices = artifacts.require("TestCurrencyPrices");
 const TokenVault = artifacts.require("TokenVault");
 const TokenVaultRegistry = artifacts.require("TokenVaultRegistery");
+const whiteListContract = artifacts.require("WhiteList");
+const WhiteListRegistry = artifacts.require("WhiteListRegistery");
+const TestAuction = artifacts.require("TestAuction")
 
 var SmartToken = require("./bancorArtifacts/SmartToken.json");
 var BancorConverterFactory = require("./bancorArtifacts/BancorConverterFactory.json");
@@ -80,6 +82,9 @@ var thousand;
 var hundread;
 var bancorNetwork;
 var ethToMainToken;
+var mainTokenTobaseToken
+var ethToBaseToken
+var baseTokenToMainToken
 var BNTToken;
 contract("~liquidity works", function (accounts) {
   const [
@@ -434,17 +439,17 @@ contract("~liquidity works", function (accounts) {
       this.jntrToken.address,
     ];
 
-    let baseTokenToMainToken = [
+    baseTokenToMainToken = [
       BNTToken.address,
       this.smartToken.address,
       this.jntrToken.address,
     ];
-    let mainTokenTobaseToken = [
+    mainTokenTobaseToken = [
       this.jntrToken.address,
       this.smartToken.address,
       BNTToken.address,
     ];
-    let ethToBaseToken = [
+    ethToBaseToken = [
       etherToken.address,
       smartTokenEthBnt.address,
       BNTToken.address,
@@ -497,6 +502,38 @@ contract("~liquidity works", function (accounts) {
       { from: primaryOwner }
     );
 
+    //the whiteList
+    let stockTokenMaturityDays = 3560;
+    let tokenMaturityDays = 0;
+    let tokenHoldBackDays = 90;
+    var whiteListRegistry = await WhiteListRegistry.new(
+      systemAddress,
+      multiSigPlaceHolder,
+      { from: primaryOwner }
+    );
+    let tempWhiteList = await whiteListContract.new();
+    await whiteListRegistry.addVersion(1, tempWhiteList.address, {
+      from: primaryOwner,
+    });
+
+    // txTimestamp = (await web3.eth.getBlock("latest")).timestamp;
+    await whiteListRegistry.createProxy(
+      1,
+      primaryOwner,
+      systemAddress,
+      multiSigPlaceHolder,
+      tokenHoldBackDays,
+      tokenHoldBackDays,
+      tokenHoldBackDays,
+      tokenMaturityDays,
+      tokenMaturityDays,
+      stockTokenMaturityDays,
+      { from: primaryOwner }
+    );
+
+    proxyAddress = await whiteListRegistry.proxyAddress();
+    this.whiteList = await whiteListContract.at(proxyAddress);
+
     await this.auctionRegistry.registerContractAddress(
       web3.utils.fromAscii("TAG_ALONG"),
       this.tagAlong.address,
@@ -521,6 +558,13 @@ contract("~liquidity works", function (accounts) {
     await this.auctionRegistry.registerContractAddress(
       web3.utils.fromAscii("CURRENCY"),
       this.currencyPrices.address,
+      {
+        from: primaryOwner,
+      }
+    );
+    await this.auctionRegistry.registerContractAddress(
+      web3.utils.fromAscii("WHITE_LIST"),
+      this.whiteList.address,
       {
         from: primaryOwner,
       }
@@ -932,7 +976,136 @@ contract("~liquidity works", function (accounts) {
       // console.log(baseReserveAfter.toString());
       // console.log(mainReserveAfter.toString());
     });
-    //tests for redemption is remaining
+
 
   });
+
+  //tests for redemption
+  //What does the _recoverAfterRedemption do
+  //This test is still remianing
+  describe("Redemption works", async function () {
+    const IS_ALLOWED_BUYBACK = 1 << 5;
+    const KYC = 1 << 0; //0x01
+    const AML = 1 << 1; //0x02
+
+    var auction;
+    const contributeAmount = new BN(10000);
+    beforeEach(async function () {
+      //lets deploy test auction for when liquidity calls it for auctionDay()
+      auction = await TestAuction.new()
+      await this.auctionRegistry.updateContractAddress(
+        web3.utils.fromAscii("AUCTION"),
+        auction.address,
+        {
+          from: multiSigPlaceHolder,
+        }
+      );
+      await this.liquidity.updateAddresses()
+      //Account should be whiteListed and it should be allowed to buy back
+      let flags1 = IS_ALLOWED_BUYBACK | KYC | AML;
+      let flags2 = KYC | AML
+      let maxWallets = 10;
+      await this.whiteList.addNewWallet(accountA, flags1, maxWallets, { from: systemAddress })
+      //the accountB is just to check one negative condition of isAllowedBuyBack()
+      await this.whiteList.addNewWallet(accountB, flags2, maxWallets, { from: systemAddress })
+
+      //lets give these guys some jntr
+      await this.jntrToken.transfer(accountA, contributeAmount, { from: accounts[0] })
+      await this.jntrToken.transfer(accountB, contributeAmount, { from: accounts[0] })
+
+
+      await this.jntrToken.approve(this.liquidity.address, contributeAmount, { from: accountA })
+      await this.jntrToken.approve(this.liquidity.address, contributeAmount, { from: accountB })
+
+
+    })
+    //case-I side reserve has enough ether
+
+    it("When side reserve has enough ether", async function () {
+      // let baseReserveBefore = await this.converter.getReserveBalance(
+      //   BNTToken.address
+      // );
+      // let mainReserveBefore = await this.converter.getReserveBalance(
+      //   this.jntrToken.address
+      // );
+
+      // console.log("before");
+
+      // console.log(baseReserveBefore.toString());
+      // console.log(mainReserveBefore.toString());
+      // console.log((await BNTToken.balanceOf(accountA)).toString())
+
+      ///here the side reserve has some ether
+      await this.liquidity.sendTransaction({ from: other1, value: contributeAmount })
+      //I need to know first how many BNT are we taking out
+      //To calculate the exact things
+
+      //should revert if address is not allowed to buyback
+      await expectRevert(this.liquidity.redemption(mainTokenTobaseToken, contributeAmount, { from: accountB }), "ERR_NOT_ALLOWED_BUYBACK")
+
+      //accountA comes for redemption of its JNTR
+      //He wants to convert JNTR into either BNT or ether 
+      //In this case BNT
+      let receipt = await this.liquidity.redemption(mainTokenTobaseToken, contributeAmount, { from: accountA })
+
+      let balanceBNTAccountA = await BNTToken.balanceOf(accountA)
+      //redemption event should be fired
+      expectEvent(receipt, "Redemption", { _token: BNTToken.address, _amount: contributeAmount, returnAmount: balanceBNTAccountA })
+
+
+
+
+      // let baseReserveAfter = await this.converter.getReserveBalance(
+      //   BNTToken.address
+      // );
+      // let mainReserveAfter = await this.converter.getReserveBalance(
+      //   this.jntrToken.address
+      // );
+      // console.log(baseReserveAfter.toString());
+      // console.log(mainReserveAfter.toString());
+
+      // //lets check what happens internally is correct or not
+      // let a = await bancorNetwork.getReturnByPath(ethToBaseToken, balanceBNTAccountA)
+      // console.log(a[0].toString())
+      // console.log(a[1].toString())
+
+      // let b = await bancorNetwork.getReturnByPath(baseTokenToMainToken, a[0] + a[1])
+      // console.log((b[0]).toString())
+
+      // console.log((await balance.current(this.liquidity.address)).toString())
+
+      // let tagAlongBalanceJntr = await this.jntrToken.balanceOf(this.tokenVault.address)
+      // console.log(tagAlongBalanceJntr.toString())
+    })
+    it("when side reserve does not have enough eth (we take them from tagAlong)", async function () {
+      console.log((await balance.current(this.tagAlong.address)).toString())
+
+      await this.tagAlong.sendTransaction({ from: other1, value: contributeAmount })
+      let receipt = await this.liquidity.redemption(mainTokenTobaseToken, contributeAmount, { from: accountA })
+      // expectEvent(receipt, "Redemption", { _token: BNTToken.address, _amount: contributeAmount, returnAmount: balanceBNTAccountA })
+    })
+    //case-III when tagAlong does not enough eth either but has bnt we require
+    it("when tagAlong does not have enough eth either", async function () {
+      await BNTToken.transfer(this.tagAlong.address, contributeAmount, { from: accounts[0] })
+
+      let receipt = await this.liquidity.redemption(mainTokenTobaseToken, contributeAmount, { from: accountA })
+    })
+    // case-IV when tagAlogn does not have ether or bnt we sell 10% relay
+    it("when tagAlong does not have ether or bnt(we sell 10% relay)", async function () {
+      //Lets give the tagAlong all the relay tokens(all two of them)
+      await this.smartToken.approve(this.tagAlong.address, one.mul(new BN(2)), {
+        from: accounts[0],
+      });
+      await this.tagAlong.depositeToken(
+        this.smartToken.address,
+        accounts[0],
+        one.mul(new BN(2)),
+        {
+          from: accounts[0],
+        }
+      );
+
+      let receipt = await this.liquidity.redemption(mainTokenTobaseToken, contributeAmount, { from: accountA })
+    })
+  })
 });
