@@ -3,6 +3,7 @@ const {
   expectEvent,
   expectRevert,
   balance,
+  time,
   BN,
 } = require("@openzeppelin/test-helpers");
 
@@ -368,7 +369,7 @@ contract("~Auction works", function (accounts) {
       from: primaryOwner,
     });
 
-    txTimestamp = (await web3.eth.getBlock("latest")).timestamp;
+    // txTimestamp = (await web3.eth.getBlock("latest")).timestamp;
     await whiteListRegistry.createProxy(
       1,
       primaryOwner,
@@ -517,10 +518,10 @@ contract("~Auction works", function (accounts) {
         from: primaryOwner,
       }
     );
-
-    let startTime = 1;
-    let minAuctionTime = 1;
-    let interval = 1;
+    //the startTime would be now from my understnding
+    //th minAuctionTime would be less than a day
+    let startTime = await time.latest();
+    let minAuctionTime = time.duration.hours(23);
     var auctionRegistry = await AuctionRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
@@ -534,7 +535,6 @@ contract("~Auction works", function (accounts) {
       1,
       startTime,
       minAuctionTime,
-      interval,
       primaryOwner,
       systemAddress,
       multiSigPlaceHolder,
@@ -574,7 +574,7 @@ contract("~Auction works", function (accounts) {
     });
   });
   it("Auction should be initialized correctly", async function () {
-    console.log(await this.auction.LAST_AUCTION_START());
+    // console.log(await this.auction.lastAuctionStart());
     //90% goes to DownsideProtection
     expect(
       await this.auction.dayWiseDownSideProtectionRatio(1)
@@ -697,13 +697,13 @@ contract("~Auction works", function (accounts) {
     //Remainig goes to reserves
     let reserveAmount = temp;
 
-    console.log((await this.jntrToken.balanceOf(companyFundWallet)).toString());
-    console.log(
-      (await this.jntrToken.balanceOf(this.protection.address)).toString()
-    );
-    console.log(
-      (await this.jntrToken.balanceOf(this.liquidity.address)).toString()
-    );
+    // console.log((await this.jntrToken.balanceOf(companyFundWallet)).toString());
+    // console.log(
+    //   (await this.jntrToken.balanceOf(this.protection.address)).toString()
+    // );
+    // console.log(
+    //   (await this.jntrToken.balanceOf(this.liquidity.address)).toString()
+    // );
     expect(
       await this.jntrToken.balanceOf(this.protection.address)
     ).to.be.bignumber.equal(downSideAmount);
