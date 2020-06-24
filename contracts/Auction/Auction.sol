@@ -19,6 +19,7 @@ interface InitializeInterface {
     function initialize(
         uint256 _startTime,
         uint256 _minAuctionTime,
+        uint256 _interval,
         address _primaryOwner,
         address _systemAddress,
         address _multisigAddress,
@@ -81,8 +82,9 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
 }
 
 contract AuctionUtils is AuctionRegistery {
+    
     uint256 public constant PRICE_NOMINATOR = 10**9;
-
+    
     uint256 public constant DECIMAL_NOMINATOR = 10**18;
 
     // allowed contarct limit the contribution
@@ -130,6 +132,7 @@ contract AuctionUtils is AuctionRegistery {
         groupBonusRatio = _groupBonusRatio;
         return true;
     }
+
 
     function setBufferLimit(uint256 _bufferLimit)
         external
@@ -189,6 +192,7 @@ contract AuctionUtils is AuctionRegistery {
 }
 
 contract AuctionFormula is SafeMath, TokenTransfer {
+    
     function calcuateAuctionTokenDistrubution(
         uint256 dayWiseContributionByWallet,
         uint256 dayWiseSupplyCore,
@@ -196,6 +200,7 @@ contract AuctionFormula is SafeMath, TokenTransfer {
         uint256 dayWiseContribution,
         uint256 downSideProtectionRatio
     ) internal pure returns (uint256, uint256) {
+        
         uint256 _dayWiseSupplyCore = safeDiv(
             safeMul(dayWiseSupplyCore, dayWiseContributionByWallet),
             dayWiseContribution
@@ -327,7 +332,8 @@ contract AuctionStorage is AuctionFormula, AuctionUtils {
     uint256 public todaySupply;
 
     bool public auctionSoldOut;
-
+    
+    
     function initializeStorage() internal {
         auctionDay = 1;
         totalContribution = 2500000 * PRICE_NOMINATOR;
@@ -338,9 +344,10 @@ contract AuctionStorage is AuctionFormula, AuctionUtils {
 }
 
 contract IndividualBonus is AuctionStorage {
+    
     //the bouns percentaage part
     mapping(uint256 => uint256) public indexReturn;
-
+    
     //Every following state varibale will be kept track of on per day basis
     //the top5Amounts contributed for a day
     mapping(uint256 => uint256[6]) public top5Amounts;
@@ -358,20 +365,15 @@ contract IndividualBonus is AuctionStorage {
     //So we need to keep track at which index was it in at the time and delete him from that index
     mapping(uint256 => mapping(address => uint256))
         public addressWhichInnerIndex;
-
+    
     uint256 public X_1;
     uint256 public X_2;
     uint256 public X_3;
     uint256 public X_4;
     uint256 public X_5;
-
-    function updateIndividualBonusRatio(
-        uint256 X1,
-        uint256 X2,
-        uint256 X3,
-        uint256 X4,
-        uint256 X5
-    ) external onlyAuthorized() {
+    
+    
+    function updateIndividualBonusRatio(uint256 X1,uint256 X2,uint256 X3,uint256 X4,uint256 X5) external onlyAuthorized(){
         X_1 = X1;
         X_2 = X2;
         X_3 = X3;
@@ -383,8 +385,9 @@ contract IndividualBonus is AuctionStorage {
         indexReturn[4] = X_4;
         indexReturn[5] = X_5;
     }
-
+    
     function _compareTopContributors(address _from) internal {
+       
         uint256 currentAmount = walletDayWiseContribution[auctionDay][_from];
 
         //If the same guy comes delete him and recompute his place
@@ -491,7 +494,8 @@ contract IndividualBonus is AuctionStorage {
             }
         }
     }
-
+    
+    
     //This will return how much percentage _which should get
     function _calculateIndividualBouns(uint256 _auctionDay, address _from)
         internal
@@ -536,6 +540,7 @@ contract IndividualBonus is AuctionStorage {
 
         //NOTE: We can delete the storage varibales at the end when the calculation is done
     }
+    
 }
 
 contract AuctionFundCollector is IndividualBonus {
@@ -597,7 +602,8 @@ contract AuctionFundCollector is IndividualBonus {
 
         IToken(mainTokenAddress).lockToken(_from, lockToken, now);
     }
-
+    
+    
     function fundAdded(
         address _token,
         uint256 _amount,
@@ -651,7 +657,7 @@ contract AuctionFundCollector is IndividualBonus {
             _contributedAmount
         );
 
-        _compareTopContributors(_from);
+       _compareTopContributors(_from);
 
         emit FundAdded(
             auctionDay,
@@ -747,23 +753,27 @@ contract AuctionFundCollector is IndividualBonus {
 }
 
 contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
-    uint256 public minAuctionTime;
+    uint256 public MIN_AUCTION_END_TIME; //epoch
 
-    uint256 public lastAuctionStart; //timestamp when auction started
+    uint256 public LAST_AUCTION_START;
+
+    uint256 public INTERVAL;
 
     function changeTimings(uint256 _flag, uint256 _time)
         external
         onlyAuthorized()
         returns (bool)
     {
-        if (_flag == 1) minAuctionTime = _time;
-        else if (_flag == 2) lastAuctionStart == _time;
+        if (_flag == 1) MIN_AUCTION_END_TIME = _time;
+        else if (_flag == 2) LAST_AUCTION_START == _time;
+        else if (_flag == 3) INTERVAL == _time;
         return true;
     }
 
     function initialize(
         uint256 _startTime,
         uint256 _minAuctionTime,
+        uint256 _interval,
         address _primaryOwner,
         address _systemAddress,
         address _multisigAddress,
@@ -777,7 +787,6 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         _updateAddresses();
 
         dayWiseDownSideProtectionRatio[auctionDay] = downSideProtectionRatio;
-
         LAST_AUCTION_START = _startTime;
         MIN_AUCTION_END_TIME = _minAuctionTime;
         INTERVAL = _interval;
@@ -844,7 +853,7 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
 
     function auctionEnd() external onlySystem() returns (bool) {
         require(
-            now >= safeAdd(lastAuctionStart, minAuctionTime),
+            now >= safeAdd(LAST_AUCTION_START, MIN_AUCTION_END_TIME),
             "ERR_MIN_TIME_IS_NOT_OVER"
         );
 
@@ -912,22 +921,19 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         uint256 _avgInvestment = 0;
 
         if (auctionDay < 11 && auctionDay > 1) {
-            _avgDays = safeSub(auctionDay, 1);
+            _avgDays = safeSub(auctionDay,1);
         }
-
-        if (auctionDay > 1) {
+        
+        if(auctionDay > 1){
             for (uint32 tempX = 1; tempX <= _avgDays; tempX++) {
                 _avgInvestment = safeAdd(
                     _avgInvestment,
                     dayWiseContribution[safeSub(auctionDay, tempX)]
                 );
             }
-
+    
             _avgInvestment = safeDiv(
-                safeMul(
-                    safeDiv(_avgInvestment, _avgDays),
-                    maxContributionAllowed
-                ),
+                safeMul(safeDiv(_avgInvestment, _avgDays), maxContributionAllowed),
                 100
             );
         }
@@ -939,13 +945,13 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         dayWiseSupplyCore[auctionDay] = todaySupply;
         dayWiseSupplyBonus[auctionDay] = bonusSupply;
         dayWiseSupply[auctionDay] = safeAdd(todaySupply, bonusSupply);
-
+        
+        
         uint256 stackingAmount = safeDiv(
-            safeMul(dayWiseSupply[auctionDay], stacking),
-            100
+            safeMul(dayWiseSupply[auctionDay],stacking),100
         );
         uint256 fee = calculateSupplyPercent(
-            safeAdd(stackingAmount, dayWiseSupply[auctionDay]),
+            safeAdd(stackingAmount,dayWiseSupply[auctionDay]),
             mangmentFee
         );
         IToken(mainTokenAddress).mintTokens(safeAdd(fee, stackingAmount));
@@ -987,9 +993,9 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         IAuctionLiquadity(liquadityAddress).auctionEnded();
 
         dayWiseDownSideProtectionRatio[auctionDay] = downSideProtectionRatio;
-        
+
         LAST_AUCTION_START = safeAdd(LAST_AUCTION_START, INTERVAL);
-        
+
         auctionSoldOut = false;
 
         todayContribution = 0;
@@ -1035,34 +1041,27 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
             dayWiseDownSideProtectionRatio[dayId]
         );
 
-
-        uint256 newReturnAmount = IIndividualBonus(individualBonusAddress)
-            .calucalteBonus(topContributiorIndex[dayId][_which], returnAmount);
-
-        uint256 fee = calculateSupplyPercent(newReturnAmount, mangmentFee);
-
-        uint256 _percent = _calculateIndividualBouns(dayId, _which);
-
+        uint256 _percent = _calculateIndividualBouns(dayId,_which);
+        
         uint256 newReturnAmount = 0;
-
+        
         uint256 fee = 0;
-
-        if (_percent > 0) {
-            newReturnAmount = safeDiv(
-                safeMul(returnAmount, _percent),
-                safeMul(100, PRICE_NOMINATOR)
+        
+        if(_percent > 0){
+            newReturnAmount = safeDiv(safeMul(returnAmount,_percent),safeMul(100,PRICE_NOMINATOR));
+            fee = calculateSupplyPercent(
+                newReturnAmount,
+                mangmentFee
             );
-            fee = calculateSupplyPercent(newReturnAmount, mangmentFee);
         }
-
-
-        newReturnAmount = safeAdd(returnAmount, newReturnAmount);
-
-        IToken(mainTokenAddress).mintTokens(safeAdd(newReturnAmount, fee));
-
-
-        IToken(mainTokenAddress).lockToken(_which, 0, lastAuctionStart);
-
+        
+        newReturnAmount = safeAdd(returnAmount,newReturnAmount);
+        
+        IToken(mainTokenAddress).mintTokens(safeAdd(newReturnAmount,fee));
+        
+        // here we check with last auction bcz user can invest after auction start
+        IToken(mainTokenAddress).lockToken(_which, 0, LAST_AUCTION_START);
+        
         ensureTransferFrom(
             IERC20Token(mainTokenAddress),
             address(this),
