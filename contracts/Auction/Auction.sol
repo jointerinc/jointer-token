@@ -82,9 +82,8 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
 }
 
 contract AuctionUtils is AuctionRegistery {
-    
     uint256 public constant PRICE_NOMINATOR = 10**9;
-    
+
     uint256 public constant DECIMAL_NOMINATOR = 10**18;
 
     // allowed contarct limit the contribution
@@ -132,7 +131,6 @@ contract AuctionUtils is AuctionRegistery {
         groupBonusRatio = _groupBonusRatio;
         return true;
     }
-
 
     function setBufferLimit(uint256 _bufferLimit)
         external
@@ -192,7 +190,6 @@ contract AuctionUtils is AuctionRegistery {
 }
 
 contract AuctionFormula is SafeMath, TokenTransfer {
-    
     function calcuateAuctionTokenDistrubution(
         uint256 dayWiseContributionByWallet,
         uint256 dayWiseSupplyCore,
@@ -200,7 +197,6 @@ contract AuctionFormula is SafeMath, TokenTransfer {
         uint256 dayWiseContribution,
         uint256 downSideProtectionRatio
     ) internal pure returns (uint256, uint256) {
-        
         uint256 _dayWiseSupplyCore = safeDiv(
             safeMul(dayWiseSupplyCore, dayWiseContributionByWallet),
             dayWiseContribution
@@ -332,8 +328,7 @@ contract AuctionStorage is AuctionFormula, AuctionUtils {
     uint256 public todaySupply;
 
     bool public auctionSoldOut;
-    
-    
+
     function initializeStorage() internal {
         auctionDay = 1;
         totalContribution = 2500000 * PRICE_NOMINATOR;
@@ -344,10 +339,9 @@ contract AuctionStorage is AuctionFormula, AuctionUtils {
 }
 
 contract IndividualBonus is AuctionStorage {
-    
     //the bouns percentaage part
     mapping(uint256 => uint256) public indexReturn;
-    
+
     //Every following state varibale will be kept track of on per day basis
     //the top5Amounts contributed for a day
     mapping(uint256 => uint256[6]) public top5Amounts;
@@ -365,15 +359,20 @@ contract IndividualBonus is AuctionStorage {
     //So we need to keep track at which index was it in at the time and delete him from that index
     mapping(uint256 => mapping(address => uint256))
         public addressWhichInnerIndex;
-    
+
     uint256 public X_1;
     uint256 public X_2;
     uint256 public X_3;
     uint256 public X_4;
     uint256 public X_5;
-    
-    
-    function updateIndividualBonusRatio(uint256 X1,uint256 X2,uint256 X3,uint256 X4,uint256 X5) external onlyAuthorized(){
+
+    function updateIndividualBonusRatio(
+        uint256 X1,
+        uint256 X2,
+        uint256 X3,
+        uint256 X4,
+        uint256 X5
+    ) external onlyAuthorized() {
         X_1 = X1;
         X_2 = X2;
         X_3 = X3;
@@ -385,9 +384,105 @@ contract IndividualBonus is AuctionStorage {
         indexReturn[4] = X_4;
         indexReturn[5] = X_5;
     }
-    
-    function _compareTopContributors(address _from) internal {
-       
+
+    function _compareTopContributors(uint256 _dayId, address _from)
+        external
+        onlyOwner()
+    {
+        uint256 currentAmount = walletDayWiseContribution[_dayId][_from];
+
+        //If the same guy comes delete him and recompute his place
+        if (addressWhichIndex[_dayId][_from] != 0) {
+            //the array from which we need to delete the _from
+
+
+                address[] storage contributorsAt
+             = indexToContributors[_dayId][addressWhichIndex[_dayId][_from]];
+
+            uint256 indexTodelete = addressWhichInnerIndex[_dayId][_from];
+
+            for (
+                uint256 i = indexTodelete;
+                i < contributorsAt.length - 1;
+                i++
+            ) {
+                contributorsAt[indexTodelete] = contributorsAt[indexTodelete +
+                    1];
+            }
+            delete contributorsAt[contributorsAt.length - 1];
+            contributorsAt.length = contributorsAt.length - 1;
+
+            // we also need to take him out of the race i.e. his last topContribution so that he is not competing against himself
+            //but only if it is the only one who has that same currentAmount
+            if (contributorsAt.length == 0) {
+                indexTodelete = addressWhichIndex[_dayId][_from];
+
+                for (
+                    uint256 i = indexTodelete;
+                    i < top5Amounts[_dayId].length - 1;
+                    i++
+                ) {
+                    top5Amounts[_dayId][indexTodelete] = top5Amounts[_dayId][indexTodelete +
+                        1];
+                }
+                delete top5Amounts[_dayId][top5Amounts[_dayId].length - 1];
+            }
+            //the last would be overwritten in the same function
+        }
+
+        //Do all this only if contribution is larger then the 5th guy
+
+        if (top5Amounts[_dayId][5] <= currentAmount) {
+            uint256 i;
+            bool flag;
+            for (i = 5; i >= 1; i--) {
+                //if it is equal to something just add it to the array and dont disturb anything else(Hence the flag)
+                if (
+                    currentAmount == top5Amounts[_dayId][i] &&
+                    top5Amounts[_dayId][i] != 0
+                ) {
+                    addressWhichInnerIndex[_dayId][_from] =
+                        indexToContributors[_dayId][i].push(_from) -
+                        1;
+
+                    addressWhichIndex[_dayId][_from] = i;
+                    flag = true;
+                }
+                //Find the right place for it
+                //Go inner untill you have find the right place
+                if (currentAmount < top5Amounts[_dayId][i]) break;
+            }
+
+            if (!flag) {
+                //if i==0 meaning it is grater than everythig else than add it to the first index
+                //In all other cases the break function will give you the right index
+
+                i++;
+                //replace all the before ones
+                for (uint256 j = 5; j > i; j--) {
+                    top5Amounts[_dayId][j] = top5Amounts[_dayId][j - 1];
+
+                    indexToContributors[_dayId][j] = indexToContributors[_dayId][j -
+                        1];
+
+                    for (
+                        uint256 k = 0;
+                        k < indexToContributors[_dayId][j].length;
+                        k++
+                    )
+                        addressWhichIndex[_dayId][indexToContributors[_dayId][j][k]] = j;
+                }
+                top5Amounts[_dayId][i] = currentAmount;
+                indexToContributors[_dayId][i].length = 0; //Why? becuse we need to overwrite it
+                addressWhichInnerIndex[_dayId][_from] =
+                    indexToContributors[_dayId][i].push(_from) -
+                    1;
+                addressWhichIndex[_dayId][_from] = i;
+            }
+        }
+    }
+
+    function compareTopContributors(address _from) internal {
         uint256 currentAmount = walletDayWiseContribution[auctionDay][_from];
 
         //If the same guy comes delete him and recompute his place
@@ -402,16 +497,14 @@ contract IndividualBonus is AuctionStorage {
 
             for (
                 uint256 i = indexTodelete;
-                i < safeSub(contributorsAt.length, 1);
-                i = safeAdd(i, 1)
+                i < contributorsAt.length - 1;
+                i++
             ) {
-                contributorsAt[indexTodelete] = contributorsAt[safeAdd(
-                    indexTodelete,
-                    1
-                )];
+                contributorsAt[indexTodelete] = contributorsAt[indexTodelete +
+                    1];
             }
-            delete contributorsAt[safeSub(contributorsAt.length, 1)];
-            contributorsAt.length = safeSub(contributorsAt.length, 1);
+            delete contributorsAt[contributorsAt.length - 1];
+            contributorsAt.length = contributorsAt.length - 1;
 
             // we also need to take him out of the race i.e. his last topContribution so that he is not competing against himself
             //but only if it is the only one who has that same currentAmount
@@ -420,18 +513,14 @@ contract IndividualBonus is AuctionStorage {
 
                 for (
                     uint256 i = indexTodelete;
-                    i < safeSub(top5Amounts[auctionDay].length, 1);
-                    i = safeAdd(i, 1)
+                    i < top5Amounts[auctionDay].length - 1;
+                    i++
                 ) {
-                    top5Amounts[auctionDay][indexTodelete] = top5Amounts[auctionDay][safeAdd(
-                        indexTodelete,
-                        1
-                    )];
+                    top5Amounts[auctionDay][indexTodelete] = top5Amounts[auctionDay][indexTodelete +
+                        1];
                 }
-                delete top5Amounts[auctionDay][safeSub(
-                    top5Amounts[auctionDay].length,
-                    1
-                )];
+                delete top5Amounts[auctionDay][top5Amounts[auctionDay].length -
+                    1];
             }
             //the last would be overwritten in the same function
         }
@@ -441,16 +530,15 @@ contract IndividualBonus is AuctionStorage {
         if (top5Amounts[auctionDay][5] <= currentAmount) {
             uint256 i;
             bool flag;
-            for (i = 5; i >= 1; i = safeSub(i, 1)) {
+            for (i = 5; i >= 1; i--) {
                 //if it is equal to something just add it to the array and dont disturb anything else(Hence the flag)
                 if (
                     currentAmount == top5Amounts[auctionDay][i] &&
                     top5Amounts[auctionDay][i] != 0
                 ) {
-                    addressWhichInnerIndex[auctionDay][_from] = safeSub(
-                        indexToContributors[auctionDay][i].push(_from),
-                        1
-                    );
+                    addressWhichInnerIndex[auctionDay][_from] =
+                        indexToContributors[auctionDay][i].push(_from) -
+                        1;
 
                     addressWhichIndex[auctionDay][_from] = i;
                     flag = true;
@@ -464,83 +552,73 @@ contract IndividualBonus is AuctionStorage {
                 //if i==0 meaning it is grater than everythig else than add it to the first index
                 //In all other cases the break function will give you the right index
 
-                i = safeAdd(i, 1);
+                i++;
                 //replace all the before ones
-                for (uint256 j = 5; j > i; j = safeSub(j, 1)) {
-                    top5Amounts[auctionDay][j] = top5Amounts[auctionDay][safeSub(
-                        j,
-                        1
-                    )];
+                for (uint256 j = 5; j > i; j--) {
+                    top5Amounts[auctionDay][j] = top5Amounts[auctionDay][j - 1];
 
-                    indexToContributors[auctionDay][j] = indexToContributors[auctionDay][safeSub(
-                        j,
-                        1
-                    )];
+                    indexToContributors[auctionDay][j] = indexToContributors[auctionDay][j -
+                        1];
 
                     for (
                         uint256 k = 0;
                         k < indexToContributors[auctionDay][j].length;
-                        k = safeAdd(k, 1)
+                        k++
                     )
                         addressWhichIndex[auctionDay][indexToContributors[auctionDay][j][k]] = j;
                 }
                 top5Amounts[auctionDay][i] = currentAmount;
                 indexToContributors[auctionDay][i].length = 0; //Why? becuse we need to overwrite it
-                addressWhichInnerIndex[auctionDay][_from] = safeSub(
-                    indexToContributors[auctionDay][i].push(_from),
-                    1
-                );
+                addressWhichInnerIndex[auctionDay][_from] =
+                    indexToContributors[auctionDay][i].push(_from) -
+                    1;
                 addressWhichIndex[auctionDay][_from] = i;
             }
         }
     }
-    
-    
-    //This will return how much percentage _which should get
-    function _calculateIndividualBouns(uint256 _auctionDay, address _from)
-        internal
+
+    function calculateBouns(uint256 _auctionDayId, address _from)
+        public
         view
         returns (uint256)
     {
-        uint256 index = addressWhichIndex[_auctionDay][_from];
-        //if this one is not in top5 then return 0
-        if (index == 0) return 0;
+        uint256 index = addressWhichIndex[_auctionDayId][_from];
+
+        if (index == 0) {
+            return 0;
+        }
         //Now start counting how many addresses ahead of him
         uint256 i;
         //We need start count from one to reflect that there are this many guys before you
         uint256 count = 1;
-        for (i = safeSub(index, 1); i >= 1; i = safeSub(i, 1)) {
+        for (i = index - 1; i >= 1; i--) {
             if (count > 5) return 0;
             //lets find out how many are at ith index
-            count = safeAdd(count, indexToContributors[_auctionDay][i].length);
+            count = count + indexToContributors[_auctionDayId][i].length;
         }
         //Do the calculation only if count is less than 5 because if there are 5 contributor ahead of you then you get nothing
-
-        // //If there are not addresses with same amount
+        // If there are not addresses with same amount
         // if (indexToContributors[index].length == 1) return indexReturn[count];
-
         //If there is... then
-
         //how many are there?
-        uint256 sameAmountAddresses = indexToContributors[_auctionDay][index]
+        uint256 sameAmountAddresses = indexToContributors[_auctionDayId][index]
             .length;
         //what the total
         uint256 totalPercentToShare;
         //count from what they have before them to how many they are now
         for (
             uint256 k = count;
-            k < safeAdd(count, sameAmountAddresses) && k <= 5;
-            k = safeAdd(k, 1)
+            k < count + sameAmountAddresses && k <= 5;
+            k++
         ) {
-            totalPercentToShare = safeAdd(totalPercentToShare, indexReturn[k]);
+            totalPercentToShare = totalPercentToShare + indexReturn[k];
         }
         //now divide it amognst them
         // returnAmount = totalPercentToShare / sameAmountAddresses;
-        return safeDiv(totalPercentToShare, sameAmountAddresses);
+        return totalPercentToShare / sameAmountAddresses;
 
         //NOTE: We can delete the storage varibales at the end when the calculation is done
     }
-    
 }
 
 contract AuctionFundCollector is IndividualBonus {
@@ -602,8 +680,7 @@ contract AuctionFundCollector is IndividualBonus {
 
         IToken(mainTokenAddress).lockToken(_from, lockToken, now);
     }
-    
-    
+
     function fundAdded(
         address _token,
         uint256 _amount,
@@ -657,7 +734,7 @@ contract AuctionFundCollector is IndividualBonus {
             _contributedAmount
         );
 
-       _compareTopContributors(_from);
+        compareTopContributors(_from);
 
         emit FundAdded(
             auctionDay,
@@ -795,11 +872,6 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         X_3 = 30 * PRICE_NOMINATOR;
         X_4 = 20 * PRICE_NOMINATOR;
         X_5 = 10 * PRICE_NOMINATOR;
-        indexReturn[1] = X_1;
-        indexReturn[2] = X_2;
-        indexReturn[3] = X_3;
-        indexReturn[4] = X_4;
-        indexReturn[5] = X_5;
     }
 
     event AuctionEnded(
@@ -881,6 +953,8 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
             _mainTokenPrice = ICurrencyPrices(currencyPricesAddress)
                 .getCurrencyPrice(mainTokenAddress);
 
+            compareTopContributors(vaultAddress);
+
             emit FundAdded(
                 auctionDay,
                 todayContribution,
@@ -921,19 +995,22 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         uint256 _avgInvestment = 0;
 
         if (auctionDay < 11 && auctionDay > 1) {
-            _avgDays = safeSub(auctionDay,1);
+            _avgDays = safeSub(auctionDay, 1);
         }
-        
-        if(auctionDay > 1){
+
+        if (auctionDay > 1) {
             for (uint32 tempX = 1; tempX <= _avgDays; tempX++) {
                 _avgInvestment = safeAdd(
                     _avgInvestment,
                     dayWiseContribution[safeSub(auctionDay, tempX)]
                 );
             }
-    
+
             _avgInvestment = safeDiv(
-                safeMul(safeDiv(_avgInvestment, _avgDays), maxContributionAllowed),
+                safeMul(
+                    safeDiv(_avgInvestment, _avgDays),
+                    maxContributionAllowed
+                ),
                 100
             );
         }
@@ -945,13 +1022,13 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         dayWiseSupplyCore[auctionDay] = todaySupply;
         dayWiseSupplyBonus[auctionDay] = bonusSupply;
         dayWiseSupply[auctionDay] = safeAdd(todaySupply, bonusSupply);
-        
-        
+
         uint256 stackingAmount = safeDiv(
-            safeMul(dayWiseSupply[auctionDay],stacking),100
+            safeMul(dayWiseSupply[auctionDay], stacking),
+            100
         );
         uint256 fee = calculateSupplyPercent(
-            safeAdd(stackingAmount,dayWiseSupply[auctionDay]),
+            safeAdd(stackingAmount, dayWiseSupply[auctionDay]),
             mangmentFee
         );
         IToken(mainTokenAddress).mintTokens(safeAdd(fee, stackingAmount));
@@ -977,11 +1054,6 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
 
         dayWiseMarketPrice[auctionDay] = _mainTokenPrice;
 
-        todaySupply = safeDiv(
-            safeMul(todayContribution, DECIMAL_NOMINATOR),
-            _mainTokenPrice
-        );
-
         totalContribution = safeAdd(totalContribution, todayContribution);
 
         yesterdaySupply = dayWiseSupply[auctionDay];
@@ -997,6 +1069,11 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         LAST_AUCTION_START = safeAdd(LAST_AUCTION_START, INTERVAL);
 
         auctionSoldOut = false;
+
+        todaySupply = safeDiv(
+            safeMul(todayContribution, DECIMAL_NOMINATOR),
+            _mainTokenPrice
+        );
 
         todayContribution = 0;
 
@@ -1015,7 +1092,7 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         return true;
     }
 
-    function _disturbuteToken(uint256 dayId, address _which)
+    function disturbuteTokenInternal(uint256 dayId, address _which)
         internal
         returns (bool)
     {
@@ -1041,27 +1118,28 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
             dayWiseDownSideProtectionRatio[dayId]
         );
 
-        uint256 _percent = _calculateIndividualBouns(dayId,_which);
-        
+        uint256 _percent = calculateBouns(dayId, _which);
+
         uint256 newReturnAmount = 0;
-        
+
         uint256 fee = 0;
-        
-        if(_percent > 0){
-            newReturnAmount = safeDiv(safeMul(returnAmount,_percent),safeMul(100,PRICE_NOMINATOR));
-            fee = calculateSupplyPercent(
-                newReturnAmount,
-                mangmentFee
+
+        if (_percent > 0) {
+            newReturnAmount = safeDiv(
+                safeMul(returnAmount, _percent),
+                safeMul(100, PRICE_NOMINATOR)
             );
+
+            fee = calculateSupplyPercent(newReturnAmount, mangmentFee);
         }
-        
-        newReturnAmount = safeAdd(returnAmount,newReturnAmount);
-        
-        IToken(mainTokenAddress).mintTokens(safeAdd(newReturnAmount,fee));
-        
+
+        newReturnAmount = safeAdd(returnAmount, newReturnAmount);
+
+        IToken(mainTokenAddress).mintTokens(safeAdd(newReturnAmount, fee));
+
         // here we check with last auction bcz user can invest after auction start
         IToken(mainTokenAddress).lockToken(_which, 0, LAST_AUCTION_START);
-        
+
         ensureTransferFrom(
             IERC20Token(mainTokenAddress),
             address(this),
@@ -1106,14 +1184,14 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         require(dayId < auctionDay, "ERR_AUCTION_DAY");
         for (uint256 tempX = 0; tempX < _which.length; tempX++) {
             if (returnToken[dayId][_which[tempX]] == false)
-                _disturbuteToken(dayId, _which[tempX]);
+                disturbuteTokenInternal(dayId, _which[tempX]);
         }
         return true;
     }
 
     function disturbuteTokens(uint256 dayId) external returns (bool) {
         require(dayId < auctionDay, "ERR_AUCTION_DAY");
-        _disturbuteToken(dayId, msg.sender);
+        disturbuteTokenInternal(dayId, msg.sender);
     }
 
     //In case if there is other tokens into contract
