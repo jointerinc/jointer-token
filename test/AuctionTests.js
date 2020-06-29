@@ -7,9 +7,9 @@ const {
   BN,
 } = require("@openzeppelin/test-helpers");
 
-const { ZERO_ADDRESS } = constants;
+const {ZERO_ADDRESS} = constants;
 
-const { expect } = require("chai");
+const {expect} = require("chai");
 
 const {
   advanceTimeAndBlock,
@@ -18,7 +18,8 @@ const {
   revertToSnapshot,
 } = require("./utils");
 
-const TruffleContract = require("@truffle/contract");
+const {deployBancor} = require("./deployBancor");
+const {forEach} = require("lodash");
 
 const Auction = artifacts.require("Auction");
 const AuctionRegistry = artifacts.require("AuctionRegistry");
@@ -33,53 +34,20 @@ const whiteListContract = artifacts.require("WhiteList");
 const WhiteListRegistry = artifacts.require("WhiteListRegistery");
 const Protection = artifacts.require("AuctionProtection");
 const ProtectionRegistry = artifacts.require("ProtectionRegistry");
+const JNTRToken = artifacts.require("MainToken");
 
-var SmartToken = require("./bancorArtifacts/SmartToken.json");
-var BancorConverterFactory = require("./bancorArtifacts/BancorConverterFactory.json");
-var BancorConverter = require("./bancorArtifacts/BancorConverter.json");
-var ContractRegistry = require("./bancorArtifacts/ContractRegistry.json");
-var ERC20Token = require("./bancorArtifacts/ERC20Token.json");
-var ContractFeatures = require("./bancorArtifacts/ContractFeatures.json");
-var BancorFormula = require("./bancorArtifacts/BancorFormula.json");
-var BancorNetwork = require("./bancorArtifacts/BancorNetwork.json");
-var BancorNetworkPathFinder = require("./bancorArtifacts/BancorNetworkPathFinder.json");
-var BancorConverterRegistry = require("./bancorArtifacts/BancorConverterRegistry.json");
-var BancorConverterRegistryData = require("./bancorArtifacts/BancorConverterRegistry.json");
-var EtherToken = require("./bancorArtifacts/EtherToken.json");
-const { italic } = require("ansi-colors");
-
-ContractRegistry = TruffleContract(ContractRegistry);
-SmartToken = TruffleContract(SmartToken);
-BancorConverterFactory = TruffleContract(BancorConverterFactory);
-BancorConverter = TruffleContract(BancorConverter);
-ContractFeatures = TruffleContract(ContractFeatures);
-BancorFormula = TruffleContract(BancorFormula);
-BancorNetwork = TruffleContract(BancorNetwork);
-BancorNetworkPathFinder = TruffleContract(BancorNetworkPathFinder);
-BancorConverterRegistry = TruffleContract(BancorConverterRegistry);
-EtherToken = TruffleContract(EtherToken);
-ERC20Token = TruffleContract(ERC20Token);
-BancorConverterRegistryData = TruffleContract(BancorConverterRegistryData);
-
-var bancorContracts = [
-  SmartToken,
-  BancorConverterFactory,
-  BancorConverter,
-  ContractRegistry,
-  ContractFeatures,
-  BancorFormula,
-  BancorNetworkPathFinder,
-  BancorNetwork,
-  BancorConverterRegistry,
-  EtherToken,
-  BancorConverterRegistryData,
-  ERC20Token,
-];
 const denominator = new BN(10).pow(new BN(18));
+const priceDenominator = new BN(10).pow(new BN(9));
 
-const getWithDeimals = function (amount) {
+const getWith18Decimals = function (amount) {
   return new BN(amount).mul(denominator);
 };
+const getWith9Decimals = function (amount) {
+  return new BN(amount).mul(priceDenominator);
+};
+
+const IS_BYPASSED = 1 << 13;
+const BANCOR_ADDRESS = 1 << 14;
 
 var one;
 var thousand;
@@ -94,222 +62,263 @@ contract("~Auction works", function (accounts) {
     systemAddress,
     multiSigPlaceHolder,
     companyFundWallet,
+    companyMainTokenWallet, //Will hold alll the main tokens
+    stackingFundWallet, //If nobody has stacked then this is where the stacking bonus goes to
     accountA,
     accountB,
     other1,
   ] = accounts;
-  one = getWithDeimals(1);
-  thousand = getWithDeimals(10000);
-  hundread = getWithDeimals(100);
+  one = getWith18Decimals(1);
+  thousand = getWith18Decimals(10000);
+  hundread = getWith18Decimals(100);
 
   const downSideProtectioRatio = new BN(90);
   const fundWalletRatio = new BN(90);
   const hundreadPercentage = new BN(100);
+
+  const deployMainToken = async function () {
+    console.log("hi");
+    a = 10;
+    console.log(primaryOwner);
+  };
   beforeEach(async function () {
-    //setting up bancor
-    //deploy all the necessary contracts first
-    bancorContracts.forEach((element) => {
-      element.setProvider(web3.currentProvider);
-    });
-    var contractRegistry = await ContractRegistry.new({ from: accounts[0] });
-    var bancorFormula = await BancorFormula.new({ from: accounts[0] });
-    var contractFeatures = await ContractFeatures.new({ from: accounts[0] });
-    bancorNetwork = await BancorNetwork.new(contractRegistry.address, {
-      from: accounts[0],
-    });
-    var bancorNetworkPathFinder = await BancorNetworkPathFinder.new(
-      contractRegistry.address,
-      { from: accounts[0] }
+    var [
+      BNTToken,
+      etherToken,
+      smartTokenEthBnt,
+      converterEthBnt,
+      jntrToken,
+      smartToken,
+      converter,
+      bancorNetwork,
+      smartTokenMainBNT,
+      converterMainBNT,
+    ] = await deployBancor(accounts);
+
+    //Now I want this.jntrToken to be actual mainToken
+    //What should I do??
+    //Create and extra converter pass it here and do the rest here
+    //setup for mainToken
+
+    //auction registry
+    this.auctionRegistry = await AuctionRegisty.new(
+      systemAddress,
+      multiSigPlaceHolder,
+      {from: primaryOwner}
     );
-    var bancorConverterRegistry = await BancorConverterRegistry.new(
-      contractRegistry.address,
-      { from: accounts[0] }
+    //Deploy Whitelist
+    let stockTokenMaturityDays = 3560;
+    let tokenMaturityDays = 0;
+    let tokenHoldBackDays = 90;
+    var whiteListRegistry = await WhiteListRegistry.new(
+      systemAddress,
+      multiSigPlaceHolder,
+      {from: primaryOwner}
     );
-    var bancorConverterRegistryData = await BancorConverterRegistryData.new(
-      contractRegistry.address,
-      { from: accounts[0] }
-    );
-    var etherToken = await EtherToken.new("ETHTOKEN", "ETHTOKEN", {
-      from: accounts[0],
-    });
-    BNTToken = await SmartToken.new("Bancor Token", "BNT", 18, {
-      from: accounts[0],
+    let tempWhiteList = await whiteListContract.new();
+    await whiteListRegistry.addVersion(1, tempWhiteList.address, {
+      from: primaryOwner,
     });
 
-    //register all the addresses to the contractRefistry
-    await contractRegistry.registerAddress(
-      web3.utils.asciiToHex("ContractRegistry"),
-      contractRegistry.address,
-      { from: accounts[0] }
+    // txTimestamp = (await web3.eth.getBlock("latest")).timestamp;
+    await whiteListRegistry.createProxy(
+      1,
+      primaryOwner,
+      systemAddress,
+      multiSigPlaceHolder,
+      tokenHoldBackDays,
+      tokenHoldBackDays,
+      tokenHoldBackDays,
+      tokenMaturityDays,
+      tokenMaturityDays,
+      stockTokenMaturityDays,
+      {from: primaryOwner}
     );
-    await contractRegistry.registerAddress(
-      web3.utils.asciiToHex("ContractFeatures"),
-      contractFeatures.address,
-      { from: accounts[0] }
+
+    let proxyAddress = await whiteListRegistry.proxyAddress();
+    this.whiteList = await whiteListContract.at(proxyAddress);
+
+    await this.auctionRegistry.registerContractAddress(
+      web3.utils.fromAscii("WHITE_LIST"),
+      this.whiteList.address,
+      {
+        from: primaryOwner,
+      }
     );
-    await contractRegistry.registerAddress(
-      web3.utils.asciiToHex("BancorFormula"),
-      bancorFormula.address,
-      { from: accounts[0] }
+
+    //setup WhiteList
+    //add acounts[0] to whitlist(make it bypassed)
+    let flags = IS_BYPASSED;
+    let maxWallets = 0;
+
+    await this.whiteList.addNewWallet(accounts[0], flags, maxWallets, {
+      from: systemAddress,
+    });
+    //converter needs to be whitelisted too
+    flags = BANCOR_ADDRESS;
+    await this.whiteList.addNewWallet(
+      converterMainBNT.address,
+      flags,
+      maxWallets,
+      {
+        from: systemAddress,
+      }
     );
-    await contractRegistry.registerAddress(
-      web3.utils.asciiToHex("BancorNetwork"),
+    //We need to whitelist the convertETHBNT too
+    //Because when converting eth into jntr it would go throught this
+    await this.whiteList.addNewWallet(
+      converterEthBnt.address,
+      flags,
+      maxWallets,
+      {
+        from: systemAddress,
+      }
+    );
+    //We also need to whitlist bancorNtwork becuase it will hold the mainToken when converting ethTOmain
+    await this.whiteList.addNewWallet(
       bancorNetwork.address,
-      { from: accounts[0] }
-    );
-    await contractRegistry.registerAddress(
-      web3.utils.asciiToHex("BancorNetworkPathFinder"),
-      bancorNetworkPathFinder.address,
-      { from: accounts[0] }
-    );
-    await contractRegistry.registerAddress(
-      web3.utils.asciiToHex("BancorConverterRegistry"),
-      bancorConverterRegistry.address,
-      { from: accounts[0] }
-    );
-    await contractRegistry.registerAddress(
-      web3.utils.asciiToHex("BancorConverterRegistryData"),
-      bancorConverterRegistryData.address,
-      { from: accounts[0] }
-    );
-    await contractRegistry.registerAddress(
-      web3.utils.asciiToHex("BNTToken"),
-      BNTToken.address,
-      { from: accounts[0] }
-    );
-    //the etheretoken
-    await bancorNetwork.registerEtherToken(etherToken.address, true, {
-      from: accounts[0],
-    });
-    //set bnt as anchor token
-    await bancorNetworkPathFinder.setAnchorToken(BNTToken.address, {
-      from: accounts[0],
-    });
-
-    //First lets make a pair of BNT and the EtherToken itself
-
-    var smartTokenEthBnt = await SmartToken.new("ETHBNT", "ETHBNT", 18, {
-      from: accounts[0],
-    });
-    var converterEthBnt = await BancorConverter.new(
-      smartTokenEthBnt.address,
-      contractRegistry.address,
-      30000,
-      BNTToken.address,
-      500000,
-      { from: accounts[0] }
+      flags,
+      maxWallets,
+      {
+        from: systemAddress,
+      }
     );
 
-    await converterEthBnt.addReserve(etherToken.address, 500000, {
+    //deploy the actual main token
+    this.mainToken = await JNTRToken.new(
+      "JNTR",
+      "JNTR",
+      systemAddress,
+      multiSigPlaceHolder,
+      this.auctionRegistry.address,
+      [accounts[0]],
+      [thousand],
+      {from: primaryOwner}
+    );
+    //With this lets fast forward in future where token holdeback days are over
+
+    //Now add it as a reserve
+    await converterMainBNT.addReserve(this.mainToken.address, 500000, {
       from: accounts[0],
     });
-    await converterEthBnt.setConversionFee(1000, { from: accounts[0] });
-    //fund the EthBnt Pool woth initial tokens
+    await converterMainBNT.setConversionFee(1000, {from: accounts[0]});
+    //fund the BNTJNTR Pool woth initial tokens
     //to do that first get those two tokens
     await BNTToken.issue(accounts[0], thousand, {
       from: accounts[0],
     });
-    await etherToken.deposit({ from: accounts[0], value: one });
     //now fund the pool
 
-    await BNTToken.transfer(converterEthBnt.address, one, {
+    await BNTToken.transfer(converterMainBNT.address, one, {
       from: accounts[0],
     });
-    await etherToken.transfer(converterEthBnt.address, one, {
+    await this.mainToken.transfer(converterMainBNT.address, one, {
       from: accounts[0],
     });
 
     //issue initial smart tokens equal to usd equivalent of the both reserve
-    await smartTokenEthBnt.issue(accounts[0], one.mul(new BN(2)), {
+    await smartTokenMainBNT.issue(accounts[0], one.mul(new BN(2)), {
       from: accounts[0],
     });
 
     //activate the pool
     //the pool would be invalid if it is not the owner of the corresponding smart token
-    await smartTokenEthBnt.transferOwnership(converterEthBnt.address, {
+    await smartTokenMainBNT.transferOwnership(converterMainBNT.address, {
       from: accounts[0],
     });
-    await converterEthBnt.acceptTokenOwnership({
+    await converterMainBNT.acceptTokenOwnership({
       from: accounts[0],
     });
 
-    //Let's try and see if this eth-bnt pool works
-    await etherToken.deposit({ from: accounts[3], value: 10 });
-    await etherToken.approve(converterEthBnt.address, 10, { from: accounts[3] });
+    this.jntrToken = this.mainToken;
+    this.smartToken = smartTokenMainBNT;
+    this.converter = converterMainBNT;
 
-    await converterEthBnt.quickConvert2(
-      [etherToken.address, smartTokenEthBnt.address, BNTToken.address],
-      10,
+    //setup for Auction
+
+    //tagAlong
+    this.tagAlong = await AuctionTagAlong.new(
+      systemAddress,
+      multiSigPlaceHolder,
+      this.auctionRegistry.address,
+      {from: primaryOwner}
+    );
+
+    //the prtection
+    var protectionRegistry = await ProtectionRegistry.new(
+      systemAddress,
+      multiSigPlaceHolder,
+      {from: primaryOwner}
+    );
+    let tempProtection = await Protection.new();
+    await protectionRegistry.addVersion(1, tempProtection.address, {
+      from: primaryOwner,
+    });
+    await protectionRegistry.createProxy(
       1,
-      ZERO_ADDRESS,
-      0,
-      { from: accounts[3] }
+      primaryOwner,
+      systemAddress,
+      multiSigPlaceHolder,
+      this.auctionRegistry.address,
+      {from: primaryOwner}
     );
+    proxyAddress = await protectionRegistry.proxyAddress();
+    this.protection = await Protection.at(proxyAddress);
 
-    //Now make a pair between the JNtR and BNT
-    this.smartToken = await SmartToken.new("BNTJNTR", "BNTJNTR", 18, {
-      from: accounts[0],
+    //the TokenVault
+    var tokenVaultRegistry = await TokenVaultRegistry.new(
+      systemAddress,
+      multiSigPlaceHolder,
+      {from: primaryOwner}
+    );
+    let tempTokenVault = await TokenVault.new({from: primaryOwner});
+    await tokenVaultRegistry.addVersion(1, tempTokenVault.address, {
+      from: primaryOwner,
     });
-    this.bancorConverterFactory = await BancorConverterFactory.new({
-      from: accounts[0],
-    });
+    await tokenVaultRegistry.createProxy(
+      1,
+      primaryOwner,
+      systemAddress,
+      multiSigPlaceHolder,
+      this.auctionRegistry.address,
+      {from: primaryOwner}
+    );
+    proxyAddress = await tokenVaultRegistry.proxyAddress();
+    this.tokenVault = await TokenVault.at(proxyAddress);
+    //test currencyPrices
 
-    this.jntrToken = await ERC20Token.new("JNTR", "JNTR", 18, thousand, {
-      from: accounts[0],
+    this.currencyPrices = await CurrencyPrices.new(
+      systemAddress,
+      multiSigPlaceHolder,
+      {from: primaryOwner}
+    );
+    //deploying the liquidity
+    let baseLinePrice = 1000000; //1$
+    var liquidityRegistry = await LiquidityRegistry.new(
+      systemAddress,
+      multiSigPlaceHolder,
+      {from: primaryOwner}
+    );
+    let tempLiquidity = await Liquidity.new({from: primaryOwner});
+    await liquidityRegistry.addVersion(1, tempLiquidity.address, {
+      from: primaryOwner,
     });
-
-    //the conoverter contract
-    let receipt = await this.bancorConverterFactory.createConverter(
-      this.smartToken.address,
-      contractRegistry.address,
-      30000,
+    await liquidityRegistry.createProxy(
+      1,
+      this.converter.address,
       BNTToken.address,
-      500000,
-      { from: accounts[0] }
+      this.jntrToken.address,
+      this.smartToken.address,
+      primaryOwner,
+      systemAddress,
+      multiSigPlaceHolder,
+      this.auctionRegistry.address,
+      baseLinePrice,
+      {from: primaryOwner}
     );
-
-    this.converter = await BancorConverter.at(receipt.logs[0].args._converter, {
-      from: accounts[0],
-    });
-
-    await this.converter.acceptOwnership({
-      from: accounts[0],
-    }); //We need to do this if we are using the bancorConverter factory
-    //It accepts the ownership to account[0]
-
-    await this.converter.addReserve(this.jntrToken.address, 500000, {
-      from: accounts[0],
-    });
-    await this.converter.setConversionFee(1000, {
-      from: accounts[0],
-    });
-
-    //fund pool with initial tokens
-
-    await this.jntrToken.transfer(this.converter.address, one, {
-      from: accounts[0],
-    });
-    await BNTToken.transfer(this.converter.address, one, {
-      from: accounts[0],
-    });
-
-    //issue initial liquidity tokens
-
-    await this.smartToken.issue(accounts[0], one.mul(new BN(2)), {
-      from: accounts[0],
-    });
-
-    //Activate the system
-
-    await this.smartToken.transferOwnership(this.converter.address, {
-      from: accounts[0],
-    });
-    await this.converter.acceptTokenOwnership({
-      from: accounts[0],
-    });
-
-    //Add the converter to the registry(TODO)
-
+    proxyAddress = await liquidityRegistry.proxyAddress();
+    this.liquidity = await Liquidity.at(proxyAddress);
+    //the paths
     //base token is the BNT
     // the main token is the JNTR
     ethToMainToken = [
@@ -340,133 +349,12 @@ contract("~Auction works", function (accounts) {
       smartTokenEthBnt.address,
       etherToken.address,
     ];
-
-    //setup for Auction
-    //auction registry
-    this.auctionRegistry = await AuctionRegisty.new(
-      systemAddress,
-      multiSigPlaceHolder,
-      { from: primaryOwner }
-    );
-    //tagAlong
-    this.tagAlong = await AuctionTagAlong.new(
-      systemAddress,
-      multiSigPlaceHolder,
-      this.auctionRegistry.address,
-      { from: primaryOwner }
-    );
-    //Deploy Whitelist
-    let stockTokenMaturityDays = 3560;
-    let tokenMaturityDays = 0;
-    let tokenHoldBackDays = 90;
-    var whiteListRegistry = await WhiteListRegistry.new(
-      systemAddress,
-      multiSigPlaceHolder,
-      { from: primaryOwner }
-    );
-    let tempWhiteList = await whiteListContract.new();
-    await whiteListRegistry.addVersion(1, tempWhiteList.address, {
-      from: primaryOwner,
-    });
-
-    // txTimestamp = (await web3.eth.getBlock("latest")).timestamp;
-    await whiteListRegistry.createProxy(
-      1,
-      primaryOwner,
-      systemAddress,
-      multiSigPlaceHolder,
-      tokenHoldBackDays,
-      tokenHoldBackDays,
-      tokenHoldBackDays,
-      tokenMaturityDays,
-      tokenMaturityDays,
-      stockTokenMaturityDays,
-      { from: primaryOwner }
-    );
-
-    let proxyAddress = await whiteListRegistry.proxyAddress();
-    this.whiteList = await whiteListContract.at(proxyAddress);
-    //the prtection
-    var protectionRegistry = await ProtectionRegistry.new(
-      systemAddress,
-      multiSigPlaceHolder,
-      { from: primaryOwner }
-    );
-    let tempProtection = await Protection.new();
-    await protectionRegistry.addVersion(1, tempProtection.address, {
-      from: primaryOwner,
-    });
-    await protectionRegistry.createProxy(
-      1,
-      primaryOwner,
-      systemAddress,
-      multiSigPlaceHolder,
-      this.auctionRegistry.address,
-      { from: primaryOwner }
-    );
-    proxyAddress = await protectionRegistry.proxyAddress();
-    this.protection = await Protection.at(proxyAddress);
-
-    //the TokenVault
-    var tokenVaultRegistry = await TokenVaultRegistry.new(
-      systemAddress,
-      multiSigPlaceHolder,
-      { from: primaryOwner }
-    );
-    let tempTokenVault = await TokenVault.new({ from: primaryOwner });
-    await tokenVaultRegistry.addVersion(1, tempTokenVault.address, {
-      from: primaryOwner,
-    });
-    await tokenVaultRegistry.createProxy(
-      1,
-      primaryOwner,
-      systemAddress,
-      multiSigPlaceHolder,
-      this.auctionRegistry.address,
-      { from: primaryOwner }
-    );
-    proxyAddress = await tokenVaultRegistry.proxyAddress();
-    this.tokenVault = await TokenVault.at(proxyAddress);
-    //test currencyPrices
-
-    this.currencyPrices = await CurrencyPrices.new(
-      systemAddress,
-      multiSigPlaceHolder,
-      { from: primaryOwner }
-    );
-    //deploying the liquidity
-    let baseLinePrice = 1000000; //1$
-    var liquidityRegistry = await LiquidityRegistry.new(
-      systemAddress,
-      multiSigPlaceHolder,
-      { from: primaryOwner }
-    );
-    let tempLiquidity = await Liquidity.new({ from: primaryOwner });
-    await liquidityRegistry.addVersion(1, tempLiquidity.address, {
-      from: primaryOwner,
-    });
-    await liquidityRegistry.createProxy(
-      1,
-      this.converter.address,
-      BNTToken.address,
-      this.jntrToken.address,
-      this.smartToken.address,
-      primaryOwner,
-      systemAddress,
-      multiSigPlaceHolder,
-      this.auctionRegistry.address,
-      baseLinePrice,
-      { from: primaryOwner }
-    );
-    proxyAddress = await liquidityRegistry.proxyAddress();
-    this.liquidity = await Liquidity.at(proxyAddress);
-
     //set the paths
-    this.liquidity.setTokenPath(0, ethToMainToken, { from: systemAddress });
-    this.liquidity.setTokenPath(1, baseTokenToMainToken, { from: systemAddress });
-    this.liquidity.setTokenPath(2, mainTokenTobaseToken, { from: systemAddress });
-    this.liquidity.setTokenPath(3, ethToBaseToken, { from: systemAddress });
-    this.liquidity.setTokenPath(4, baseTokenToEth, { from: systemAddress });
+    this.liquidity.setTokenPath(0, ethToMainToken, {from: systemAddress});
+    this.liquidity.setTokenPath(1, baseTokenToMainToken, {from: systemAddress});
+    this.liquidity.setTokenPath(2, mainTokenTobaseToken, {from: systemAddress});
+    this.liquidity.setTokenPath(3, ethToBaseToken, {from: systemAddress});
+    this.liquidity.setTokenPath(4, baseTokenToEth, {from: systemAddress});
     //Put all these addresses in the auction Registry
     await this.auctionRegistry.registerContractAddress(
       web3.utils.fromAscii("LIQUADITY"),
@@ -498,15 +386,15 @@ contract("~Auction works", function (accounts) {
       }
     );
     await this.auctionRegistry.registerContractAddress(
-      web3.utils.fromAscii("WHITE_LIST"),
-      this.whiteList.address,
+      web3.utils.fromAscii("COMPANY_FUND_WALLET"),
+      companyFundWallet,
       {
         from: primaryOwner,
       }
     );
     await this.auctionRegistry.registerContractAddress(
-      web3.utils.fromAscii("COMPANY_FUND_WALLET"),
-      companyFundWallet,
+      web3.utils.fromAscii("COMPANY_MAIN_TOKEN_WALLET"),
+      companyMainTokenWallet,
       {
         from: primaryOwner,
       }
@@ -518,16 +406,33 @@ contract("~Auction works", function (accounts) {
         from: primaryOwner,
       }
     );
+    await this.auctionRegistry.registerContractAddress(
+      web3.utils.fromAscii("STACKING_TOKEN_WALLET"),
+      stackingFundWallet,
+      {
+        from: primaryOwner,
+      }
+    );
+
+    await this.auctionRegistry.registerContractAddress(
+      web3.utils.fromAscii("MAIN_TOKEN"),
+      this.jntrToken.address,
+      {
+        from: primaryOwner,
+      }
+    );
+
     //the startTime would be now from my understnding
     //th minAuctionTime would be less than a day
     let startTime = await time.latest();
     let minAuctionTime = time.duration.hours(23);
+    let interval = time.duration.days(1);
     var auctionRegistry = await AuctionRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      { from: primaryOwner }
+      {from: primaryOwner}
     );
-    let tempAuction = await Auction.new({ from: primaryOwner });
+    let tempAuction = await Auction.new({from: primaryOwner});
     await auctionRegistry.addVersion(1, tempAuction.address, {
       from: primaryOwner,
     });
@@ -535,11 +440,12 @@ contract("~Auction works", function (accounts) {
       1,
       startTime,
       minAuctionTime,
+      interval,
       primaryOwner,
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      { from: primaryOwner }
+      {from: primaryOwner}
     );
     proxyAddress = await auctionRegistry.proxyAddress();
     this.auction = await Auction.at(proxyAddress);
@@ -558,23 +464,86 @@ contract("~Auction works", function (accounts) {
     await this.tokenVault.updateAddresses();
     await this.tagAlong.updateAddresses();
     await this.protection.updateAddresses();
+    await this.jntrToken.updateAddresses();
     //Add liquidity address as a spender in tokenVault
     await this.tokenVault.addSpender(this.liquidity.address, {
       from: multiSigPlaceHolder,
     });
 
     //Whitelist accountA and AccountB
-    let flags = 3; // KYC|AML
-    let maxWallets = 10;
+    flags = IS_BYPASSED; // KYC|AML
+    maxWallets = 10;
     await this.whiteList.addNewWallet(accountA, flags, maxWallets, {
       from: systemAddress,
     });
     await this.whiteList.addNewWallet(accountB, flags, maxWallets, {
       from: systemAddress,
     });
+    //We need to whiteList evryone who gets their hands on the jntr
+    flags = IS_BYPASSED;
+    maxWallets = 0;
+    await this.whiteList.addNewWallet(
+      this.tokenVault.address,
+      flags,
+      maxWallets,
+      {
+        from: systemAddress,
+      }
+    );
+    await this.whiteList.addNewWallet(
+      this.tagAlong.address,
+      flags,
+      maxWallets,
+      {
+        from: systemAddress,
+      }
+    );
+    await this.whiteList.addNewWallet(
+      this.liquidity.address,
+      flags,
+      maxWallets,
+      {
+        from: systemAddress,
+      }
+    );
+    await this.whiteList.addNewWallet(this.auction.address, flags, maxWallets, {
+      from: systemAddress,
+    });
+    await this.whiteList.addNewWallet(companyFundWallet, flags, maxWallets, {
+      from: systemAddress,
+    });
+    await this.whiteList.addNewWallet(
+      this.protection.address,
+      flags,
+      maxWallets,
+      {
+        from: systemAddress,
+      }
+    );
+    //Because if no one has stacked then the stacking bonus goes to stackingFundWallet
+    await this.whiteList.addNewWallet(stackingFundWallet, flags, maxWallets, {
+      from: systemAddress,
+    });
+    //This is the wallet where the minting fees after auction end goes
+    await this.whiteList.addNewWallet(
+      companyMainTokenWallet,
+      flags,
+      maxWallets,
+      {
+        from: systemAddress,
+      }
+    );
+    //Alo lets just fast forward in the future where holdback days are over
+    await time.increase(time.duration.days(tokenHoldBackDays));
   });
   it("Auction should be initialized correctly", async function () {
-    // console.log(await this.auction.lastAuctionStart());
+    //lets see if converting eth to main token works
+
+    // await this.converter.quickConvert2(ethToMainToken, 10, 1, ZERO_ADDRESS, 0, {
+    //   from: accountA,
+    //   value: 10,
+    // });
+    //console.log(await this.auction.lastAuctionStart());
     //90% goes to DownsideProtection
     expect(
       await this.auction.dayWiseDownSideProtectionRatio(1)
@@ -583,6 +552,21 @@ contract("~Auction works", function (accounts) {
     expect(await this.auction.fundWalletRatio()).to.be.bignumber.equal(
       fundWalletRatio
     );
+
+    //other initializations
+    expect(await this.auction.totalContribution()).to.be.bignumber.equal(
+      getWith9Decimals(2500000)
+    );
+    expect(await this.auction.yesterdayContribution()).to.be.bignumber.equal(
+      getWith9Decimals(500)
+    );
+    expect(await this.auction.allowedMaxContribution()).to.be.bignumber.equal(
+      getWith9Decimals(500)
+    );
+    expect(await this.auction.todaySupply()).to.be.bignumber.equal(
+      getWith18Decimals(50000)
+    );
+
     // //To make sure everybody has everybody's address
     // console.log(await this.protection.auctionAddress());
     // console.log(await this.protection.auctionAddress());
@@ -697,13 +681,13 @@ contract("~Auction works", function (accounts) {
     //Remainig goes to reserves
     let reserveAmount = temp;
 
-    // console.log((await this.jntrToken.balanceOf(companyFundWallet)).toString());
-    // console.log(
-    //   (await this.jntrToken.balanceOf(this.protection.address)).toString()
-    // );
-    // console.log(
-    //   (await this.jntrToken.balanceOf(this.liquidity.address)).toString()
-    // );
+    console.log((await this.jntrToken.balanceOf(companyFundWallet)).toString());
+    console.log(
+      (await this.jntrToken.balanceOf(this.protection.address)).toString()
+    );
+    console.log(
+      (await this.jntrToken.balanceOf(this.liquidity.address)).toString()
+    );
     expect(
       await this.jntrToken.balanceOf(this.protection.address)
     ).to.be.bignumber.equal(downSideAmount);
@@ -714,8 +698,378 @@ contract("~Auction works", function (accounts) {
       await this.jntrToken.balanceOf(this.liquidity.address)
     ).to.be.bignumber.equal(reserveAmount);
   });
+  it("should keep track of top5 contributors", async function () {
+    //the current way to calculate bonus can be optimized
+    //by keeping track of only first 5 addresses
+
+    //first things first
+    //add currencyPrices
+    let ethPrice = one;
+    let mainTokenPrice = one;
+    await this.currencyPrices.setCurrencyPriceUSD(
+      [ZERO_ADDRESS, this.jntrToken.address],
+      [ethPrice, mainTokenPrice],
+      {from: systemAddress}
+    );
+    //lets make a programmable test
+    //change the vaules here to test if it works correctly
+    //Max 10 and it only tests the condition when two accounts does not have same contribution
+    let contributionInEth = [80000, 90000, 40000, 50000, 60000, 70000];
+
+    let amountToAccount = new Map();
+    let i = 0;
+    contributionInEth.forEach((element) => {
+      amountToAccount.set(element, i);
+      i++;
+    });
+
+    let contributionBN = [];
+    contributionInEth.forEach((element) => {
+      contributionBN.push(new BN(element));
+    });
+
+    //Whitelist them
+    for (let i = 0; i < contributionInEth.length; i++) {
+      let isWhiteListed = await this.whiteList.isWhiteListed(accounts[i]);
+      let flags = 3;
+      let maxWallets = 10;
+      if (!isWhiteListed) {
+        await this.whiteList.addNewWallet(accounts[i], flags, maxWallets, {
+          from: systemAddress,
+        });
+      }
+    }
+
+    for (let i = 0; i < contributionInEth.length; i++) {
+      await this.auction.contributeWithEther({
+        from: accounts[i],
+        value: contributionBN[i],
+      });
+    }
+    let auctionDay = await this.auction.auctionDay();
+
+    //following is true only becuase I have set the price of ether to be 1* 10^18
+    for (let i = 0; i < contributionInEth.length; i++) {
+      expect(
+        await this.auction.walletDayWiseContribution(auctionDay, accounts[i])
+      ).to.be.bignumber.equal(contributionBN[i]);
+    }
+
+    contributionInEth.sort();
+    contributionInEth.reverse();
+
+    for (let i = 0; i < 5; i++) {
+      expect(
+        await this.auction.addressWhichIndex(
+          auctionDay,
+          accounts[amountToAccount.get(contributionInEth[i])]
+        )
+      ).to.be.bignumber.equal((i + 1).toString());
+    }
+  });
 
   //Next I need to check what happens when auction ends
   //Also after it is updated I need to check the bonus calculation
   //That includes two things "FundAdded" and distributeTokens
+
+  describe("Auction Ends correctly", async function () {
+    beforeEach(async function () {
+      //Also we would need to allow the token becuse you cannot lock tokens in protection if token is not allowed
+      await this.protection.allowToken(this.jntrToken.address, {
+        from: systemAddress,
+      });
+      //set the price for ether and the jntr in the currencyPrices
+      //1 eth = 1* 10 ^18
+      //1 jntr =1 * 10^ 18
+      //need to figure out what is the deimal situation in auction
+      await this.currencyPrices.setCurrencyPriceUSD(
+        [ZERO_ADDRESS, this.jntrToken.address],
+        [one, one],
+        {from: systemAddress}
+      );
+      //Also we need to whitelist every address that contributes
+      //accountA and accountB are already whitelisted
+
+      await this.jntrToken.transfer(accountA, one, {
+        from: accounts[0],
+      });
+      await this.jntrToken.transfer(accountB, one, {
+        from: accounts[0],
+      });
+    });
+
+    it("When ", async function () {
+      //the idea is to make this test dynamic so that we can test it using different value
+
+      //contribute with token
+      let contributionAmount = new BN(10000);
+
+      //Noe the contribution starts
+      await this.jntrToken.approve(this.auction.address, contributionAmount, {
+        from: accountA,
+      });
+
+      await this.auction.contributeWithToken(
+        this.jntrToken.address,
+        contributionAmount,
+        {
+          from: accountA,
+        }
+      );
+
+      await this.jntrToken.approve(this.auction.address, contributionAmount, {
+        from: accountB,
+      });
+      await this.auction.contributeWithToken(
+        this.jntrToken.address,
+        contributionAmount,
+        {
+          from: accountB,
+        }
+      );
+      //contribute with ether
+      await this.auction.contributeWithEther({
+        from: accountA,
+        value: contributionAmount,
+      });
+
+      //lets make sure all the veriable are now set correctly
+      let todayContribution = contributionAmount.mul(new BN(3));
+      console.log((await this.auction.todayContribution()).toString());
+      console.log(todayContribution.toString());
+
+      // //should not be able to end the auction before the minAuctionTime(a day)
+      // await expectRevert(
+      //   this.auction.auctionEnd({from: systemAddress}),
+      //   "ERR_MIN_TIME_IS_NOT_OVER"
+      // );
+
+      // await time.increase(time.duration.days(1));
+      await this.auction.auctionEnd({from: systemAddress});
+    });
+    it("when today's supply is less then the yesterday's supply", async function () {
+      let yesterdaySupply = new BN(200000);
+      let todaySupply = new BN(100000);
+
+      //contribute yesterDay supply and end the auction
+      await this.auction.contributeWithEther({
+        from: accountA,
+        value: yesterdaySupply,
+      });
+      await this.auction.auctionEnd({from: systemAddress});
+
+      //contribute today supply and end the auction
+      await this.auction.contributeWithEther({
+        from: accountB,
+        value: todaySupply,
+      });
+      let auctionDay = await this.auction.auctionDay();
+      let supplyOfJNTR = await this.auction.todaySupply();
+      let stackingWalletJNTRBalance = await this.jntrToken.balanceOf(
+        stackingFundWallet
+      );
+      let companyTokenWalletJNTRBalnce = await this.jntrToken.balanceOf(
+        companyMainTokenWallet
+      );
+      console.log(companyTokenWalletJNTRBalnce.toString());
+      await this.auction.auctionEnd({from: systemAddress});
+
+      //lets make sure everything is set correctly
+
+      let allowedMaxContributionPercent = await this.auction.maxContributionAllowed(); //Which is 150
+      let maxContributionAllowed1 = todaySupply
+        .mul(allowedMaxContributionPercent)
+        .div(hundreadPercentage);
+
+      let maxContributionAllowed2 = yesterdaySupply
+        .mul(allowedMaxContributionPercent)
+        .div(hundreadPercentage);
+      //Following because the max for these two will be the ones getting selected(This will be the case when auctionDay = 2)
+      let maxContributionAllowed =
+        maxContributionAllowed1 > maxContributionAllowed2
+          ? maxContributionAllowed1
+          : maxContributionAllowed2;
+
+      expect(await this.auction.allowedMaxContribution()).to.be.bignumber.equal(
+        maxContributionAllowed
+      );
+      //expect bonusSupply to be zero
+      expect(
+        await this.auction.dayWiseSupplyBonus(auctionDay)
+      ).to.be.bignumber.equal("0");
+
+      console.log((await this.auction.dayWiseSupply(auctionDay)).toString());
+
+      expect(
+        await this.auction.dayWiseSupply(auctionDay)
+      ).to.be.bignumber.equal(supplyOfJNTR);
+
+      let dayWiseSupply = await this.auction.dayWiseSupply(auctionDay);
+      //calculate the stacking Amount(Which is 1% of the dayWiseSupply)
+      //Find the difference of jntrBalance
+      stackingWalletJNTRBalance = (
+        await this.jntrToken.balanceOf(stackingFundWallet)
+      ).sub(stackingWalletJNTRBalance);
+
+      //This difference should be same as 1% of the dayWise supply
+      let stackingRatio = await this.auction.stacking();
+      let stackingAmount = dayWiseSupply
+        .mul(stackingRatio)
+        .div(hundreadPercentage);
+
+      expect(stackingAmount).to.be.bignumber.equal(stackingWalletJNTRBalance);
+
+      //calculate the management fees (which is (100/98 -1) of the supply + stackingAmount)
+      let totalSupply = dayWiseSupply.add(stackingAmount);
+      let managementFees = await this.auction.mangmentFee(); //which is =2
+      let temp = totalSupply
+        .mul(hundreadPercentage)
+        .div(hundreadPercentage.sub(managementFees));
+      let fees = temp.sub(totalSupply);
+
+      //Find the difference of jntrBalance
+      companyTokenWalletJNTRBalnce = (
+        await this.jntrToken.balanceOf(companyMainTokenWallet)
+      ).sub(companyTokenWalletJNTRBalnce);
+
+      expect(fees).to.be.bignumber.equal(companyTokenWalletJNTRBalnce);
+    });
+    it("when today's supply is greater then the yesterday's supply", async function () {
+      let yesterdaySupply = new BN(200000);
+      let todaySupply = new BN(300000);
+
+      //contribute yesterDay supply and end the auction
+      await this.auction.contributeWithEther({
+        from: accountA,
+        value: yesterdaySupply,
+      });
+      await this.auction.auctionEnd({from: systemAddress});
+
+      //contribute today supply and end the auction
+      await this.auction.contributeWithEther({
+        from: accountB,
+        value: todaySupply,
+      });
+      let auctionDay = await this.auction.auctionDay();
+      let supplyOfJNTR = await this.auction.todaySupply();
+      let stackingWalletJNTRBalance = await this.jntrToken.balanceOf(
+        stackingFundWallet
+      );
+      let companyTokenWalletJNTRBalnce = await this.jntrToken.balanceOf(
+        companyMainTokenWallet
+      );
+      // console.log(companyTokenWalletJNTRBalnce.toString());
+
+      await this.auction.auctionEnd({from: systemAddress});
+
+      //lets make sure everything is set correctly
+
+      let allowedMaxContributionPercent = await this.auction.maxContributionAllowed(); //Which is 150
+      let maxContributionAllowed1 = todaySupply
+        .mul(allowedMaxContributionPercent)
+        .div(hundreadPercentage);
+
+      let maxContributionAllowed2 = yesterdaySupply
+        .mul(allowedMaxContributionPercent)
+        .div(hundreadPercentage);
+      //Following because the max for these two will be the ones getting selected(This will be the case when auctionDay = 2)
+      let maxContributionAllowed =
+        maxContributionAllowed1 > maxContributionAllowed2
+          ? maxContributionAllowed1
+          : maxContributionAllowed2;
+
+      expect(await this.auction.allowedMaxContribution()).to.be.bignumber.equal(
+        maxContributionAllowed
+      );
+      //calculate the bonus
+      //Which will be on the today's supply which is decided by yesterday's contribution(i.e. supplyOf JNTR)
+      let groupBonusRatio = await this.auction.groupBonusRatio(); //Which is 2
+      //The bonus is (supply*(today*ratio/yesterday) - supply)
+
+      let temp = todaySupply
+        .mul(denominator)
+        .div(yesterdaySupply)
+        .mul(groupBonusRatio);
+
+      let bonusSupply = supplyOfJNTR
+        .mul(temp)
+        .div(denominator)
+        .sub(supplyOfJNTR);
+      expect(
+        await this.auction.dayWiseSupplyBonus(auctionDay)
+      ).to.be.bignumber.equal(bonusSupply);
+
+      let dayWiseSupply = await this.auction.dayWiseSupply(auctionDay);
+
+      expect(dayWiseSupply).to.be.bignumber.equal(
+        bonusSupply.add(supplyOfJNTR)
+      );
+      //calculate the stacking Amount(Which is 1% of the dayWiseSupply)
+      //Find the difference of jntrBalance
+      stackingWalletJNTRBalance = (
+        await this.jntrToken.balanceOf(stackingFundWallet)
+      ).sub(stackingWalletJNTRBalance);
+
+      //This difference should be same as 1% of the dayWise supply
+      let stackingRatio = await this.auction.stacking();
+      let stackingAmount = dayWiseSupply
+        .mul(stackingRatio)
+        .div(hundreadPercentage);
+
+      expect(stackingAmount).to.be.bignumber.equal(stackingWalletJNTRBalance);
+
+      //calculate the management fees (which is (100/98 -1) of the supply + stackingAmount)
+      let totalSupply = dayWiseSupply.add(stackingAmount);
+      let managementFees = await this.auction.mangmentFee(); //which is =2
+      temp = totalSupply
+        .mul(hundreadPercentage)
+        .div(hundreadPercentage.sub(managementFees));
+      let fees = temp.sub(totalSupply);
+
+      //Find the difference of jntrBalance
+      companyTokenWalletJNTRBalnce = (
+        await this.jntrToken.balanceOf(companyMainTokenWallet)
+      ).sub(companyTokenWalletJNTRBalnce);
+
+      expect(fees).to.be.bignumber.equal(companyTokenWalletJNTRBalnce);
+    });
+    it("when the today's contribution is zero(TODO)", async function () {});
+  });
+  it("should distribute Tokens correctly(TODO)", async function () {
+    //here lets end the first auction
+    let yesterdaySupply = new BN(200000);
+    // let todaySupply = new BN(300000);
+
+    //contribute yesterDay supply and end the auction
+    await this.auction.contributeWithEther({
+      from: accountA,
+      value: yesterdaySupply,
+    });
+    await this.auction.auctionEnd({from: systemAddress});
+
+    //Made this just so that yesterdays supply is not a too big of a number(i.e 50000 * DECIMAL_NOMINATOR)
+
+    //contribute today supply and end the auction
+    await this.auction.contributeWithEther({
+      from: accountB,
+      value: todaySupply,
+    });
+    let auctionDay = await this.auction.auctionDay();
+
+    await this.auction.auctionEnd({from: systemAddress});
+
+    //lets get all the necessary amounts for auctionDay
+    let bonusSupply = await this.auction.dayWiseSupplyBonus(auctionDay);
+    let coreSupply = await this.auction.dayWiseSupplyCore(auctionDay);
+    let downSideProtectioRatio = await this.aucion.dayWiseDownSideProtectionRatio(
+      auctionDay
+    ); //Its 90%
+  });
 });
+//minimium for contribution with eth is 10000 wei
+//if 1000 it fails
+//somewhere in dividing it fails
+//I dont know where
+
+//Note: when the first auction ends the 500*Price denomitors's 1% gets added to stacking Wallet
+//Keep in mind that in the first auction end the vaules being used
