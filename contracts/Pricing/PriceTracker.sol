@@ -3,15 +3,18 @@ pragma solidity ^0.5.9;
 import "./provableAPI.sol";
 import "../common/Ownable.sol";
 
+contract CurrencyPriceTicker is usingProvable, Ownable {
+    string public currency;
 
-contract EthPriceTicker is usingProvable, Ownable {
-    uint256 public priceETHUSD;
+    uint256 public priceUSD;
 
-    uint256 public currentGasPrice = 4000000000; //4Gwei
+    uint256 public currentGasPrice = 12000000000; //12Gwei
 
-    uint256 public currentGasLimit = 80000;
+    uint256 public currentGasLimit = 100000;
 
     string[] public parameters;
+
+    bytes32[] public queryIds;
 
     mapping(bytes32 => bool) validIds;
 
@@ -20,14 +23,15 @@ contract EthPriceTicker is usingProvable, Ownable {
     event LogProof(bytes proof);
 
     constructor(
+        string memory _currency,
         address _systemAddress,
         address _multisigAddress,
         string memory _parameter
     ) public payable Ownable(_systemAddress, _multisigAddress) {
+        currency = _currency;
         provable_setCustomGasPrice(currentGasPrice);
         provable_setProof(proofType_Android | proofStorage_IPFS);
         parameters.push(_parameter);
-        update(); // Update price on contract creation...
     }
 
     function setGasPrice(uint256 _gasPrice) external onlySystem() {
@@ -51,20 +55,20 @@ contract EthPriceTicker is usingProvable, Ownable {
         string memory _result,
         bytes memory _proof
     ) public {
-        require(msg.sender == provable_cbAddress());
-        require(validIds[_myid]);
+        require(msg.sender == provable_cbAddress(),ERR_AUTHORIZED_ADDRESS_ONLY);
+        require(validIds[_myid],"ERR_NOT_VALID_ID");
 
-        priceETHUSD = parseInt(_result);
+        priceUSD = parseInt(_result);
         delete validIds[_myid];
-        emit LogNewEthPriceTicker(priceETHUSD);
+        emit LogNewEthPriceTicker(priceUSD);
         emit LogProof(_proof);
     }
 
     function getCurrencyPrice() external view returns (uint256) {
-        return priceETHUSD;
+        return priceUSD;
     }
 
-    function update() public payable {
+    function update() external payable {
         uint256 fee = provable_getPrice("computation", currentGasLimit);
 
         if (msg.sender != systemAddress) {
@@ -88,6 +92,7 @@ contract EthPriceTicker is usingProvable, Ownable {
                 currentGasLimit
             );
             validIds[queryId] = true;
+            queryIds.push(queryId);
         }
     }
 
