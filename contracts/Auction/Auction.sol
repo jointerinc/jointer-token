@@ -435,8 +435,8 @@ contract AuctionFundCollector is IndividualBonus {
     // check before contribution
     function _checkContribution(address _from) internal view returns (bool) {
         require(
-            IWhiteList(whiteListAddress).isWhiteListed(_from),
-            "ERR_WHITELIST_CHECK"
+            IWhiteList(whiteListAddress).isAllowedInAuction(_from),
+            "ERR_NOT_ALLOWED_IN_AUCTION"
         );
         return true;
     }
@@ -467,7 +467,7 @@ contract AuctionFundCollector is IndividualBonus {
                     walletDayWiseContribution[auctionDay][_from],
                     _contributedAmount
                 ),
-            "ERR_USER_DONT_HAVE_ENOUGH_TOKEN"
+            "ERR_USER_DONT_HAVE_EQUAL_BALANCE"
         );
 
         uint256 lockToken = safeDiv(
