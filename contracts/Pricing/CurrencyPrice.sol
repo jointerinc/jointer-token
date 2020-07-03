@@ -2,11 +2,9 @@ pragma solidity ^0.5.9;
 
 import "../common/Ownable.sol";
 
-
 interface IPrice {
     function getCurrencyPrice() external view returns (uint256);
 }
-
 
 contract CurrencyPrices is Ownable {
     mapping(address => address) public currencyContract;
@@ -21,7 +19,7 @@ contract CurrencyPrices is Ownable {
         onlySystem()
         returns (bool)
     {
-        require(currencyContract[_currency] == address(0));
+        require(currencyContract[_currency] == address(0),"ERR_ADDRESS_IS_SET");
         currencyContract[_currency] = _priceFeed;
         return true;
     }
