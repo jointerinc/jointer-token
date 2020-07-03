@@ -12,7 +12,6 @@ import "../InterFaces/ICurrencyPrices.sol";
 import "../InterFaces/IAuctionLiquadity.sol";
 import "../InterFaces/ITokenVault.sol";
 import "../InterFaces/IToken.sol";
-import "../InterFaces/IIndividualBonus.sol";
 import "../InterFaces/IWhiteList.sol";
 
 interface InitializeInterface {
@@ -39,7 +38,6 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     address payable public liquadityAddress;
     address payable public companyFundWalletAddress;
     address payable public companyTokenWalletAddress;
-    address payable public individualBonusAddress;
 
     function updateRegistery(address _address)
         external
@@ -73,7 +71,6 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
         liquadityAddress = getAddressOf(LIQUADITY);
         companyFundWalletAddress = getAddressOf(COMPANY_FUND_WALLET);
         companyTokenWalletAddress = getAddressOf(COMPANY_MAIN_TOKEN_WALLET);
-        individualBonusAddress = getAddressOf(INDIVIDUAL_BONUS);
     }
 
     function updateAddresses() external returns (bool) {
@@ -82,9 +79,8 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
 }
 
 contract AuctionUtils is AuctionRegistery {
-    
     uint256 public constant PRICE_NOMINATOR = 10**9;
-    
+
     uint256 public constant DECIMAL_NOMINATOR = 10**18;
 
     // allowed contarct limit the contribution
@@ -132,7 +128,6 @@ contract AuctionUtils is AuctionRegistery {
         groupBonusRatio = _groupBonusRatio;
         return true;
     }
-
 
     function setBufferLimit(uint256 _bufferLimit)
         external
@@ -192,10 +187,9 @@ contract AuctionUtils is AuctionRegistery {
 }
 
 contract AuctionFormula is SafeMath, TokenTransfer {
-    
-    //calculate Fund On each day how much user get 
+    //calculate Fund On each day how much user get
     // split between to _returnAmount totalAmount which user get
-    // _userAmount is which user get other token is locked 
+    // _userAmount is which user get other token is locked
     function calcuateAuctionTokenDistrubution(
         uint256 dayWiseContributionByWallet,
         uint256 dayWiseSupplyCore,
@@ -203,7 +197,6 @@ contract AuctionFormula is SafeMath, TokenTransfer {
         uint256 dayWiseContribution,
         uint256 downSideProtectionRatio
     ) internal pure returns (uint256, uint256) {
-        
         uint256 _dayWiseSupplyCore = safeDiv(
             safeMul(dayWiseSupplyCore, dayWiseContributionByWallet),
             dayWiseContribution
@@ -228,8 +221,8 @@ contract AuctionFormula is SafeMath, TokenTransfer {
 
         return (_returnAmount, _userAmount);
     }
-    
-    //this method calculate fund disturbution 
+
+    //this method calculate fund disturbution
     // 90% fund locked in downSideProtection
     // other fund divided into LIQUADITY and companyWallet
     function calcuateAuctionFundDistrubution(
@@ -257,8 +250,7 @@ contract AuctionFormula is SafeMath, TokenTransfer {
 
         return (_downsideAmount, _fundwallet, newvalue);
     }
-    
-    
+
     function calculateNewSupply(
         uint256 todayContribution,
         uint256 tokenPrice,
@@ -339,8 +331,7 @@ contract AuctionStorage is AuctionFormula, AuctionUtils {
     uint256 public todaySupply;
 
     bool public auctionSoldOut;
-    
-    
+
     function initializeStorage() internal {
         auctionDay = 1;
         totalContribution = 2500000 * PRICE_NOMINATOR;
@@ -351,17 +342,21 @@ contract AuctionStorage is AuctionFormula, AuctionUtils {
 }
 
 contract IndividualBonus is AuctionStorage {
-    
     mapping(uint256 => uint256) public indexReturn;
-    
+
     // top five contributor daywise
     mapping(uint256 => mapping(uint256 => address)) public topFiveContributior;
-    
+
     //contributor Index
     mapping(uint256 => mapping(address => uint256)) public topContributiorIndex;
-    
-   
-    function updateIndividualBonusRatio(uint256 X1,uint256 X2,uint256 X3,uint256 X4,uint256 X5) external onlyAuthorized() returns(bool){
+
+    function updateIndividualBonusRatio(
+        uint256 X1,
+        uint256 X2,
+        uint256 X3,
+        uint256 X4,
+        uint256 X5
+    ) external onlyAuthorized() returns (bool) {
         indexReturn[1] = X1;
         indexReturn[2] = X2;
         indexReturn[3] = X3;
@@ -369,20 +364,21 @@ contract IndividualBonus is AuctionStorage {
         indexReturn[5] = X5;
         return true;
     }
-    
-    
-   function _comprareForGroupBonus(address _from) internal {
+
+    function _comprareForGroupBonus(address _from) internal {
         address contributor;
         uint256 topContributior;
         bool replaced = false;
         address replaceWith;
 
+
             uint256 contributionByUser
          = walletDayWiseContribution[auctionDay][_from];
-        
-        uint256 smallestContributionByUser = walletDayWiseContribution[auctionDay][topFiveContributior[auctionDay][5]];
-        if(contributionByUser > smallestContributionByUser){
-            
+
+
+            uint256 smallestContributionByUser
+         = walletDayWiseContribution[auctionDay][topFiveContributior[auctionDay][5]];
+        if (contributionByUser > smallestContributionByUser) {
             for (uint256 x = 1; x <= 5; x++) {
                 contributor = topFiveContributior[auctionDay][x];
                 topContributior = walletDayWiseContribution[auctionDay][contributor];
@@ -396,31 +392,30 @@ contract IndividualBonus is AuctionStorage {
                     topContributiorIndex[auctionDay][replaceWith] = x;
                     replaceWith = contributor;
                 }
-            } 
-            if(replaceWith != address(0) && replaceWith != _from)
+            }
+            if (replaceWith != address(0) && replaceWith != _from)
                 topContributiorIndex[auctionDay][replaceWith] = 0;
         }
     }
-    
-    function calculateBouns(uint256 _auctionDay, address _from) external view returns (uint256)
+
+    function calculateBouns(uint256 _auctionDay, address _from)
+        external
+        view
+        returns (uint256)
     {
-        return _calculateBouns(_auctionDay,_from);
+        return _calculateBouns(_auctionDay, _from);
     }
-    
+
     function _calculateBouns(uint256 _auctionDay, address _from)
         internal
         view
         returns (uint256)
     {
-       
-       return indexReturn[topContributiorIndex[_auctionDay][_from]];
+        return indexReturn[topContributiorIndex[_auctionDay][_from]];
     }
-
-    
 }
 
 contract AuctionFundCollector is IndividualBonus {
-    
     event FundAdded(
         uint256 indexed _auctionDayId,
         uint256 _todayContribution,
@@ -480,8 +475,7 @@ contract AuctionFundCollector is IndividualBonus {
 
         IToken(mainTokenAddress).lockToken(_from, lockToken, now);
     }
-    
-    
+
     function fundAdded(
         address _token,
         uint256 _amount,
@@ -535,7 +529,7 @@ contract AuctionFundCollector is IndividualBonus {
             _contributedAmount
         );
 
-       _comprareForGroupBonus(_from);
+        _comprareForGroupBonus(_from);
 
         emit FundAdded(
             auctionDay,
@@ -754,9 +748,9 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
 
             _mainTokenPrice = ICurrencyPrices(currencyPricesAddress)
                 .getCurrencyPrice(mainTokenAddress);
-            
+
             _comprareForGroupBonus(vaultAddress);
-            
+
             emit FundAdded(
                 auctionDay,
                 todayContribution,
@@ -798,19 +792,22 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         uint256 _avgInvestment = 0;
 
         if (auctionDay < 11 && auctionDay > 1) {
-            _avgDays = safeSub(auctionDay,1);
+            _avgDays = safeSub(auctionDay, 1);
         }
-        
-        if(auctionDay > 1){
+
+        if (auctionDay > 1) {
             for (uint32 tempX = 1; tempX <= _avgDays; tempX++) {
                 _avgInvestment = safeAdd(
                     _avgInvestment,
                     dayWiseContribution[safeSub(auctionDay, tempX)]
                 );
             }
-    
+
             _avgInvestment = safeDiv(
-                safeMul(safeDiv(_avgInvestment, _avgDays), maxContributionAllowed),
+                safeMul(
+                    safeDiv(_avgInvestment, _avgDays),
+                    maxContributionAllowed
+                ),
                 100
             );
         }
@@ -822,13 +819,13 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         dayWiseSupplyCore[auctionDay] = todaySupply;
         dayWiseSupplyBonus[auctionDay] = bonusSupply;
         dayWiseSupply[auctionDay] = safeAdd(todaySupply, bonusSupply);
-        
-        
+
         uint256 stackingAmount = safeDiv(
-            safeMul(dayWiseSupply[auctionDay],stacking),100
+            safeMul(dayWiseSupply[auctionDay], stacking),
+            100
         );
         uint256 fee = calculateSupplyPercent(
-            safeAdd(stackingAmount,dayWiseSupply[auctionDay]),
+            safeAdd(stackingAmount, dayWiseSupply[auctionDay]),
             mangmentFee
         );
         IToken(mainTokenAddress).mintTokens(safeAdd(fee, stackingAmount));
@@ -918,29 +915,25 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
             dayWiseDownSideProtectionRatio[dayId]
         );
 
-        uint256 _percent = _calculateBouns(dayId,_which);
-        
+        uint256 _percent = _calculateBouns(dayId, _which);
+
         uint256 newReturnAmount = 0;
 
         uint256 fee = 0;
-        
-        if(_percent > 0){
-            
-            newReturnAmount = safeDiv(safeMul(returnAmount,_percent),100);
-            
-            fee = calculateSupplyPercent(
-                newReturnAmount,
-                mangmentFee
-            );
+
+        if (_percent > 0) {
+            newReturnAmount = safeDiv(safeMul(returnAmount, _percent), 100);
+
+            fee = calculateSupplyPercent(newReturnAmount, mangmentFee);
         }
-        
-        newReturnAmount = safeAdd(returnAmount,newReturnAmount);
-        
-        IToken(mainTokenAddress).mintTokens(safeAdd(newReturnAmount,fee));
-        
+
+        newReturnAmount = safeAdd(returnAmount, newReturnAmount);
+
+        IToken(mainTokenAddress).mintTokens(safeAdd(newReturnAmount, fee));
+
         // here we check with last auction bcz user can invest after auction start
         IToken(mainTokenAddress).lockToken(_which, 0, LAST_AUCTION_START);
-        
+
         ensureTransferFrom(
             IERC20Token(mainTokenAddress),
             address(this),
