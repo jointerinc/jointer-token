@@ -1,7 +1,8 @@
 pragma solidity ^0.5.9;
 
 import "../common/SafeMath.sol";
-import "../common/Ownable.sol";
+import "../common/ProxyOwnable.sol";
+import "../Proxy/Upgradeable.sol";
 import "../common/TokenTransfer.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IAuctionProtection.sol";
@@ -12,16 +13,28 @@ import "../InterFaces/IAuction.sol";
 import "../InterFaces/ITokenVault.sol";
 
 
-contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
+interface InitializeInterface {
+    function initialize(
+        address _primaryOwner,
+        address _systemAddress,
+        address _multisigAdress,
+        address _registeryAddress
+    ) external;
+}
+
+
+contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     IAuctionRegistery public contractsRegistry;
 
     address payable public liquadityAddress;
 
-    constructor(
+    function initilizeRegistry(
+        address _primaryOwner,
         address _systemAddress,
         address _multisigAdress,
         address _registeryAddress
-    ) public Ownable(_systemAddress, _multisigAdress) {
+    ) internal {
+        initializeOwner(_primaryOwner, _systemAddress, _multisigAdress);
         contractsRegistry = IAuctionRegistery(_registeryAddress);
         _updateAddresses();
     }
@@ -59,18 +72,25 @@ contract AuctionRegistery is Ownable, AuctionRegisteryContracts {
 
 
 contract Utils is AuctionRegistery, SafeMath {
-    uint256 public liquadityRatio = 100;
+    uint256 public liquadityRatio;
 
-    uint256 public contributionRatio = 100;
+    uint256 public contributionRatio;
 
-    constructor(
+    function initializeUtils(
+        address _primaryOwner,
         address _systemAddress,
         address _multisigAdress,
         address _registeryAddress
-    )
-        public
-        AuctionRegistery(_systemAddress, _multisigAdress, _registeryAddress)
-    {}
+    ) internal {
+        initilizeRegistry(
+            _primaryOwner,
+            _systemAddress,
+            _multisigAdress,
+            _registeryAddress
+        );
+        liquadityRatio = 100;
+        contributionRatio = 100;
+    }
 
     function setLiquadityRatio(uint256 _ratio)
         external
@@ -92,12 +112,26 @@ contract Utils is AuctionRegistery, SafeMath {
 }
 
 
-contract AuctionTagAlong is Utils, TokenTransfer {
-    constructor(
+contract AuctionTagAlong is
+    Upgradeable,
+    Utils,
+    TokenTransfer,
+    InitializeInterface
+{
+    function initialize(
+        address _primaryOwner,
         address _systemAddress,
         address _multisigAdress,
         address _registeryAddress
-    ) public Utils(_systemAddress, _multisigAdress, _registeryAddress) {}
+    ) external {
+        super.initialize();
+        initializeUtils(
+            _primaryOwner,
+            _systemAddress,
+            _multisigAdress,
+            _registeryAddress
+        );
+    }
 
     event FundDeposited(address _token, address _from, uint256 _amount);
 

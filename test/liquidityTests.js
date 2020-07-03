@@ -23,7 +23,8 @@ const {deployBancor} = require("./deployBancor");
 
 const Liquidity = artifacts.require("Liquadity");
 const LiquidityRegistry = artifacts.require("LiquadityRegistery");
-const AuctionTagAlong = artifacts.require("AuctionTagAlong");
+const TagAlong = artifacts.require("AuctionTagAlong");
+const TagAlongRegistry = artifacts.require("AuctionTagAlongRegistry");
 const AuctionRegisty = artifacts.require("TestAuctionRegistery");
 const CurrencyPrices = artifacts.require("TestCurrencyPrices");
 const TokenVault = artifacts.require("TokenVault");
@@ -119,12 +120,25 @@ contract("~liquidity works", function (accounts) {
       {from: primaryOwner}
     );
     //tagAlong
-    this.tagAlong = await AuctionTagAlong.new(
+    var tagAlongRegistry = await TagAlongRegistry.new(
+      systemAddress,
+      multiSigPlaceHolder,
+      {from: primaryOwner}
+    );
+    let tempTagAlong = await TagAlong.new({from: primaryOwner});
+    await tagAlongRegistry.addVersion(1, tempTagAlong.address, {
+      from: primaryOwner,
+    });
+    await tagAlongRegistry.createProxy(
+      1,
+      primaryOwner,
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
       {from: primaryOwner}
     );
+    let proxyAddress = await tagAlongRegistry.proxyAddress();
+    this.tagAlong = await TagAlong.at(proxyAddress);
     //the TokenVault
     var tokenVaultRegistry = await TokenVaultRegistry.new(
       systemAddress,
@@ -143,7 +157,7 @@ contract("~liquidity works", function (accounts) {
       this.auctionRegistry.address,
       {from: primaryOwner}
     );
-    let proxyAddress = await tokenVaultRegistry.proxyAddress();
+    proxyAddress = await tokenVaultRegistry.proxyAddress();
     this.tokenVault = await TokenVault.at(proxyAddress);
     //test currencyPrices
 
