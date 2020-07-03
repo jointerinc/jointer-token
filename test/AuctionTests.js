@@ -25,7 +25,8 @@ const Auction = artifacts.require("Auction");
 const AuctionRegistry = artifacts.require("AuctionRegistry");
 const Liquidity = artifacts.require("Liquadity");
 const LiquidityRegistry = artifacts.require("LiquadityRegistery");
-const AuctionTagAlong = artifacts.require("AuctionTagAlong");
+const TagAlong = artifacts.require("AuctionTagAlong");
+const TagAlongRegistry = artifacts.require("AuctionTagAlongRegistry");
 const AuctionRegisty = artifacts.require("TestAuctionRegistery");
 const CurrencyPrices = artifacts.require("TestCurrencyPrices");
 const TokenVault = artifacts.require("TokenVault");
@@ -76,11 +77,6 @@ contract("~Auction works", function (accounts) {
   const fundWalletRatio = new BN(90);
   const hundreadPercentage = new BN(100);
 
-  const deployMainToken = async function () {
-    console.log("hi");
-    a = 10;
-    console.log(primaryOwner);
-  };
   beforeEach(async function () {
     var [
       BNTToken,
@@ -237,12 +233,25 @@ contract("~Auction works", function (accounts) {
     //setup for Auction
 
     //tagAlong
-    this.tagAlong = await AuctionTagAlong.new(
+    var tagAlongRegistry = await TagAlongRegistry.new(
+      systemAddress,
+      multiSigPlaceHolder,
+      {from: primaryOwner}
+    );
+    let tempTagAlong = await TagAlong.new({from: primaryOwner});
+    await tagAlongRegistry.addVersion(1, tempTagAlong.address, {
+      from: primaryOwner,
+    });
+    await tagAlongRegistry.createProxy(
+      1,
+      primaryOwner,
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
       {from: primaryOwner}
     );
+    proxyAddress = await tagAlongRegistry.proxyAddress();
+    this.tagAlong = await TagAlong.at(proxyAddress);
 
     //the prtection
     var protectionRegistry = await ProtectionRegistry.new(
@@ -627,7 +636,7 @@ contract("~Auction works", function (accounts) {
     //liqudity contract itself??
     // Thats suprising but that is what is happening)
     let sideReserveRatio = await this.liquidity.sideReseverRatio(); //Which is 90%
-    console.log(sideReserveRatio.toString());
+    // console.log(sideReserveRatio.toString());
     let sideReserveAmount = reserveAmount
       .mul(sideReserveRatio)
       .div(hundreadPercentage);
@@ -681,13 +690,13 @@ contract("~Auction works", function (accounts) {
     //Remainig goes to reserves
     let reserveAmount = temp;
 
-    console.log((await this.jntrToken.balanceOf(companyFundWallet)).toString());
-    console.log(
-      (await this.jntrToken.balanceOf(this.protection.address)).toString()
-    );
-    console.log(
-      (await this.jntrToken.balanceOf(this.liquidity.address)).toString()
-    );
+    // console.log((await this.jntrToken.balanceOf(companyFundWallet)).toString());
+    // console.log(
+    //   (await this.jntrToken.balanceOf(this.protection.address)).toString()
+    // );
+    // console.log(
+    //   (await this.jntrToken.balanceOf(this.liquidity.address)).toString()
+    // );
     expect(
       await this.jntrToken.balanceOf(this.protection.address)
     ).to.be.bignumber.equal(downSideAmount);
@@ -760,7 +769,7 @@ contract("~Auction works", function (accounts) {
 
     for (let i = 0; i < 5; i++) {
       expect(
-        await this.auction.addressWhichIndex(
+        await this.auction.topContributiorIndex(
           auctionDay,
           accounts[amountToAccount.get(contributionInEth[i])]
         )
@@ -768,9 +777,9 @@ contract("~Auction works", function (accounts) {
     }
   });
 
-  //Next I need to check what happens when auction ends
-  //Also after it is updated I need to check the bonus calculation
-  //That includes two things "FundAdded" and distributeTokens
+  // Next I need to check what happens when auction ends
+  // Also after it is updated I need to check the bonus calculation
+  // That includes two things "FundAdded" and distributeTokens
 
   describe("Auction Ends correctly", async function () {
     beforeEach(async function () {
@@ -797,56 +806,6 @@ contract("~Auction works", function (accounts) {
         from: accounts[0],
       });
     });
-
-    it("When ", async function () {
-      //the idea is to make this test dynamic so that we can test it using different value
-
-      //contribute with token
-      let contributionAmount = new BN(10000);
-
-      //Noe the contribution starts
-      await this.jntrToken.approve(this.auction.address, contributionAmount, {
-        from: accountA,
-      });
-
-      await this.auction.contributeWithToken(
-        this.jntrToken.address,
-        contributionAmount,
-        {
-          from: accountA,
-        }
-      );
-
-      await this.jntrToken.approve(this.auction.address, contributionAmount, {
-        from: accountB,
-      });
-      await this.auction.contributeWithToken(
-        this.jntrToken.address,
-        contributionAmount,
-        {
-          from: accountB,
-        }
-      );
-      //contribute with ether
-      await this.auction.contributeWithEther({
-        from: accountA,
-        value: contributionAmount,
-      });
-
-      //lets make sure all the veriable are now set correctly
-      let todayContribution = contributionAmount.mul(new BN(3));
-      console.log((await this.auction.todayContribution()).toString());
-      console.log(todayContribution.toString());
-
-      // //should not be able to end the auction before the minAuctionTime(a day)
-      // await expectRevert(
-      //   this.auction.auctionEnd({from: systemAddress}),
-      //   "ERR_MIN_TIME_IS_NOT_OVER"
-      // );
-
-      // await time.increase(time.duration.days(1));
-      await this.auction.auctionEnd({from: systemAddress});
-    });
     it("when today's supply is less then the yesterday's supply", async function () {
       let yesterdaySupply = new BN(200000);
       let todaySupply = new BN(100000);
@@ -871,7 +830,7 @@ contract("~Auction works", function (accounts) {
       let companyTokenWalletJNTRBalnce = await this.jntrToken.balanceOf(
         companyMainTokenWallet
       );
-      console.log(companyTokenWalletJNTRBalnce.toString());
+      // console.log(companyTokenWalletJNTRBalnce.toString());
       await this.auction.auctionEnd({from: systemAddress});
 
       //lets make sure everything is set correctly
@@ -898,7 +857,7 @@ contract("~Auction works", function (accounts) {
         await this.auction.dayWiseSupplyBonus(auctionDay)
       ).to.be.bignumber.equal("0");
 
-      console.log((await this.auction.dayWiseSupply(auctionDay)).toString());
+      // console.log((await this.auction.dayWiseSupply(auctionDay)).toString());
 
       expect(
         await this.auction.dayWiseSupply(auctionDay)
@@ -1035,9 +994,23 @@ contract("~Auction works", function (accounts) {
     });
     it("when the today's contribution is zero(TODO)", async function () {});
   });
-  it("should distribute Tokens correctly(TODO)", async function () {
+  // //Will need to change this becuase of new change
+  it("should distribute Tokens correctly", async function () {
+    //set the price for ether and the jntr in the currencyPrices
+    //1 eth = 1* 10 ^18
+    //1 jntr =1 * 10^ 18
+    //need to figure out what is the deimal situation in auction
+    await this.currencyPrices.setCurrencyPriceUSD(
+      [ZERO_ADDRESS, this.jntrToken.address],
+      [one, one],
+      {from: systemAddress}
+    );
+    //need to allow the token to be able to lock the tokens
+    await this.protection.allowToken(this.jntrToken.address, {
+      from: systemAddress,
+    });
     //here lets end the first auction
-    let yesterdaySupply = new BN(200000);
+    let yesterdaySupply = new BN(900000);
     // let todaySupply = new BN(300000);
 
     //contribute yesterDay supply and end the auction
@@ -1050,20 +1023,124 @@ contract("~Auction works", function (accounts) {
     //Made this just so that yesterdays supply is not a too big of a number(i.e 50000 * DECIMAL_NOMINATOR)
 
     //contribute today supply and end the auction
-    await this.auction.contributeWithEther({
-      from: accountB,
-      value: todaySupply,
+    let contributionInEth = [80000, 90000, 40000, 50000, 60000, 70000];
+
+    let contributionBN = [];
+    contributionInEth.forEach((element) => {
+      contributionBN.push(new BN(element));
     });
+
+    //Whitelist them
+    for (let i = 0; i < contributionInEth.length; i++) {
+      let isWhiteListed = await this.whiteList.isWhiteListed(accounts[i]);
+      let flags = 3;
+      let maxWallets = 10;
+      if (!isWhiteListed) {
+        await this.whiteList.addNewWallet(accounts[i], flags, maxWallets, {
+          from: systemAddress,
+        });
+      }
+    }
+
+    for (let i = 0; i < contributionInEth.length; i++) {
+      await this.auction.contributeWithEther({
+        from: accounts[i],
+        value: contributionBN[i],
+      });
+    }
     let auctionDay = await this.auction.auctionDay();
 
     await this.auction.auctionEnd({from: systemAddress});
 
+    //We will calculate the individual bonus according to this array
+    let individualBonus = [0, 50, 40, 30, 20, 10];
+    let individualBonusBN = [];
+    individualBonus.forEach((element) => {
+      individualBonusBN.push(new BN(element));
+    });
+
     //lets get all the necessary amounts for auctionDay
     let bonusSupply = await this.auction.dayWiseSupplyBonus(auctionDay);
     let coreSupply = await this.auction.dayWiseSupplyCore(auctionDay);
-    let downSideProtectioRatio = await this.aucion.dayWiseDownSideProtectionRatio(
+    let downSideProtectioRatio = await this.auction.dayWiseDownSideProtectionRatio(
       auctionDay
     ); //Its 90%
+    let totalContribution = await this.auction.dayWiseContribution(auctionDay); //total contribution that day
+
+    //to get amountToaccount
+    // accounts[amountToAccount.get(contributionInEth[i])]
+
+    //Loop trhough and check
+    for (let i = 0; i < contributionInEth.length; i++) {
+      let recipet = await this.auction.disturbuteTokens(
+        auctionDay,
+        [accounts[i]],
+        {
+          from: systemAddress,
+        }
+      );
+
+      let contributionByWallet = await this.auction.walletDayWiseContribution(
+        auctionDay,
+        accounts[i]
+      );
+      //Here you get the part if bonus and core supply on pro rata basis
+      let accountCoreSupply = coreSupply
+        .mul(contributionByWallet)
+        .div(totalContribution);
+      let accountBonusSupply = new BN(0);
+      if (bonusSupply > 0) {
+        accountBonusSupply = bonusSupply
+          .mul(contributionByWallet)
+          .div(totalContribution);
+      }
+      //This is how much user gets
+      let accountCoreAndBonus = accountCoreSupply.add(accountBonusSupply); //The returnAmount
+      //On return amount the user will get individual bonus
+
+      // let individualBonusOfAccountPercentage =  //At which index the account is??
+      let accountIndex = await this.auction.topContributiorIndex(
+        auctionDay,
+        accounts[i]
+      );
+      // console.log(accountIndex.toString());
+      let individualBonusPercetage = individualBonusBN[accountIndex.toString()];
+      // console.log(individualBonusPercetage.mul(priceDenominator).toString());
+      // console.log(
+      //   (await this.auction.calculateBouns(auctionDay, accounts[i])).toString()
+      // );
+      // console.log((await this.auction.indexReturn[2]).toString());
+
+      let newAccountCoreAndBonus = new BN(0);
+      let fees = new BN(0);
+      if (individualBonusPercetage > 0) {
+        newAccountCoreAndBonus = accountCoreAndBonus
+          .mul(individualBonusPercetage.mul(priceDenominator))
+          .div(hundreadPercentage.mul(priceDenominator));
+
+        //calculate the fees only if they are being rewarded???
+        let managementFees = await this.auction.mangmentFee(); //which is =2
+        let temp = newAccountCoreAndBonus
+          .mul(hundreadPercentage)
+          .div(hundreadPercentage.sub(managementFees));
+        fees = temp.sub(newAccountCoreAndBonus);
+      }
+      newAccountCoreAndBonus = newAccountCoreAndBonus.add(accountCoreAndBonus);
+
+      //The _userAmount
+      let nintyPercentOfCore = accountCoreSupply
+        .mul(hundreadPercentage.sub(downSideProtectioRatio))
+        .div(hundreadPercentage);
+
+      //This event args will test if everything works as it supposed to
+      expectEvent(recipet, "TokenDistrubuted", {
+        _whom: accounts[i],
+        dayId: auctionDay,
+        _totalToken: newAccountCoreAndBonus,
+        lockedToken: newAccountCoreAndBonus.sub(nintyPercentOfCore),
+        _userToken: nintyPercentOfCore,
+      });
+    }
   });
 });
 //minimium for contribution with eth is 10000 wei
