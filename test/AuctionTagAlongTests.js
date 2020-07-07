@@ -8,7 +8,8 @@ const {ZERO_ADDRESS} = constants;
 
 const {expect} = require("chai");
 
-const AuctionTagAlong = artifacts.require("AuctionTagAlong");
+const TagAlong = artifacts.require("AuctionTagAlong");
+const TagAlongRegistry = artifacts.require("AuctionTagAlongRegistry");
 const AuctionRegisty = artifacts.require("TestAuctionRegistery");
 const ERC20 = artifacts.require("TestERC20");
 
@@ -24,22 +25,37 @@ contract("~auction tag Along works", function (accounts) {
   const contributeAmount = new BN(1000);
   beforeEach(async function () {
     //contract that has address of all the contracts
-    this.auctionRegistery = await AuctionRegisty.new(
+    this.auctionRegistry = await AuctionRegisty.new(
       systemAddress,
       multiSigPlaceHolder,
       {from: primaryOwner}
     );
-    await this.auctionRegistery.registerContractAddress(
+    await this.auctionRegistry.registerContractAddress(
       web3.utils.fromAscii("LIQUADITY"),
       liquidityPlaceHolder,
       {from: primaryOwner}
     );
-    this.tagAlong = await AuctionTagAlong.new(
+
+    var tagAlongRegistry = await TagAlongRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      this.auctionRegistery.address,
       {from: primaryOwner}
     );
+    let tempTagAlong = await TagAlong.new({from: primaryOwner});
+    await tagAlongRegistry.addVersion(1, tempTagAlong.address, {
+      from: primaryOwner,
+    });
+    await tagAlongRegistry.createProxy(
+      1,
+      primaryOwner,
+      systemAddress,
+      multiSigPlaceHolder,
+      this.auctionRegistry.address,
+      {from: primaryOwner}
+    );
+    proxyAddress = await tagAlongRegistry.proxyAddress();
+    this.tagAlong = await TagAlong.at(proxyAddress);
+
     this.erc20 = await ERC20.new({from: other1});
     this.erc20.mint(contributer1, contributeAmount, {from: contributer1});
   });
@@ -50,7 +66,7 @@ contract("~auction tag Along works", function (accounts) {
       multiSigPlaceHolder
     );
     expect(await this.tagAlong.contractsRegistry()).to.equal(
-      this.auctionRegistery.address
+      this.auctionRegistry.address
     );
     expect(await this.tagAlong.liquadityAddress()).to.equal(
       liquidityPlaceHolder
