@@ -508,8 +508,24 @@ contract AuctionFundCollector is IndividualBonus {
                     safeAdd(todayContribution, _contributedAmount),
                 "ERR_CONTRIBUTION_LIMIT_REACH"
             );
-
             auctionSoldOut = true;
+            if (
+                safeAdd(todayContribution, _contributedAmount) >
+                allowedMaxContribution
+            ) {
+                uint256 extraAmount = safeSub(
+                    allowedMaxContribution,
+                    safeAdd(todayContribution, _contributedAmount)
+                );
+                _contributedAmount = safeSub(_contributedAmount, extraAmount);
+                walletDayWiseContribution[safeAdd(
+                    auctionDay,
+                    1
+                )][_from] = safeAdd(
+                    walletDayWiseContribution[safeAdd(auctionDay, 1)][_from],
+                    extraAmount
+                );
+            }
         }
 
         todayContribution = safeAdd(todayContribution, _contributedAmount);

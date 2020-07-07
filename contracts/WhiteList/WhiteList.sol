@@ -167,7 +167,7 @@ contract WhiteList is
     }
 
     /**@dev checks if address is bypassed*/
-    function isAddressByPassed(address _which) internal view returns (bool) {
+    function isAddressByPassed(address _which) external view returns (bool) {
         return _isAddressByPassed(_which);
     }
 
