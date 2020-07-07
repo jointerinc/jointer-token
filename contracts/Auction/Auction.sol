@@ -382,11 +382,21 @@ contract IndividualBonus is AuctionStorage {
             for (uint256 x = 1; x <= 5; x++) {
                 contributor = topFiveContributior[auctionDay][x];
                 topContributior = walletDayWiseContribution[auctionDay][contributor];
-                if (contributionByUser > topContributior && replaced == false) {
-                    topFiveContributior[auctionDay][x] = _from;
-                    topContributiorIndex[auctionDay][_from] = x;
-                    replaceWith = contributor;
-                    replaced = true;
+                if (
+                    contributionByUser >= topContributior && replaced == false
+                ) {
+                    if (
+                        contributor != _from &&
+                        contributionByUser > topContributior
+                    ) {
+                        topFiveContributior[auctionDay][x] = _from;
+                        topContributiorIndex[auctionDay][_from] = x;
+                        replaceWith = contributor;
+                        replaced = true;
+                    } else if (contributor == _from) {
+                        replaceWith = contributor;
+                        replaced = true;
+                    }
                 } else if (replaced && replaceWith != _from) {
                     topFiveContributior[auctionDay][x] = replaceWith;
                     topContributiorIndex[auctionDay][replaceWith] = x;
@@ -509,15 +519,18 @@ contract AuctionFundCollector is IndividualBonus {
                 "ERR_CONTRIBUTION_LIMIT_REACH"
             );
             auctionSoldOut = true;
+
             if (
                 safeAdd(todayContribution, _contributedAmount) >
                 allowedMaxContribution
             ) {
                 uint256 extraAmount = safeSub(
-                    allowedMaxContribution,
-                    safeAdd(todayContribution, _contributedAmount)
+                    safeAdd(todayContribution, _contributedAmount),
+                    allowedMaxContribution
                 );
+
                 _contributedAmount = safeSub(_contributedAmount, extraAmount);
+
                 walletDayWiseContribution[safeAdd(
                     auctionDay,
                     1
@@ -844,7 +857,9 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
             safeAdd(stackingAmount, dayWiseSupply[auctionDay]),
             mangmentFee
         );
+
         IToken(mainTokenAddress).mintTokens(safeAdd(fee, stackingAmount));
+
         ensureTransferFrom(
             IERC20Token(mainTokenAddress),
             address(this),
