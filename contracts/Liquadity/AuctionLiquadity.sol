@@ -455,9 +455,9 @@ contract Liquadity is
 
         emit Contribution(address(0), value, returnAmount);
 
-        checkAppeciationLimit();
-
         lastReserveBalance = baseToken.balanceOf(converter);
+
+        checkAppeciationLimit();
 
         return returnAmount;
     }
@@ -470,22 +470,16 @@ contract Liquadity is
     {
         uint256 returnAmount;
 
-        if (etherTokens(address(_path[0]))) {
-            returnAmount = IBancorConverter(converter).quickConvert2.value(
-                value
-            )(_path, value, 1, address(0), 0);
-        } else {
-            approveTransferFrom(_path[0], converter, value);
-            returnAmount = IBancorConverter(converter).quickConvert2.value(0)(
-                _path,
-                value,
-                1,
-                address(0),
-                0
-            );
-        }
-        IERC20Token returnToken = _path[safeSub(_path.length, 1)];
+        approveTransferFrom(_path[0], converter, value);
+        returnAmount = IBancorConverter(converter).quickConvert2.value(0)(
+            _path,
+            value,
+            1,
+            address(0),
+            0
+        );
 
+        IERC20Token returnToken = _path[safeSub(_path.length, 1)];
         if (returnToken == mainToken) {
             ensureTransferFrom(
                 returnToken,
@@ -563,20 +557,6 @@ contract Liquadity is
         return previousMainReserveContribution;
     }
 
-    function _getMainReserveAmount(uint256 mainReserverAmount)
-        internal
-        view
-        returns (uint256)
-    {
-        if (virtualReserverDivisor > 0)
-            mainReserverAmount = safeDiv(
-                safeMul(mainReserverAmount, DECIMAL_NOMINATOR),
-                virtualReserverDivisor
-            );
-
-        return mainReserverAmount;
-    }
-
     function contributeWithEther()
         public
         payable
@@ -591,7 +571,11 @@ contract Liquadity is
         );
 
         uint256 mainReserverAmount = safeSub(_amount, sideReseverAmount);
-        mainReserverAmount = _getMainReserveAmount(mainReserverAmount);
+        if (virtualReserverDivisor > 0)
+            mainReserverAmount = safeDiv(
+                safeMul(mainReserverAmount, DECIMAL_NOMINATOR),
+                virtualReserverDivisor
+            );
         if (isAppreciationLimitReached) {
             tagAlongAddress.transfer(mainReserverAmount);
             return _getCurrentMarketPrice();
@@ -612,6 +596,43 @@ contract Liquadity is
     ) public allowedAddressOnly(msg.sender) returns (uint256) {
         ensureTransferFrom(_token, _from, address(this), _amount);
         return _getCurrentMarketPrice();
+    }
+
+    function _recoverReserve(bool isMainToken, uint256 _liquadateRatio)
+        internal
+    {
+        (uint256 returnBase, uint256 returnMain) = _liquadate(
+            _liquadateRatio,
+            false
+        );
+
+        if (isMainToken) {
+            ITokenVault(vaultAddress).directTransfer(
+                address(mainToken),
+                converter,
+                returnMain
+            );
+        } else {
+            if (etherTokens(address(baseToken))) {
+                IAuctionTagAlong(tagAlongAddress).contributeTowardLiquadity(
+                    returnBase
+                );
+                IEtherToken(address(baseToken)).deposit.value(returnBase)();
+                ensureTransferFrom(
+                    baseToken,
+                    address(this),
+                    converter,
+                    returnBase
+                );
+            } else {
+                IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
+                    baseToken,
+                    converter,
+                    returnBase
+                );
+            }
+        }
+        lastReserveBalance = baseToken.balanceOf(converter);
     }
 
     function recoverPriceVolatility() external onlySystem() returns (bool) {
@@ -643,30 +664,9 @@ contract Liquadity is
         }
 
         if (volatilty >= baseTokenVolatiltyRatio) {
-            (uint256 returnBase, uint256 returnMain) = _liquadate(
-                volatilty,
-                false
-            );
-
-            if (isMainToken) {
-                ITokenVault(vaultAddress).directTransfer(
-                    address(mainToken),
-                    converter,
-                    returnMain
-                );
-            } else {
-                IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
-                    baseToken,
-                    converter,
-                    returnBase
-                );
-            }
+            _recoverReserve(isMainToken, volatilty);
         }
-
         baseLinePrice = baseTokenPrice;
-
-        lastReserveBalance = baseToken.balanceOf(converter);
-
         return true;
     }
 
@@ -689,23 +689,7 @@ contract Liquadity is
 
             isMainToken = true;
         }
-
-        (uint256 returnBase, uint256 returnMain) = _liquadate(volatilty, false);
-
-        if (isMainToken) {
-            ITokenVault(vaultAddress).directTransfer(
-                address(mainToken),
-                converter,
-                returnMain
-            );
-        } else {
-            IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
-                baseToken,
-                converter,
-                returnBase
-            );
-        }
-        lastReserveBalance = baseToken.balanceOf(converter);
+        _recoverReserve(isMainToken, volatilty);
         return true;
     }
 
@@ -727,20 +711,14 @@ contract Liquadity is
         returns (bool)
     {
         uint256 tempX = safeDiv(_percent, appreciationLimit);
-
         uint256 root = nthRoot(tempX, 2, 0, maxIteration);
-
         uint256 _tempValue = safeSub(root, PRICE_NOMINATOR);
-
         uint256 _supply = mainToken.balanceOf(converter);
-
         uint256 _reverseBalance = safeDiv(
             safeMul(_supply, _tempValue),
             PRICE_NOMINATOR
         );
-
         uint256 vaultBalance = mainToken.balanceOf(vaultAddress);
-
         if (vaultBalance >= _reverseBalance) {
             ITokenVault(vaultAddress).directTransfer(
                 address(mainToken),
@@ -773,13 +751,10 @@ contract Liquadity is
         );
 
         uint256 totalEthAmount = safeAdd(ethAmount, fee);
-
         if (etherTokens(address(baseToken))) {
             isEtherToken = true;
             totalEthAmount = _amount;
         }
-
-        // if side resever have ether it will convert into bnt
 
         if (address(this).balance >= totalEthAmount) {
             uint256 returnAmount = _amount;
@@ -831,26 +806,30 @@ contract Liquadity is
 
                 // redemption amount always less then what converter have
                 uint256 converterBalance = baseToken.balanceOf(converter);
-
                 uint256 relayPercent = 10;
-
                 if (converterBalance > _amount) {
                     relayPercent = safeDiv(
-                        safeMul(safeSub(converterBalance, _amount), 100),
+                        safeMul(
+                            safeSub(converterBalance, _amount),
+                            safeMul(100, PRICE_NOMINATOR)
+                        ),
                         _amount
                     );
-                    if (relayPercent > 99) relayPercent = 99;
                 }
-
-                _liquadate(safeMul(relayPercent, PRICE_NOMINATOR), false);
-
+                _liquadate(relayPercent, false);
                 _amount = safeSub(_amount, safeDiv(_amount, relayPercent));
-
-                IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
-                    baseToken,
-                    address(this),
-                    _amount
-                );
+                if (etherTokens(address(baseToken))) {
+                    IAuctionTagAlong(tagAlongAddress).contributeTowardLiquadity(
+                        _amount
+                    );
+                    IEtherToken(address(baseToken)).deposit.value(_amount)();
+                } else {
+                    IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
+                        baseToken,
+                        address(this),
+                        _amount
+                    );
+                }
 
                 return _convertWithToken(_amount, baseTokenToMainToken);
             }
@@ -1012,7 +991,9 @@ contract Liquadity is
             );
         } else if (_convertToEth) {
             uint256 beforeEthBalance = address(this).balance;
+
             approveTransferFrom(baseToken, converter, _baseTokenBalance);
+
             IBancorConverter(converter).quickConvert2.value(0)(
                 baseTokenToEth,
                 _baseTokenBalance,
@@ -1038,14 +1019,20 @@ contract Liquadity is
         return _getCurrentMarketPrice();
     }
 
-    function liquidateFromSystem(uint256 _percent)
+    function moveFundToLiquadity(IERC20Token _token, uint256 _value)
         external
-        onlySystem()
+        onlyOwner()
         returns (bool)
     {
-        _liquadate(safeMul(_percent, PRICE_NOMINATOR), false);
+        if (address(_token) == address(0)) {
+            tagAlongAddress.transfer(_value);
+        } else {
+            ensureTransferFrom(_token, address(this), tagAlongAddress, _value);
+        }
         return true;
     }
+
+    function drainLiquadity() external onlyOwner() returns (bool) {}
 
     //return token and ether from here
     function returnFund(
@@ -1058,28 +1045,8 @@ contract Liquadity is
         } else {
             ensureTransferFrom(_token, address(this), _which, _value);
         }
-        return true;
-    }
 
-    function depositeToken(
-        IERC20Token _token,
-        address _from,
-        uint256 _amount
-    ) external returns (bool) {
-        ensureTransferFrom(_token, _from, address(this), _amount);
-        emit FundDeposited(address(_token), _from, _amount);
         return true;
-    }
-
-    //tesing purpose
-    function resetLiuqadity() external onlyOwner() returns (bool) {
-        tokenAuctionEndPrice = _getCurrentMarketPrice();
-        lastReserveBalance = baseToken.balanceOf(converter);
-        previousMainReserveContribution = todayMainReserveContribution;
-        todayMainReserveContribution = 0;
-        tokenAuctionEndPrice = _getCurrentMarketPrice();
-        isAppreciationLimitReached = false;
-        virtualReserverDivisor = 0;
     }
 
     // emiting Event cause Problem in proxy
