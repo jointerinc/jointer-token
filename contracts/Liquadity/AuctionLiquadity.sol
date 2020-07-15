@@ -1019,7 +1019,23 @@ contract Liquadity is
         return _getCurrentMarketPrice();
     }
 
-    function moveFundToLiquadity(IERC20Token _token, uint256 _value)
+    // Take out all the fund from liquadity
+    function drainLiquadity(
+        IERC20Token _token,
+        uint256 _value,
+        address payable _which
+    ) external onlyOwner() returns (bool) {
+        if (relayToken.totalSupply() == 0) {
+            if (address(_token) == address(0)) {
+                _which.transfer(_value);
+            } else {
+                ensureTransferFrom(_token, address(this), _which, _value);
+            }
+        }
+    }
+
+    //return token and ether from here to tagalong
+    function returnFundToTagAlong(IERC20Token _token, uint256 _value)
         external
         onlyOwner()
         returns (bool)
@@ -1029,28 +1045,19 @@ contract Liquadity is
         } else {
             ensureTransferFrom(_token, address(this), tagAlongAddress, _value);
         }
-        return true;
-    }
-
-    function drainLiquadity() external onlyOwner() returns (bool) {}
-
-    //return token and ether from here
-    function returnFund(
-        IERC20Token _token,
-        uint256 _value,
-        address payable _which
-    ) external onlyOwner() returns (bool) {
-        if (address(_token) == address(0)) {
-            _which.transfer(_value);
-        } else {
-            ensureTransferFrom(_token, address(this), _which, _value);
-        }
 
         return true;
     }
 
-    // emiting Event cause Problem in proxy
-    function() external payable {
-        // emit FundDeposited(address(0), msg.sender, msg.value);
+    //return token and ether from tagalong to here  as we only need ether
+    function takeFundFromTagAlong(uint256 _value)
+        external
+        onlyOwner()
+        returns (bool)
+    {
+        IAuctionTagAlong(tagAlongAddress).contributeTowardLiquadity(_value);
+        return true;
     }
+
+    function() external payable {}
 }

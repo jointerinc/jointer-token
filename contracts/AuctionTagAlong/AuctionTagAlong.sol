@@ -12,7 +12,6 @@ import "../InterFaces/IAuctionLiquadity.sol";
 import "../InterFaces/IAuction.sol";
 import "../InterFaces/ITokenVault.sol";
 
-
 interface InitializeInterface {
     function initialize(
         address _primaryOwner,
@@ -21,7 +20,6 @@ interface InitializeInterface {
         address _registeryAddress
     ) external;
 }
-
 
 contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     IAuctionRegistery public contractsRegistry;
@@ -70,7 +68,6 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     }
 }
 
-
 contract Utils is AuctionRegistery, SafeMath {
     uint256 public liquadityRatio;
 
@@ -110,7 +107,6 @@ contract Utils is AuctionRegistery, SafeMath {
         return true;
     }
 }
-
 
 contract AuctionTagAlong is
     Upgradeable,
@@ -158,20 +154,6 @@ contract AuctionTagAlong is
     ) external returns (bool) {
         require(msg.sender == liquadityAddress, "ERR_ONLY_LIQUADITY_ALLWOED");
         ensureTransferFrom(_token, address(this), _reciver, _amount);
-        return true;
-    }
-
-    //return token and ether from here
-    function returnFund(
-        IERC20Token _token,
-        uint256 _value,
-        address payable _which
-    ) external onlyOwner() returns (bool) {
-        if (address(_token) == address(0)) {
-            _which.transfer(_value);
-        } else {
-            ensureTransferFrom(_token, address(this), _which, _value);
-        }
         return true;
     }
 
