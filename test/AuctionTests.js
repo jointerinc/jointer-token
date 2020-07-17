@@ -7,9 +7,9 @@ const {
   BN,
 } = require("@openzeppelin/test-helpers");
 
-const {ZERO_ADDRESS} = constants;
+const { ZERO_ADDRESS } = constants;
 
-const {expect} = require("chai");
+const { expect } = require("chai");
 
 const {
   advanceTimeAndBlock,
@@ -18,8 +18,8 @@ const {
   revertToSnapshot,
 } = require("./utils");
 
-const {deployBancor} = require("./deployBancor");
-const {forEach} = require("lodash");
+const { deployBancor } = require("./deployBancor");
+const { forEach } = require("lodash");
 
 const Auction = artifacts.require("Auction");
 const AuctionRegistry = artifacts.require("AuctionRegistry");
@@ -49,6 +49,7 @@ const getWith9Decimals = function (amount) {
 
 const IS_BYPASSED = 1 << 13;
 const BANCOR_ADDRESS = 1 << 14;
+const IS_ALLOWED_AUCTION = 1 << 15;
 
 var one;
 var thousand;
@@ -100,7 +101,7 @@ contract("~Auction works", function (accounts) {
     this.auctionRegistry = await AuctionRegisty.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     //Deploy Whitelist
     let stockTokenMaturityDays = 3560;
@@ -109,7 +110,7 @@ contract("~Auction works", function (accounts) {
     var whiteListRegistry = await WhiteListRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     let tempWhiteList = await whiteListContract.new();
     await whiteListRegistry.addVersion(1, tempWhiteList.address, {
@@ -128,7 +129,7 @@ contract("~Auction works", function (accounts) {
       tokenMaturityDays,
       tokenMaturityDays,
       stockTokenMaturityDays,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
 
     let proxyAddress = await whiteListRegistry.proxyAddress();
@@ -144,14 +145,16 @@ contract("~Auction works", function (accounts) {
 
     //setup WhiteList
     //add acounts[0] to whitlist(make it bypassed)
-    let flags = IS_BYPASSED;
+    // let flags = IS_BYPASSED || IS_ALLOWED_AUCTION;
+    let flags = 49152;
     let maxWallets = 0;
 
     await this.whiteList.addNewWallet(accounts[0], flags, maxWallets, {
       from: systemAddress,
     });
     //converter needs to be whitelisted too
-    flags = BANCOR_ADDRESS;
+    // flags = BANCOR_ADDRESS || IS_ALLOWED_AUCTION;
+    flags = 49152;
     await this.whiteList.addNewWallet(
       converterMainBNT.address,
       flags,
@@ -189,7 +192,7 @@ contract("~Auction works", function (accounts) {
       this.auctionRegistry.address,
       [accounts[0]],
       [thousand],
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     //With this lets fast forward in future where token holdeback days are over
 
@@ -197,7 +200,7 @@ contract("~Auction works", function (accounts) {
     await converterMainBNT.addReserve(this.mainToken.address, 500000, {
       from: accounts[0],
     });
-    await converterMainBNT.setConversionFee(1000, {from: accounts[0]});
+    await converterMainBNT.setConversionFee(1000, { from: accounts[0] });
     //fund the BNTJNTR Pool woth initial tokens
     //to do that first get those two tokens
     await BNTToken.issue(accounts[0], thousand, {
@@ -236,9 +239,9 @@ contract("~Auction works", function (accounts) {
     var tagAlongRegistry = await TagAlongRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
-    let tempTagAlong = await TagAlong.new({from: primaryOwner});
+    let tempTagAlong = await TagAlong.new({ from: primaryOwner });
     await tagAlongRegistry.addVersion(1, tempTagAlong.address, {
       from: primaryOwner,
     });
@@ -248,7 +251,7 @@ contract("~Auction works", function (accounts) {
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     proxyAddress = await tagAlongRegistry.proxyAddress();
     this.tagAlong = await TagAlong.at(proxyAddress);
@@ -257,7 +260,7 @@ contract("~Auction works", function (accounts) {
     var protectionRegistry = await ProtectionRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     let tempProtection = await Protection.new();
     await protectionRegistry.addVersion(1, tempProtection.address, {
@@ -269,7 +272,7 @@ contract("~Auction works", function (accounts) {
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     proxyAddress = await protectionRegistry.proxyAddress();
     this.protection = await Protection.at(proxyAddress);
@@ -278,9 +281,9 @@ contract("~Auction works", function (accounts) {
     var tokenVaultRegistry = await TokenVaultRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
-    let tempTokenVault = await TokenVault.new({from: primaryOwner});
+    let tempTokenVault = await TokenVault.new({ from: primaryOwner });
     await tokenVaultRegistry.addVersion(1, tempTokenVault.address, {
       from: primaryOwner,
     });
@@ -290,7 +293,7 @@ contract("~Auction works", function (accounts) {
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     proxyAddress = await tokenVaultRegistry.proxyAddress();
     this.tokenVault = await TokenVault.at(proxyAddress);
@@ -299,16 +302,16 @@ contract("~Auction works", function (accounts) {
     this.currencyPrices = await CurrencyPrices.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     //deploying the liquidity
     let baseLinePrice = 1000000; //1$
     var liquidityRegistry = await LiquidityRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
-    let tempLiquidity = await Liquidity.new({from: primaryOwner});
+    let tempLiquidity = await Liquidity.new({ from: primaryOwner });
     await liquidityRegistry.addVersion(1, tempLiquidity.address, {
       from: primaryOwner,
     });
@@ -323,7 +326,7 @@ contract("~Auction works", function (accounts) {
       multiSigPlaceHolder,
       this.auctionRegistry.address,
       baseLinePrice,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     proxyAddress = await liquidityRegistry.proxyAddress();
     this.liquidity = await Liquidity.at(proxyAddress);
@@ -359,11 +362,15 @@ contract("~Auction works", function (accounts) {
       etherToken.address,
     ];
     //set the paths
-    this.liquidity.setTokenPath(0, ethToMainToken, {from: systemAddress});
-    this.liquidity.setTokenPath(1, baseTokenToMainToken, {from: systemAddress});
-    this.liquidity.setTokenPath(2, mainTokenTobaseToken, {from: systemAddress});
-    this.liquidity.setTokenPath(3, ethToBaseToken, {from: systemAddress});
-    this.liquidity.setTokenPath(4, baseTokenToEth, {from: systemAddress});
+    this.liquidity.setTokenPath(0, ethToMainToken, { from: systemAddress });
+    this.liquidity.setTokenPath(1, baseTokenToMainToken, {
+      from: systemAddress,
+    });
+    this.liquidity.setTokenPath(2, mainTokenTobaseToken, {
+      from: systemAddress,
+    });
+    this.liquidity.setTokenPath(3, ethToBaseToken, { from: systemAddress });
+    this.liquidity.setTokenPath(4, baseTokenToEth, { from: systemAddress });
     //Put all these addresses in the auction Registry
     await this.auctionRegistry.registerContractAddress(
       web3.utils.fromAscii("LIQUADITY"),
@@ -439,9 +446,9 @@ contract("~Auction works", function (accounts) {
     var auctionRegistry = await AuctionRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
-    let tempAuction = await Auction.new({from: primaryOwner});
+    let tempAuction = await Auction.new({ from: primaryOwner });
     await auctionRegistry.addVersion(1, tempAuction.address, {
       from: primaryOwner,
     });
@@ -454,7 +461,7 @@ contract("~Auction works", function (accounts) {
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     proxyAddress = await auctionRegistry.proxyAddress();
     this.auction = await Auction.at(proxyAddress);
@@ -480,7 +487,9 @@ contract("~Auction works", function (accounts) {
     });
 
     //Whitelist accountA and AccountB
-    flags = IS_BYPASSED; // KYC|AML
+    // flags = IS_BYPASSED || IS_ALLOWED_AUCTION; // KYC|AML
+    flags = 49152;
+    // console.log(flags);
     maxWallets = 10;
     await this.whiteList.addNewWallet(accountA, flags, maxWallets, {
       from: systemAddress,
@@ -489,7 +498,8 @@ contract("~Auction works", function (accounts) {
       from: systemAddress,
     });
     //We need to whiteList evryone who gets their hands on the jntr
-    flags = IS_BYPASSED;
+    //flags = IS_BYPASSED || IS_ALLOWED_AUCTION;
+    flags = 40960;
     maxWallets = 0;
     await this.whiteList.addNewWallet(
       this.tokenVault.address,
@@ -718,7 +728,7 @@ contract("~Auction works", function (accounts) {
     await this.currencyPrices.setCurrencyPriceUSD(
       [ZERO_ADDRESS, this.jntrToken.address],
       [ethPrice, mainTokenPrice],
-      {from: systemAddress}
+      { from: systemAddress }
     );
     //lets make a programmable test
     //change the vaules here to test if it works correctly
@@ -740,7 +750,7 @@ contract("~Auction works", function (accounts) {
     //Whitelist them
     for (let i = 0; i < contributionInEth.length; i++) {
       let isWhiteListed = await this.whiteList.isWhiteListed(accounts[i]);
-      let flags = 3;
+      let flags = 32768;
       let maxWallets = 10;
       if (!isWhiteListed) {
         await this.whiteList.addNewWallet(accounts[i], flags, maxWallets, {
@@ -777,8 +787,8 @@ contract("~Auction works", function (accounts) {
     }
   });
 
-  // Next I need to check what happens when auction ends
-  // Also after it is updated I need to check the bonus calculation
+  // Next We need to check what happens when auction ends
+  // Also after it is updated We need to check the bonus calculation
   // That includes two things "FundAdded" and distributeTokens
 
   describe("Auction Ends correctly", async function () {
@@ -794,7 +804,7 @@ contract("~Auction works", function (accounts) {
       await this.currencyPrices.setCurrencyPriceUSD(
         [ZERO_ADDRESS, this.jntrToken.address],
         [one, one],
-        {from: systemAddress}
+        { from: systemAddress }
       );
       //Also we need to whitelist every address that contributes
       //accountA and accountB are already whitelisted
@@ -815,7 +825,7 @@ contract("~Auction works", function (accounts) {
         from: accountA,
         value: yesterdaySupply,
       });
-      await this.auction.auctionEnd({from: systemAddress});
+      await this.auction.auctionEnd({ from: systemAddress });
 
       //contribute today supply and end the auction
       await this.auction.contributeWithEther({
@@ -831,7 +841,7 @@ contract("~Auction works", function (accounts) {
         companyMainTokenWallet
       );
       // console.log(companyTokenWalletJNTRBalnce.toString());
-      await this.auction.auctionEnd({from: systemAddress});
+      await this.auction.auctionEnd({ from: systemAddress });
 
       //lets make sure everything is set correctly
 
@@ -902,7 +912,7 @@ contract("~Auction works", function (accounts) {
         from: accountA,
         value: yesterdaySupply,
       });
-      await this.auction.auctionEnd({from: systemAddress});
+      await this.auction.auctionEnd({ from: systemAddress });
 
       //contribute today supply and end the auction
       await this.auction.contributeWithEther({
@@ -919,7 +929,7 @@ contract("~Auction works", function (accounts) {
       );
       // console.log(companyTokenWalletJNTRBalnce.toString());
 
-      await this.auction.auctionEnd({from: systemAddress});
+      await this.auction.auctionEnd({ from: systemAddress });
 
       //lets make sure everything is set correctly
 
@@ -994,7 +1004,7 @@ contract("~Auction works", function (accounts) {
     });
     it("when the today's contribution is zero(TODO)", async function () {});
   });
-  // //Will need to change this becuase of new change
+  //Will need to change this becuase of new change
   it("should distribute Tokens correctly", async function () {
     //set the price for ether and the jntr in the currencyPrices
     //1 eth = 1* 10 ^18
@@ -1003,7 +1013,7 @@ contract("~Auction works", function (accounts) {
     await this.currencyPrices.setCurrencyPriceUSD(
       [ZERO_ADDRESS, this.jntrToken.address],
       [one, one],
-      {from: systemAddress}
+      { from: systemAddress }
     );
     //need to allow the token to be able to lock the tokens
     await this.protection.allowToken(this.jntrToken.address, {
@@ -1018,7 +1028,7 @@ contract("~Auction works", function (accounts) {
       from: accountA,
       value: yesterdaySupply,
     });
-    await this.auction.auctionEnd({from: systemAddress});
+    await this.auction.auctionEnd({ from: systemAddress });
 
     //Made this just so that yesterdays supply is not a too big of a number(i.e 50000 * DECIMAL_NOMINATOR)
 
@@ -1033,8 +1043,10 @@ contract("~Auction works", function (accounts) {
     //Whitelist them
     for (let i = 0; i < contributionInEth.length; i++) {
       let isWhiteListed = await this.whiteList.isWhiteListed(accounts[i]);
-      let flags = 3;
+      //console.log(isWhiteListed);
+      let flags = 32768;
       let maxWallets = 10;
+
       if (!isWhiteListed) {
         await this.whiteList.addNewWallet(accounts[i], flags, maxWallets, {
           from: systemAddress,
@@ -1050,7 +1062,7 @@ contract("~Auction works", function (accounts) {
     }
     let auctionDay = await this.auction.auctionDay();
 
-    await this.auction.auctionEnd({from: systemAddress});
+    await this.auction.auctionEnd({ from: systemAddress });
 
     //We will calculate the individual bonus according to this array
     let individualBonus = [0, 50, 40, 30, 20, 10];
