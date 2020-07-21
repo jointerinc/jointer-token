@@ -296,19 +296,7 @@ contract Stacking is
         emit StackRemoved(stackRoundId, msg.sender, actulToken);
     }
 
-    function trasferExtraToken(uint256 _amount, address _address)
-        external
-        returns (bool)
-    {
-        totalTokenAmount = safeSub(totalTokenAmount, _amount);
-        ensureTransferFrom(
-            IERC20Token(mainTokenAddress),
-            address(this),
-            _address,
-            _amount
-        );
-        return true;
-    }
+
 }
 
 contract AuctionProtection is Upgradeable, Stacking {
