@@ -317,8 +317,6 @@ contract AuctionStorage is AuctionFormula, AuctionUtils {
 
     uint256 public todaySupply;
 
-    bool public auctionSoldOut;
-
     function initializeStorage() internal {
         auctionDay = 1;
         totalContribution = 2500000 * PRICE_NOMINATOR;
@@ -512,8 +510,6 @@ contract AuctionFundCollector is IndividualBonus {
         address _from,
         uint256 currentMarketPrice
     ) internal {
-        require(auctionSoldOut == false, "ERR_AUCTION_SOLD_OUT");
-
         uint256 _currencyPrices = ICurrencyPrices(currencyPricesAddress)
             .getCurrencyPrice(_token);
 
@@ -591,64 +587,10 @@ contract AuctionFundCollector is IndividualBonus {
         fundAdded(address(0), _value, 18, _from, currentMarketPrice);
     }
 
-    function _contributeWithToken(
-        IERC20Token _token,
-        uint256 _value,
-        address _from
-    ) internal returns (bool) {
-        ensureTransferFrom(_token, _from, address(this), _value);
-
-        uint256 decimals = _token.decimals();
-
-        uint256 returnAmount = calculateFund(address(0), _value, decimals);
-
-        if (returnAmount != 0) {
-            ensureTransferFrom(_token, address(this), _from, returnAmount);
-            _value = safeSub(_value, returnAmount);
-        }
-
-        (
-            uint256 downSideAmount,
-            uint256 fundWalletamount,
-            uint256 reserveAmount
-        ) = calcuateAuctionFundDistrubution(
-            _value,
-            dayWiseDownSideProtectionRatio[auctionDay],
-            fundWalletRatio
-        );
-
-        approveTransferFrom(_token, auctionProtectionAddress, downSideAmount);
-        IAuctionProtection(auctionProtectionAddress).lockTokens(
-            _token,
-            address(this),
-            _from,
-            downSideAmount
-        );
-
-        approveTransferFrom(_token, liquadityAddress, reserveAmount);
-        uint256 currentMarketPrice = IAuctionLiquadity(liquadityAddress)
-            .contributeWithToken(_token, address(this), reserveAmount);
-        ensureTransferFrom(
-            _token,
-            address(this),
-            companyFundWalletAddress,
-            fundWalletamount
-        );
-
-        fundAdded(address(_token), _value, decimals, _from, currentMarketPrice);
-    }
-
+    // we only start with ether we dont need any token right now
     function contributeWithEther() external payable returns (bool) {
         require(_checkContribution(msg.sender));
         return _contributeWithEther(msg.value, msg.sender);
-    }
-
-    function contributeWithToken(IERC20Token _token, uint256 _value)
-        external
-        returns (bool)
-    {
-        require(_checkContribution(msg.sender));
-        return _contributeWithToken(_token, _value, msg.sender);
     }
 }
 
@@ -898,8 +840,6 @@ contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
         dayWiseDownSideProtectionRatio[auctionDay] = downSideProtectionRatio;
 
         LAST_AUCTION_START = safeAdd(LAST_AUCTION_START, INTERVAL);
-
-        auctionSoldOut = false;
 
         todayContribution = 0;
 
