@@ -790,26 +790,26 @@ contract("~liquidity works", function (accounts) {
         { from: accountA }
       );
     });
-    // // case-IV when tagAlogn does not have ether or bnt we sell 10% relay
-    // it("when tagAlong does not have ether or bnt(we sell 10% relay)", async function () {
-    //   //Lets give the tagAlong all the relay tokens(all two of them)
-    //   await this.smartToken.approve(this.tagAlong.address, one.mul(new BN(2)), {
-    //     from: accounts[0],
-    //   });
-    //   await this.tagAlong.depositeToken(
-    //     this.smartToken.address,
-    //     accounts[0],
-    //     one.mul(new BN(2)),
-    //     {
-    //       from: accounts[0],
-    //     }
-    //   );
-    //   // console.log(await web3.eth.getBalance(this.tagAlong.address));
-    //   let receipt = await this.liquidity.redemption(
-    //     mainTokenTobaseToken,
-    //     contributeAmount,
-    //     { from: accountA }
-    //   );
-    // });
+    // case-IV when tagAlogn does not have ether or bnt we sell 10% relay
+    it("when tagAlong does not have ether or bnt(we sell 10% relay)", async function () {
+      //Lets give the tagAlong all the relay tokens(all two of them)
+      await this.smartToken.approve(this.tagAlong.address, one.mul(new BN(2)), {
+        from: accounts[0],
+      });
+      await this.tagAlong.depositeToken(
+        this.smartToken.address,
+        accounts[0],
+        one.mul(new BN(2)),
+        {
+          from: accounts[0],
+        }
+      );
+      // console.log(await web3.eth.getBalance(this.tagAlong.address));
+      let receipt = await this.liquidity.redemption(
+        mainTokenTobaseToken,
+        contributeAmount,
+        { from: accountA }
+      );
+    });
   });
 });
