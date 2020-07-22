@@ -751,10 +751,13 @@ contract Liquadity is
         );
 
         uint256 totalEthAmount = safeAdd(ethAmount, fee);
+
         if (etherTokens(address(baseToken))) {
             isEtherToken = true;
             totalEthAmount = _amount;
         }
+
+        // if side resever have ether it will convert into bnt
 
         if (address(this).balance >= totalEthAmount) {
             uint256 returnAmount = _amount;
@@ -806,30 +809,26 @@ contract Liquadity is
 
                 // redemption amount always less then what converter have
                 uint256 converterBalance = baseToken.balanceOf(converter);
+
                 uint256 relayPercent = 10;
+
                 if (converterBalance > _amount) {
                     relayPercent = safeDiv(
-                        safeMul(
-                            safeSub(converterBalance, _amount),
-                            safeMul(100, PRICE_NOMINATOR)
-                        ),
+                        safeMul(safeSub(converterBalance, _amount), 100),
                         _amount
                     );
+                    if (relayPercent > 99) relayPercent = 99;
                 }
-                _liquadate(relayPercent, false);
+
+                _liquadate(safeMul(relayPercent, PRICE_NOMINATOR), false);
+
                 _amount = safeSub(_amount, safeDiv(_amount, relayPercent));
-                if (etherTokens(address(baseToken))) {
-                    IAuctionTagAlong(tagAlongAddress).contributeTowardLiquadity(
-                        _amount
-                    );
-                    IEtherToken(address(baseToken)).deposit.value(_amount)();
-                } else {
-                    IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
-                        baseToken,
-                        address(this),
-                        _amount
-                    );
-                }
+
+                IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
+                    baseToken,
+                    address(this),
+                    _amount
+                );
 
                 return _convertWithToken(_amount, baseTokenToMainToken);
             }
