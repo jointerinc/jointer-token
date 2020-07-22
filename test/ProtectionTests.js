@@ -1,8 +1,3 @@
-//Note: is there any assertion for below in auction protection...
-// In the technical design it says "Once the user canceling the staking, he is out and there is no option to return those tokens or deposit any other tokens
-// into the staking program."
-//This test need to be updated as the contract has been changed
-
 const {
   constants,
   expectEvent,
@@ -10,9 +5,9 @@ const {
   BN,
 } = require("@openzeppelin/test-helpers");
 
-const {ZERO_ADDRESS} = constants;
+const { ZERO_ADDRESS } = constants;
 
-const {expect} = require("chai");
+const { expect } = require("chai");
 
 const {
   advanceTimeAndBlock,
@@ -27,24 +22,28 @@ const TokenVaultRegistry = artifacts.require("TokenVaultRegistery");
 const TagAlong = artifacts.require("AuctionTagAlong");
 const TagAlongRegistry = artifacts.require("AuctionTagAlongRegistry");
 const AuctionRegisty = artifacts.require("TestAuctionRegistery");
+const TestAuction = artifacts.require("TestAuction");
 
 const TestERC20 = artifacts.require("TestERC20");
 
 const denominator = new BN(10).pow(new BN(18));
+const PERCENT_NOMINATOR = new BN(10).pow(new BN(6));
 
-const getWithDeimals = function (amount) {
+const getWithDecimals = function (amount) {
   return new BN(amount).mul(denominator);
 };
+const getWith6Decimals = function (amount) {
+  return new BN(amount).mul(PERCENT_NOMINATOR);
+};
 
-const totalAmount = new BN(100000);
-const contributeAmount = new BN(1);
+const totalAmount = getWithDecimals(new BN(1)); //1* 10^18
+const contributeAmount = getWith6Decimals(new BN(2)); // 2* 10^6
 
 contract("~Protection works", function (accounts) {
   const [
     primaryOwner,
     systemAddress,
     multiSigPlaceHolder,
-    auctionPlaceHolder,
     companyFundWallet,
     stakingCompanyWallet,
     accountA,
@@ -57,13 +56,13 @@ contract("~Protection works", function (accounts) {
     this.auctionRegistry = await AuctionRegisty.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     //the prtection
     var protectionRegistry = await ProtectionRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     let tempProtection = await Protection.new();
     await protectionRegistry.addVersion(1, tempProtection.address);
@@ -73,19 +72,22 @@ contract("~Protection works", function (accounts) {
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     let proxyAddress = await protectionRegistry.proxyAddress();
     this.protection = await Protection.at(proxyAddress);
     //some other token
-    this.erc20 = await TestERC20.new({from: primaryOwner});
+    this.erc20 = await TestERC20.new({ from: primaryOwner });
     //main token
-    this.mockMainToken = await TestERC20.new({from: primaryOwner});
+    this.mockMainToken = await TestERC20.new({ from: primaryOwner });
+
+    //The stub auction
+    this.auctionStub = await TestAuction.new(this.protection.address);
     //token vault
     var tokenVaultRegistry = await TokenVaultRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     let tempTokenVault = await TokenVault.new();
     await tokenVaultRegistry.addVersion(1, tempTokenVault.address);
@@ -95,7 +97,7 @@ contract("~Protection works", function (accounts) {
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     proxyAddress = await tokenVaultRegistry.proxyAddress();
     this.tokenVault = await TokenVault.at(proxyAddress);
@@ -104,9 +106,9 @@ contract("~Protection works", function (accounts) {
     var tagAlongRegistry = await TagAlongRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
-    let tempTagAlong = await TagAlong.new({from: primaryOwner});
+    let tempTagAlong = await TagAlong.new({ from: primaryOwner });
     await tagAlongRegistry.addVersion(1, tempTagAlong.address, {
       from: primaryOwner,
     });
@@ -116,7 +118,7 @@ contract("~Protection works", function (accounts) {
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     proxyAddress = await tagAlongRegistry.proxyAddress();
     this.tagAlong = await TagAlong.at(proxyAddress);
@@ -145,7 +147,7 @@ contract("~Protection works", function (accounts) {
     );
     await this.auctionRegistry.registerContractAddress(
       web3.utils.fromAscii("AUCTION"),
-      auctionPlaceHolder,
+      this.auctionStub.address,
       {
         from: primaryOwner,
       }
@@ -180,15 +182,17 @@ contract("~Protection works", function (accounts) {
     //Note: do we need the liquidity's address???
 
     //Mint some to the auction address
-    await this.erc20.mint(auctionPlaceHolder, totalAmount, {
+    await this.erc20.mint(this.auctionStub.address, totalAmount, {
       from: primaryOwner,
     });
-    await this.mockMainToken.mint(auctionPlaceHolder, totalAmount, {
+    await this.mockMainToken.mint(this.auctionStub.address, totalAmount, {
       from: primaryOwner,
     });
 
     //Allow the token
-    await this.protection.allowToken(this.erc20.address, {from: systemAddress});
+    await this.protection.allowToken(this.erc20.address, {
+      from: systemAddress,
+    });
 
     // console.log("protection: " + this.protection.address);
     // console.log("main token: " + this.mockMainToken.address);
@@ -197,9 +201,9 @@ contract("~Protection works", function (accounts) {
     // console.log("accountC: " + accountC);
   });
   it("should initialize correctly", async function () {
-    console.log(
-      "There can be an error of one second because of the whole transaction not getting included in the same block(It is not a breaking error)"
-    );
+    // console.log(
+    //   "There can be an error of one second because of the whole transaction not getting included in the same block(It is not a breaking error)"
+    // );
 
     expect(await this.protection.systemAddress()).to.equal(systemAddress);
     expect(await this.protection.primaryOwner()).to.equal(primaryOwner);
@@ -222,7 +226,9 @@ contract("~Protection works", function (accounts) {
     expect(await this.protection.tagAlongAddress()).to.equal(
       this.tagAlong.address
     );
-    expect(await this.protection.auctionAddress()).to.equal(auctionPlaceHolder);
+    expect(await this.protection.auctionAddress()).to.equal(
+      this.auctionStub.address
+    );
 
     expect(await this.protection.tokenLockDuration()).to.be.bignumber.equal(
       "365"
@@ -238,19 +244,16 @@ contract("~Protection works", function (accounts) {
       "ERR_AUTHORIZED_ADDRESS_ONLY"
     );
     let now = (await web3.eth.getBlock("latest")).timestamp;
-    let receipt = await this.protection.lockEther(accountA, {
-      from: auctionPlaceHolder,
+    let receipt = await this.auctionStub.lockEther(accountA, {
       value: contributeAmount,
     });
-    expectEvent(receipt, "FundLocked", {
+    expectEvent.inTransaction(receipt.tx, Protection, "FundLocked", {
       _token: ZERO_ADDRESS,
       _which: accountA,
       _amount: contributeAmount,
     });
 
-    expect(await this.protection.lockedOn(accountA)).to.be.bignumber.equal(
-      now.toString()
-    );
+    expect(await this.protection.lockedOn(accountA)).to.be.bignumber.equal("1");
 
     expect(
       await this.protection.currentLockedFunds(accountA, ZERO_ADDRESS)
@@ -258,23 +261,22 @@ contract("~Protection works", function (accounts) {
   });
   it("should lock tokens correctly", async function () {
     await expectRevert.unspecified(
-      this.protection.lockTokens(
+      this.auctionStub.lockTokens(
         this.erc20.address,
-        auctionPlaceHolder,
+        this.auctionStub.address,
         accountA,
-        contributeAmount,
-        {
-          from: auctionPlaceHolder,
-        }
+        contributeAmount
       )
     );
-    await this.erc20.approve(this.protection.address, contributeAmount, {
-      from: auctionPlaceHolder,
-    });
+    await this.auctionStub.approve(
+      this.erc20.address,
+      this.protection.address,
+      contributeAmount
+    );
     await expectRevert(
       this.protection.lockTokens(
         this.erc20.address,
-        auctionPlaceHolder,
+        this.auctionStub.address,
         accountA,
         contributeAmount,
         {
@@ -283,78 +285,67 @@ contract("~Protection works", function (accounts) {
       ),
       "ERR_AUTHORIZED_ADDRESS_ONLY"
     );
-    let now = (await web3.eth.getBlock("latest")).timestamp;
-    let receipt = await this.protection.lockTokens(
+    let receipt = await this.auctionStub.lockTokens(
       this.erc20.address,
-      auctionPlaceHolder,
+      this.auctionStub.address,
       accountA,
-      contributeAmount,
-      {
-        from: auctionPlaceHolder,
-      }
+      contributeAmount
     );
-    expectEvent(receipt, "FundLocked", {
+    expectEvent.inTransaction(receipt.tx, Protection, "FundLocked", {
       _token: this.erc20.address,
       _which: accountA,
       _amount: contributeAmount,
     });
 
-    expect(await this.protection.lockedOn(accountA)).to.be.bignumber.equal(
-      now.toString()
-    );
+    expect(await this.protection.lockedOn(accountA)).to.be.bignumber.equal("1");
 
     expect(
       await this.protection.currentLockedFunds(accountA, this.erc20.address)
     ).to.be.bignumber.equal(contributeAmount);
   });
   it("auction should be able to deposit token correctly", async function () {
-    await this.protection.lockEther(accountA, {
-      from: auctionPlaceHolder,
+    await this.auctionStub.lockEther(accountA, {
       value: contributeAmount,
     });
-    await this.erc20.approve(this.protection.address, contributeAmount, {
-      from: auctionPlaceHolder,
-    });
-    await this.protection.lockTokens(
+    await this.auctionStub.approve(
       this.erc20.address,
-      auctionPlaceHolder,
+      this.protection.address,
+      contributeAmount
+    );
+    await this.auctionStub.lockTokens(
+      this.erc20.address,
+      this.auctionStub.address,
       accountA,
-      contributeAmount,
-      {
-        from: auctionPlaceHolder,
-      }
+      contributeAmount
     );
     await expectRevert.unspecified(
-      this.protection.depositToken(
-        auctionPlaceHolder,
+      this.auctionStub.depositToken(
+        this.auctionStub.address,
         accountA,
-        contributeAmount,
-        {from: auctionPlaceHolder}
+        contributeAmount
       )
     );
-    await this.mockMainToken.approve(
+    await this.auctionStub.approve(
+      this.mockMainToken.address,
       this.protection.address,
-      contributeAmount,
-      {
-        from: auctionPlaceHolder,
-      }
+      contributeAmount
     );
+
     await expectRevert(
       this.protection.depositToken(
-        auctionPlaceHolder,
+        this.auctionStub.address,
         accountA,
         contributeAmount,
-        {from: other1}
+        { from: other1 }
       ),
       "ERR_AUTHORIZED_ADDRESS_ONLY"
     );
-    let receipt = await this.protection.depositToken(
-      auctionPlaceHolder,
+    let receipt = await this.auctionStub.depositToken(
+      this.auctionStub.address,
       accountA,
-      contributeAmount,
-      {from: auctionPlaceHolder}
+      contributeAmount
     );
-    expectEvent(receipt, "FundLocked", {
+    expectEvent.inTransaction(receipt.tx, Protection, "FundLocked", {
       _token: this.mockMainToken.address,
       _which: accountA,
       _amount: contributeAmount,
@@ -371,47 +362,48 @@ contract("~Protection works", function (accounts) {
     );
   });
   it("should cancel investment correctly(Investor->tokens/company->JNTR)", async function () {
-    await this.protection.lockEther(accountA, {
-      from: auctionPlaceHolder,
+    await this.auctionStub.lockEther(accountA, {
       value: contributeAmount,
     });
-    await this.erc20.approve(this.protection.address, contributeAmount, {
-      from: auctionPlaceHolder,
-    });
-    await this.protection.lockTokens(
+    await this.auctionStub.approve(
       this.erc20.address,
-      auctionPlaceHolder,
-      accountA,
-      contributeAmount,
-      {
-        from: auctionPlaceHolder,
-      }
-    );
-    await this.mockMainToken.approve(
       this.protection.address,
-      contributeAmount,
-      {
-        from: auctionPlaceHolder,
-      }
+      contributeAmount
     );
-    await this.protection.depositToken(
-      auctionPlaceHolder,
+    await this.auctionStub.lockTokens(
+      this.erc20.address,
+      this.auctionStub.address,
       accountA,
-      contributeAmount,
-      {from: auctionPlaceHolder}
+      contributeAmount
+    );
+    await this.auctionStub.approve(
+      this.mockMainToken.address,
+      this.protection.address,
+      contributeAmount
+    );
+    await this.auctionStub.depositToken(
+      this.auctionStub.address,
+      accountA,
+      contributeAmount
     );
     let snapId = (await takeSnapshot()).result;
-
-    let now = await web3.eth.getBlock("latest").timestamp;
-    await advanceTimeAndBlock(365 * 86400);
+    await this.auctionStub.changeAuctionDay(367);
+    // console.log(
+    //   "locked on: " + (await this.protection.lockedOn(accountA)).toString()
+    // );
+    // console.log((await this.auctionStub.auctionDay()).toString());
+    // console.log((await this.protection.tokenLockDuration()).toString());
+    // //Just to test the cancelling  period
+    // console.log(await this.protection.isTokenLockEndDay("1"));
 
     await expectRevert(
-      this.protection.cancelInvestment({from: accountA}),
+      this.protection.cancelInvestment({ from: accountA }),
       "ERR_INVESTMENT_CANCEL_PERIOD_OVER"
     );
+    // await this.auctionStub.changeAuctionDay(1);
 
     await revertToSnapshot(snapId);
-    let receipt = await this.protection.cancelInvestment({from: accountA});
+    let receipt = await this.protection.cancelInvestment({ from: accountA });
     expectEvent.inLogs(receipt.logs, "InvestMentCancelled", {
       _from: accountA,
       _tokenAmount: contributeAmount,
@@ -450,37 +442,35 @@ contract("~Protection works", function (accounts) {
   });
   // There is some redundancy in the code but it works
   it("should unlock tokens correctly(Investor->JNTR/company->Tokens)", async function () {
-    await this.protection.lockEther(accountA, {
-      from: auctionPlaceHolder,
+    //    console.log("tagAlong: " +  await this.protection.tagAlongAddress());
+
+    // console.log("companyFundWallet: " + await this.protection.companyFundWallet());
+
+    await this.auctionStub.lockEther(accountA, {
       value: contributeAmount,
     });
-    await this.erc20.approve(this.protection.address, contributeAmount, {
-      from: auctionPlaceHolder,
-    });
-    await this.protection.lockTokens(
+    await this.auctionStub.approve(
       this.erc20.address,
-      auctionPlaceHolder,
-      accountA,
-      contributeAmount,
-      {
-        from: auctionPlaceHolder,
-      }
-    );
-    await this.mockMainToken.approve(
       this.protection.address,
-      contributeAmount,
-      {
-        from: auctionPlaceHolder,
-      }
+      contributeAmount
     );
-    await this.protection.depositToken(
-      auctionPlaceHolder,
+    await this.auctionStub.lockTokens(
+      this.erc20.address,
+      this.auctionStub.address,
       accountA,
-      contributeAmount,
-      {from: auctionPlaceHolder}
+      contributeAmount
     );
-
-    let receipt = await this.protection.unLockTokens({from: accountA});
+    await this.auctionStub.approve(
+      this.mockMainToken.address,
+      this.protection.address,
+      contributeAmount
+    );
+    await this.auctionStub.depositToken(
+      this.auctionStub.address,
+      accountA,
+      contributeAmount
+    );
+    let receipt = await this.protection.unLockTokens({ from: accountA });
     let vaultRatio = await this.protection.vaultRatio();
     let walletAmount = contributeAmount.mul(vaultRatio).div(new BN(100));
     let tagAlongAmount = contributeAmount.sub(walletAmount);
@@ -534,45 +524,41 @@ contract("~Protection works", function (accounts) {
     );
   });
   it("should unlock funds of someone by one of the owners", async function () {
-    await this.protection.lockEther(accountA, {
-      from: auctionPlaceHolder,
+    await this.auctionStub.lockEther(accountA, {
       value: contributeAmount,
     });
-    await this.erc20.approve(this.protection.address, contributeAmount, {
-      from: auctionPlaceHolder,
-    });
-    await this.protection.lockTokens(
+    await this.auctionStub.approve(
       this.erc20.address,
-      auctionPlaceHolder,
-      accountA,
-      contributeAmount,
-      {
-        from: auctionPlaceHolder,
-      }
-    );
-    await this.mockMainToken.approve(
       this.protection.address,
-      contributeAmount,
-      {
-        from: auctionPlaceHolder,
-      }
+      contributeAmount
     );
-    await this.protection.depositToken(
-      auctionPlaceHolder,
+    await this.auctionStub.lockTokens(
+      this.erc20.address,
+      this.auctionStub.address,
       accountA,
-      contributeAmount,
-      {from: auctionPlaceHolder}
+      contributeAmount
+    );
+    await this.auctionStub.approve(
+      this.mockMainToken.address,
+      this.protection.address,
+      contributeAmount
+    );
+    await this.auctionStub.depositToken(
+      this.auctionStub.address,
+      accountA,
+      contributeAmount
     );
 
     await expectRevert(
-      this.protection.unLockFundByAdmin(accountA, {from: systemAddress}),
+      this.protection.unLockFundByAdmin(accountA, { from: systemAddress }),
       "ERR_ADMIN_CANT_UNLOCK_FUND"
     );
-    await advanceTimeAndBlock(365 * 86400);
+    await this.auctionStub.changeAuctionDay(400);
     await expectRevert(
-      this.protection.unLockFundByAdmin(accountA, {from: other1}),
+      this.protection.unLockFundByAdmin(accountA, { from: other1 }),
       "ERR_AUTHORIZED_ADDRESS_ONLY"
     );
+
     //the method we are testing
     let receipt = await this.protection.unLockFundByAdmin(accountA, {
       from: systemAddress,
@@ -631,37 +617,32 @@ contract("~Protection works", function (accounts) {
   });
   describe("~Stacking works", async function () {
     it("should stack tokens by user correctly", async function () {
-      await this.protection.lockEther(accountA, {
-        from: auctionPlaceHolder,
+      await this.auctionStub.lockEther(accountA, {
         value: contributeAmount,
       });
-      await this.erc20.approve(this.protection.address, contributeAmount, {
-        from: auctionPlaceHolder,
-      });
-      await this.protection.lockTokens(
+      await this.auctionStub.approve(
         this.erc20.address,
-        auctionPlaceHolder,
-        accountA,
-        contributeAmount,
-        {
-          from: auctionPlaceHolder,
-        }
-      );
-      await this.mockMainToken.approve(
         this.protection.address,
-        contributeAmount,
-        {
-          from: auctionPlaceHolder,
-        }
+        contributeAmount
       );
-      await this.protection.depositToken(
-        auctionPlaceHolder,
+      await this.auctionStub.lockTokens(
+        this.erc20.address,
+        this.auctionStub.address,
         accountA,
-        contributeAmount,
-        {from: auctionPlaceHolder}
+        contributeAmount
+      );
+      await this.auctionStub.approve(
+        this.mockMainToken.address,
+        this.protection.address,
+        contributeAmount
+      );
+      await this.auctionStub.depositToken(
+        this.auctionStub.address,
+        accountA,
+        contributeAmount
       );
       let roundId = await this.protection.stackRoundId();
-      let receipt = await this.protection.stackToken({from: accountA});
+      let receipt = await this.protection.stackToken({ from: accountA });
       let vaultRatio = await this.protection.vaultRatio();
       let walletAmount = contributeAmount.mul(vaultRatio).div(new BN(100));
       let tagAlongAmount = contributeAmount.sub(walletAmount);
@@ -713,17 +694,14 @@ contract("~Protection works", function (accounts) {
       ).to.be.bignumber.equal("0");
     });
     it("should add the reward tokens correctly", async function () {
+      //revert if tokens are not approved
       await expectRevert.unspecified(
-        this.protection.stackFund(contributeAmount, {
-          from: auctionPlaceHolder,
-        })
+        this.auctionStub.stackFund(contributeAmount)
       );
-      await this.mockMainToken.approve(
+      await this.auctionStub.approve(
+        this.mockMainToken.address,
         this.protection.address,
-        contributeAmount,
-        {
-          from: auctionPlaceHolder,
-        }
+        contributeAmount
       );
       //only auction protection should be able to
       await expectRevert(
@@ -733,9 +711,7 @@ contract("~Protection works", function (accounts) {
         "ERR_AUTHORIZED_ADDRESS_ONLY"
       );
       let roundId = await this.protection.stackRoundId();
-      await this.protection.stackFund(contributeAmount, {
-        from: auctionPlaceHolder,
-      });
+      await this.auctionStub.stackFund(contributeAmount);
       expect(await this.protection.stackRoundId()).to.be.bignumber.equal(
         roundId.add(new BN(1))
       );
@@ -744,50 +720,41 @@ contract("~Protection works", function (accounts) {
         await this.mockMainToken.balanceOf(stakingCompanyWallet)
       ).to.be.bignumber.equal(contributeAmount);
       //if somebody stacks it then...
-      await this.protection.lockEther(accountA, {
-        from: auctionPlaceHolder,
+      await this.auctionStub.lockEther(accountA, {
         value: contributeAmount,
       });
-      await this.erc20.approve(this.protection.address, contributeAmount, {
-        from: auctionPlaceHolder,
-      });
-      await this.protection.lockTokens(
+      await this.auctionStub.approve(
         this.erc20.address,
-        auctionPlaceHolder,
-        accountA,
-        contributeAmount,
-        {
-          from: auctionPlaceHolder,
-        }
-      );
-      await this.mockMainToken.approve(
         this.protection.address,
-        contributeAmount,
-        {
-          from: auctionPlaceHolder,
-        }
+        contributeAmount
       );
-      await this.protection.depositToken(
-        auctionPlaceHolder,
+      await this.auctionStub.lockTokens(
+        this.erc20.address,
+        this.auctionStub.address,
         accountA,
-        contributeAmount,
-        {from: auctionPlaceHolder}
+        contributeAmount
       );
-      await this.protection.stackToken({from: accountA});
+      await this.auctionStub.approve(
+        this.mockMainToken.address,
+        this.protection.address,
+        contributeAmount
+      );
+      await this.auctionStub.depositToken(
+        this.auctionStub.address,
+        accountA,
+        contributeAmount
+      );
+      await this.protection.stackToken({ from: accountA });
       expect(await this.protection.totalTokenAmount()).to.be.bignumber.equal(
         contributeAmount
       );
-      await this.mockMainToken.approve(
+      await this.auctionStub.approve(
+        this.mockMainToken.address,
         this.protection.address,
-        contributeAmount,
-        {
-          from: auctionPlaceHolder,
-        }
+        contributeAmount
       );
       roundId = await this.protection.stackRoundId();
-      await this.protection.stackFund(contributeAmount, {
-        from: auctionPlaceHolder,
-      });
+      await this.auctionStub.stackFund(contributeAmount);
       expect(await this.protection.stackRoundId()).to.be.bignumber.equal(
         roundId.add(new BN(1))
       );
@@ -795,16 +762,16 @@ contract("~Protection works", function (accounts) {
         contributeAmount.mul(new BN(2))
       );
     });
-
     //this test needs improvement for sure
     it("should distribute the reward correclty (_calculateStackFund)", async function () {
-      await this.mockMainToken.approve(this.protection.address, totalAmount, {
-        from: auctionPlaceHolder,
-      });
-      const amount1 = new BN(1000);
-      const amount2 = new BN(1000);
-      const amount3 = new BN(1000);
-
+      await this.auctionStub.approve(
+        this.mockMainToken.address,
+        this.protection.address,
+        totalAmount
+      );
+      const amount1 = getWith6Decimals(new BN(1000));
+      const amount2 = getWith6Decimals(new BN(1000));
+      const amount3 = getWith6Decimals(new BN(1000));
       var accs = [accountA, accountB, accountC];
       var rewards = [amount1, amount2, amount3];
       var protectionBalance = [
@@ -812,7 +779,6 @@ contract("~Protection works", function (accounts) {
         [amount1, amount2, amount3],
         [amount1, amount2, amount3],
       ];
-
       var balance = new Array(3).fill(new BN(0));
       //It is just to store balabce everyday to be able to compare afterwards
       var balanceDayWise = [...Array(3)].map((e) => Array(3).fill(new BN(0)));
@@ -836,20 +802,18 @@ contract("~Protection works", function (accounts) {
       }
       for (let day = 0; day < accs.length; day++) {
         for (let i = 0; i < accs.length; i++) {
-          await this.protection.depositToken(
-            auctionPlaceHolder,
+          await this.auctionStub.depositToken(
+            this.auctionStub.address,
             accs[i],
-            protectionBalance[day][i],
-            {from: auctionPlaceHolder}
+            protectionBalance[day][i]
           );
+          // console.log(day);
+          // console.log(i);
           // console.log(protectionBalance[day][i].toString());
-
-          await this.protection.stackToken({from: accs[i]});
+          await this.protection.stackToken({ from: accs[i] });
           // console.log(":: " + (await this.protection.getStackBalance(accs[i])));
         }
-        await this.protection.stackFund(rewards[day], {
-          from: auctionPlaceHolder,
-        });
+        await this.auctionStub.stackFund(rewards[day]);
         for (let i = 0; i < accs.length; i++) {
           expect(
             await this.protection.getStackBalance(accs[i])
@@ -860,20 +824,17 @@ contract("~Protection works", function (accounts) {
     it("should unlock tokens from stacking correctly", async function () {
       //The calcultion is happing correctly(see the test above) So we just need to check if
       //things other than calcualting is happening correclty
-      await this.mockMainToken.approve(
+      await this.auctionStub.approve(
+        this.mockMainToken.address,
         this.protection.address,
-        contributeAmount,
-        {
-          from: auctionPlaceHolder,
-        }
+        contributeAmount
       );
-      await this.protection.depositToken(
-        auctionPlaceHolder,
+      await this.auctionStub.depositToken(
+        this.auctionStub.address,
         accountA,
-        contributeAmount,
-        {from: auctionPlaceHolder}
+        contributeAmount
       );
-      await this.protection.stackToken({from: accountA});
+      await this.protection.stackToken({ from: accountA });
       let totalTokenAmount = await this.protection.totalTokenAmount();
       let roundId = await this.protection.stackRoundId();
       let reciept = await this.protection.unlockTokenFromStack({

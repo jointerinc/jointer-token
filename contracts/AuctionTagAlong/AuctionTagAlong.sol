@@ -167,7 +167,5 @@ contract AuctionTagAlong is
         return true;
     }
 
-    function() external payable {
-        emit FundDeposited(address(0), msg.sender, msg.value);
-    }
+    function() external payable {}
 }

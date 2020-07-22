@@ -4,9 +4,9 @@ const {
   expectRevert,
   BN,
 } = require("@openzeppelin/test-helpers");
-const {ZERO_ADDRESS} = constants;
+const { ZERO_ADDRESS } = constants;
 
-const {expect} = require("chai");
+const { expect } = require("chai");
 
 const TagAlong = artifacts.require("AuctionTagAlong");
 const TagAlongRegistry = artifacts.require("AuctionTagAlongRegistry");
@@ -28,20 +28,20 @@ contract("~auction tag Along works", function (accounts) {
     this.auctionRegistry = await AuctionRegisty.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     await this.auctionRegistry.registerContractAddress(
       web3.utils.fromAscii("LIQUADITY"),
       liquidityPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
 
     var tagAlongRegistry = await TagAlongRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
-    let tempTagAlong = await TagAlong.new({from: primaryOwner});
+    let tempTagAlong = await TagAlong.new({ from: primaryOwner });
     await tagAlongRegistry.addVersion(1, tempTagAlong.address, {
       from: primaryOwner,
     });
@@ -51,13 +51,13 @@ contract("~auction tag Along works", function (accounts) {
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     proxyAddress = await tagAlongRegistry.proxyAddress();
     this.tagAlong = await TagAlong.at(proxyAddress);
 
-    this.erc20 = await ERC20.new({from: other1});
-    this.erc20.mint(contributer1, contributeAmount, {from: contributer1});
+    this.erc20 = await ERC20.new({ from: other1 });
+    this.erc20.mint(contributer1, contributeAmount, { from: contributer1 });
   });
   it("should initialize correctly", async function () {
     expect(await this.tagAlong.systemAddress()).to.equal(systemAddress);
@@ -103,14 +103,9 @@ contract("~auction tag Along works", function (accounts) {
         from: other1,
         value: initialBalance,
       });
-      expectEvent(receipt, "FundDeposited", {
-        _token: ZERO_ADDRESS,
-        _from: other1,
-        _amount: initialBalance,
-      });
       let amount = new BN(1000);
       await expectRevert(
-        this.tagAlong.contributeTowardLiquadity(amount, {from: other1}),
+        this.tagAlong.contributeTowardLiquadity(amount, { from: other1 }),
         "ERR_ONLY_LIQUADITY_ALLWOED"
       );
 
@@ -139,7 +134,7 @@ contract("~auction tag Along works", function (accounts) {
           this.erc20.address,
           other1,
           contributeAmount,
-          {from: other1}
+          { from: other1 }
         ),
         "ERR_ONLY_LIQUADITY_ALLWOED"
       );
@@ -147,61 +142,8 @@ contract("~auction tag Along works", function (accounts) {
         this.erc20.address,
         other1,
         contributeAmount,
-        {from: liquidityPlaceHolder}
+        { from: liquidityPlaceHolder }
       );
-    });
-    it("should return funds correctly", async function () {
-      let initialBalance = new BN(1000000);
-      await this.tagAlong.sendTransaction({
-        from: other1,
-        value: initialBalance,
-      });
-      await this.erc20.approve(this.tagAlong.address, contributeAmount, {
-        from: contributer1,
-      });
-      await this.tagAlong.depositeToken(
-        this.erc20.address,
-        contributer1,
-        contributeAmount,
-        {
-          from: contributer1,
-        }
-      );
-      expectRevert(
-        this.tagAlong.returnFund(ZERO_ADDRESS, initialBalance, other1, {
-          from: other1,
-        }),
-        "ERR_AUTHORIZED_ADDRESS_ONLY"
-      );
-      await this.tagAlong.returnFund(ZERO_ADDRESS, initialBalance, other1, {
-        from: primaryOwner,
-      });
-      expect(
-        await web3.eth.getBalance(this.tagAlong.address)
-      ).to.be.bignumber.equal("0");
-
-      expectRevert(
-        this.tagAlong.returnFund(
-          this.erc20.address,
-          contributeAmount,
-          contributer1,
-          {
-            from: contributer1,
-          }
-        ),
-        "ERR_AUTHORIZED_ADDRESS_ONLY"
-      );
-      await this.tagAlong.returnFund(
-        this.erc20.address,
-        contributeAmount,
-        contributer1,
-        {
-          from: primaryOwner,
-        }
-      );
-      expect(
-        await this.erc20.balanceOf(this.tagAlong.address)
-      ).to.be.bignumber.equal("0");
     });
   });
 });

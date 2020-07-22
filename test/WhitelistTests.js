@@ -4,9 +4,9 @@ const {
   expectEvent,
   expectRevert,
 } = require("@openzeppelin/test-helpers");
-const {ZERO_ADDRESS} = constants;
+const { ZERO_ADDRESS } = constants;
 
-const {expect} = require("chai");
+const { expect } = require("chai");
 
 const whiteListContract = artifacts.require("WhiteList");
 const WhiteListRegistry = artifacts.require("WhiteListRegistery");
@@ -126,45 +126,49 @@ contract("~WhiteList works", function (accounts) {
     let proxyAddress = await whiteListRegistry.proxyAddress();
     this.whiteList = await whiteListContract.at(proxyAddress);
     registryAddress = whiteListRegistry.address;
-
-    //there is a chance that first test fails by 1 second. The difference is becuase all the transactions in this.whiteList.createroxy() are not in the same block.It is not a big deal
   });
   it("should initialize properly", async function () {
-    console.log("see L#130 if fails");
-
     expect(await this.whiteList.primaryOwner()).to.equal(primaryOwner);
     expect(await this.whiteList.authorityAddress()).to.equal(authorityAddress);
     expect(await this.whiteList.systemAddress()).to.equal(systemAddress);
 
+    //there is a chance that first test fails by 1 second. The difference is becuase all the transactions in this.whiteList.createroxy() are not in the same block.It is not a big deal
+    //That is why cheking for +-2 second is a good idea
     expect(
       await this.whiteList.tokenToHoldBackDaysTimeStamp(0)
-    ).to.be.bignumber.equal(
-      convertDaysToTimeStamp(tokenHoldBackDays).toString()
+    ).to.be.bignumber.closeTo(
+      (convertDaysToTimeStamp(tokenHoldBackDays) - 2).toString(),
+      (convertDaysToTimeStamp(tokenHoldBackDays) + 2).toString()
     );
     expect(
       await this.whiteList.tokenToHoldBackDaysTimeStamp(1)
-    ).to.be.bignumber.equal(
-      convertDaysToTimeStamp(tokenHoldBackDays).toString()
+    ).to.be.bignumber.closeTo(
+      (convertDaysToTimeStamp(tokenHoldBackDays) - 2).toString(),
+      (convertDaysToTimeStamp(tokenHoldBackDays) + 2).toString()
     );
     expect(
       await this.whiteList.tokenToHoldBackDaysTimeStamp(2)
-    ).to.be.bignumber.equal(
-      convertDaysToTimeStamp(tokenHoldBackDays).toString()
+    ).to.be.bignumber.closeTo(
+      (convertDaysToTimeStamp(tokenHoldBackDays) - 2).toString(),
+      (convertDaysToTimeStamp(tokenHoldBackDays) + 2).toString()
     );
     expect(
       await this.whiteList.tokenToMaturityDaysTimeStamp(0)
-    ).to.be.bignumber.equal(
-      convertDaysToTimeStamp(tokenMaturityDays).toString()
+    ).to.be.bignumber.closeTo(
+      (convertDaysToTimeStamp(tokenMaturityDays) - 2).toString(),
+      (convertDaysToTimeStamp(tokenMaturityDays) + 2).toString()
     );
     expect(
       await this.whiteList.tokenToMaturityDaysTimeStamp(1)
-    ).to.be.bignumber.equal(
-      convertDaysToTimeStamp(tokenMaturityDays).toString()
+    ).to.be.bignumber.closeTo(
+      (convertDaysToTimeStamp(tokenMaturityDays) - 2).toString(),
+      (convertDaysToTimeStamp(tokenMaturityDays) + 2).toString()
     );
     expect(
       await this.whiteList.tokenToMaturityDaysTimeStamp(2)
-    ).to.be.bignumber.equal(
-      convertDaysToTimeStamp(stockTokenMaturityDays).toString()
+    ).to.be.bignumber.closeTo(
+      (convertDaysToTimeStamp(stockTokenMaturityDays) - 2).toString(),
+      (convertDaysToTimeStamp(tokenMaturityDays) + 2).toString()
     );
   });
   it("should add New wallet correctly by system only", async function () {
@@ -293,12 +297,14 @@ contract("~WhiteList works", function (accounts) {
       from: systemAddress,
     });
     await expectRevert(
-      this.whiteList.changeFlags(toBeWhiteListed, changedFlags, {from: other1}),
+      this.whiteList.changeFlags(toBeWhiteListed, changedFlags, {
+        from: other1,
+      }),
       "ERR_AUTHORIZED_ADDRESS_ONLY"
     );
     //if not whitelisted
     await expectRevert(
-      this.whiteList.changeFlags(other1, changedFlags, {from: systemAddress}),
+      this.whiteList.changeFlags(other1, changedFlags, { from: systemAddress }),
       "ERR_ACTION_NOT_ALLOWED"
     );
     let receipt = await this.whiteList.changeFlags(
@@ -440,10 +446,10 @@ contract("~WhiteList works", function (accounts) {
     expect(transferringRule[3].toString()).to.equal(to_condition.toString());
 
     await expectRevert(
-      this.whiteList.removeMainTransferingRules(1, {from: other1}),
+      this.whiteList.removeMainTransferingRules(1, { from: other1 }),
       "ERR_AUTHORIZED_ADDRESS_ONLY"
     );
-    this.whiteList.removeMainTransferingRules(1, {from: systemAddress});
+    this.whiteList.removeMainTransferingRules(1, { from: systemAddress });
     await expectRevert.unspecified(
       this.whiteList.tokenToTransferringRuleArray(0, 1)
     );
