@@ -12,7 +12,7 @@
  *   },
  */
 
-var HDWalletProvider = require("truffle-hdwallet-provider");
+var HDWalletProvider = require("@truffle/hdwallet-provider");
 const MNEMONIC = '';
 
 module.exports = {

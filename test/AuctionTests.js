@@ -11,13 +11,6 @@ const { ZERO_ADDRESS } = constants;
 
 const { expect } = require("chai");
 
-const {
-  advanceTimeAndBlock,
-  advanceTime,
-  takeSnapshot,
-  revertToSnapshot,
-} = require("./utils");
-
 const { deployBancor } = require("./deployBancor");
 const { forEach } = require("lodash");
 
@@ -657,66 +650,6 @@ contract("~Auction works", function (accounts) {
     //for the remaining 0.1% gets converted into jntr with help of bancor and given to tokenVault
     //These tests are done already in the liquidity so choosing not to do it again
   });
-  it("should contribute with tokens correctly", async function () {
-    //I feel like here the getCurrencyPrices would be needed
-    //First lets give our boy some jntr
-    let contributionAmount = one;
-    await this.jntrToken.transfer(accountA, contributionAmount, {
-      from: accounts[0],
-    });
-    //Noe the contribution starts
-    await this.jntrToken.approve(this.auction.address, contributionAmount, {
-      from: accountA,
-    });
-
-    //Also we would need to allow the token becuse you cannot lock tokens in protection if token is not allowed
-    await this.protection.allowToken(this.jntrToken.address, {
-      from: systemAddress,
-    });
-
-    await this.auction.contributeWithToken(
-      this.jntrToken.address,
-      contributionAmount,
-      {
-        from: accountA,
-      }
-    );
-    //I am being lazy and checking current balances of address to be equal to expected amount
-    //Actually it should be the delta
-
-    //90% of it goes to the downside protection
-    //tokens gets locked
-    let downSideAmount = contributionAmount
-      .mul(downSideProtectioRatio)
-      .div(hundreadPercentage);
-
-    //90% of reamaning goes to the comany fund wallet
-    let temp = contributionAmount.sub(downSideAmount);
-    let companyFundWalletAmount = temp
-      .mul(fundWalletRatio)
-      .div(hundreadPercentage);
-
-    temp = temp.sub(companyFundWalletAmount);
-    //Remainig goes to reserves
-    let reserveAmount = temp;
-
-    // console.log((await this.jntrToken.balanceOf(companyFundWallet)).toString());
-    // console.log(
-    //   (await this.jntrToken.balanceOf(this.protection.address)).toString()
-    // );
-    // console.log(
-    //   (await this.jntrToken.balanceOf(this.liquidity.address)).toString()
-    // );
-    expect(
-      await this.jntrToken.balanceOf(this.protection.address)
-    ).to.be.bignumber.equal(downSideAmount);
-    expect(
-      await this.jntrToken.balanceOf(companyFundWallet)
-    ).to.be.bignumber.equal(companyFundWalletAmount);
-    expect(
-      await this.jntrToken.balanceOf(this.liquidity.address)
-    ).to.be.bignumber.equal(reserveAmount);
-  });
   it("should keep track of top5 contributors", async function () {
     //the current way to calculate bonus can be optimized
     //by keeping track of only first 5 addresses
@@ -1002,7 +935,7 @@ contract("~Auction works", function (accounts) {
 
       expect(fees).to.be.bignumber.equal(companyTokenWalletJNTRBalnce);
     });
-    it("when the today's contribution is zero(TODO)", async function () {});
+    // it("when the today's contribution is zero(TODO)", async function () {});whe
   });
   //Will need to change this becuase of new change
   it("should distribute Tokens correctly", async function () {

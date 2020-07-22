@@ -6,20 +6,16 @@ const {
   BN,
 } = require("@openzeppelin/test-helpers");
 
-const {ZERO_ADDRESS} = constants;
+const { ZERO_ADDRESS } = constants;
 
-const {expect} = require("chai");
+const { expect } = require("chai");
 
-const {
-  advanceTimeAndBlock,
-  advanceTime,
-  takeSnapshot,
-  revertToSnapshot,
-} = require("./utils");
+const { takeSnapshot, revertToSnapshot } = require("./utils");
 
 const TruffleContract = require("@truffle/contract");
 
-const {deployBancor} = require("./deployBancor");
+const { deployBancor } = require("./deployBancor");
+const { web3 } = require("@openzeppelin/test-helpers/src/setup");
 
 const Liquidity = artifacts.require("Liquadity");
 const LiquidityRegistry = artifacts.require("LiquadityRegistery");
@@ -117,15 +113,15 @@ contract("~liquidity works", function (accounts) {
     this.auctionRegistry = await AuctionRegisty.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     //tagAlong
     var tagAlongRegistry = await TagAlongRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
-    let tempTagAlong = await TagAlong.new({from: primaryOwner});
+    let tempTagAlong = await TagAlong.new({ from: primaryOwner });
     await tagAlongRegistry.addVersion(1, tempTagAlong.address, {
       from: primaryOwner,
     });
@@ -135,7 +131,7 @@ contract("~liquidity works", function (accounts) {
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     let proxyAddress = await tagAlongRegistry.proxyAddress();
     this.tagAlong = await TagAlong.at(proxyAddress);
@@ -143,9 +139,9 @@ contract("~liquidity works", function (accounts) {
     var tokenVaultRegistry = await TokenVaultRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
-    let tempTokenVault = await TokenVault.new({from: primaryOwner});
+    let tempTokenVault = await TokenVault.new({ from: primaryOwner });
     await tokenVaultRegistry.addVersion(1, tempTokenVault.address, {
       from: primaryOwner,
     });
@@ -155,7 +151,7 @@ contract("~liquidity works", function (accounts) {
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     proxyAddress = await tokenVaultRegistry.proxyAddress();
     this.tokenVault = await TokenVault.at(proxyAddress);
@@ -164,7 +160,7 @@ contract("~liquidity works", function (accounts) {
     this.currencyPrices = await CurrencyPrices.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
 
     //the whiteList
@@ -174,7 +170,7 @@ contract("~liquidity works", function (accounts) {
     var whiteListRegistry = await WhiteListRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     let tempWhiteList = await whiteListContract.new();
     await whiteListRegistry.addVersion(1, tempWhiteList.address, {
@@ -193,7 +189,7 @@ contract("~liquidity works", function (accounts) {
       tokenMaturityDays,
       tokenMaturityDays,
       stockTokenMaturityDays,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
 
     proxyAddress = await whiteListRegistry.proxyAddress();
@@ -239,9 +235,9 @@ contract("~liquidity works", function (accounts) {
     var liquidityRegistry = await LiquidityRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
-    let tempLiquidity = await Liquidity.new({from: primaryOwner});
+    let tempLiquidity = await Liquidity.new({ from: primaryOwner });
     await liquidityRegistry.addVersion(1, tempLiquidity.address, {
       from: primaryOwner,
     });
@@ -256,17 +252,21 @@ contract("~liquidity works", function (accounts) {
       multiSigPlaceHolder,
       this.auctionRegistry.address,
       baseLinePrice,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     proxyAddress = await liquidityRegistry.proxyAddress();
     this.liquidity = await Liquidity.at(proxyAddress);
 
     //set the paths
-    this.liquidity.setTokenPath(0, ethToMainToken, {from: systemAddress});
-    this.liquidity.setTokenPath(1, baseTokenToMainToken, {from: systemAddress});
-    this.liquidity.setTokenPath(2, mainTokenTobaseToken, {from: systemAddress});
-    this.liquidity.setTokenPath(3, ethToBaseToken, {from: systemAddress});
-    this.liquidity.setTokenPath(4, baseTokenToEth, {from: systemAddress});
+    this.liquidity.setTokenPath(0, ethToMainToken, { from: systemAddress });
+    this.liquidity.setTokenPath(1, baseTokenToMainToken, {
+      from: systemAddress,
+    });
+    this.liquidity.setTokenPath(2, mainTokenTobaseToken, {
+      from: systemAddress,
+    });
+    this.liquidity.setTokenPath(3, ethToBaseToken, { from: systemAddress });
+    this.liquidity.setTokenPath(4, baseTokenToEth, { from: systemAddress });
 
     // this.liquidity = await Liquidity.new(
     //   this.converter.address,
@@ -393,7 +393,7 @@ contract("~liquidity works", function (accounts) {
       await this.currencyPrices.setCurrencyPriceUSD(
         [BNTToken.address],
         [bntPriceBefore],
-        {from: systemAddress}
+        { from: systemAddress }
       );
       //Lets give the tagAlong all the relay tokens(all two of them)
       await this.smartToken.approve(this.tagAlong.address, one.mul(new BN(2)), {
@@ -429,10 +429,10 @@ contract("~liquidity works", function (accounts) {
       await this.currencyPrices.setCurrencyPriceUSD(
         [BNTToken.address],
         [1030000],
-        {from: systemAddress}
+        { from: systemAddress }
       );
 
-      await this.liquidity.recoverPriceVolatility({from: systemAddress});
+      await this.liquidity.recoverPriceVolatility({ from: systemAddress });
 
       let baseReserveAfter = await this.converter.getReserveBalance(
         BNTToken.address
@@ -480,14 +480,14 @@ contract("~liquidity works", function (accounts) {
       await this.currencyPrices.setCurrencyPriceUSD(
         [BNTToken.address],
         [bntPriceAfter],
-        {from: systemAddress}
+        { from: systemAddress }
       );
       // console.log(
       //   "Before balance of tagalong of bnt" +
       //     (await BNTToken.balanceOf(this.tagAlong.address)).toString()
       // );
 
-      await this.liquidity.recoverPriceVolatility({from: systemAddress});
+      await this.liquidity.recoverPriceVolatility({ from: systemAddress });
 
       // console.log("after");
 
@@ -543,14 +543,14 @@ contract("~liquidity works", function (accounts) {
       await this.currencyPrices.setCurrencyPriceUSD(
         [BNTToken.address],
         [bntPriceAfter],
-        {from: systemAddress}
+        { from: systemAddress }
       );
       // console.log(
       //   "Before balance of tagalong of bnt" +
       //     (await BNTToken.balanceOf(this.tagAlong.address)).toString()
       // );
 
-      await this.liquidity.recoverPriceVolatility({from: systemAddress});
+      await this.liquidity.recoverPriceVolatility({ from: systemAddress });
 
       // console.log("after");
 
@@ -614,7 +614,9 @@ contract("~liquidity works", function (accounts) {
       let lastReserveBalance = await this.liquidity.lastReserveBalance();
       // console.log(lastReserveBalance.toString());
 
-      await this.liquidity.recoverPriceDueToManipulation({from: systemAddress});
+      await this.liquidity.recoverPriceDueToManipulation({
+        from: systemAddress,
+      });
 
       // console.log("after");
 
@@ -650,12 +652,12 @@ contract("~liquidity works", function (accounts) {
     const IS_ALLOWED_BUYBACK = 1 << 5;
     const KYC = 1 << 0; //0x01
     const AML = 1 << 1; //0x02
-
+    //auctionStub
     var auction;
     const contributeAmount = new BN(10000);
     beforeEach(async function () {
       //lets deploy test auction for when liquidity calls it for auctionDay()
-      auction = await TestAuction.new();
+      auction = await TestAuction.new(ZERO_ADDRESS);
       await this.auctionRegistry.updateContractAddress(
         web3.utils.fromAscii("AUCTION"),
         auction.address,
@@ -729,7 +731,7 @@ contract("~liquidity works", function (accounts) {
       let receipt = await this.liquidity.redemption(
         mainTokenTobaseToken,
         contributeAmount,
-        {from: accountA}
+        { from: accountA }
       );
 
       let balanceBNTAccountA = await BNTToken.balanceOf(accountA);
@@ -772,7 +774,7 @@ contract("~liquidity works", function (accounts) {
       let receipt = await this.liquidity.redemption(
         mainTokenTobaseToken,
         contributeAmount,
-        {from: accountA}
+        { from: accountA }
       );
       // expectEvent(receipt, "Redemption", { _token: BNTToken.address, _amount: contributeAmount, returnAmount: balanceBNTAccountA })
     });
@@ -785,29 +787,29 @@ contract("~liquidity works", function (accounts) {
       let receipt = await this.liquidity.redemption(
         mainTokenTobaseToken,
         contributeAmount,
-        {from: accountA}
+        { from: accountA }
       );
     });
-    // case-IV when tagAlogn does not have ether or bnt we sell 10% relay
-    it("when tagAlong does not have ether or bnt(we sell 10% relay)", async function () {
-      //Lets give the tagAlong all the relay tokens(all two of them)
-      await this.smartToken.approve(this.tagAlong.address, one.mul(new BN(2)), {
-        from: accounts[0],
-      });
-      await this.tagAlong.depositeToken(
-        this.smartToken.address,
-        accounts[0],
-        one.mul(new BN(2)),
-        {
-          from: accounts[0],
-        }
-      );
-
-      let receipt = await this.liquidity.redemption(
-        mainTokenTobaseToken,
-        contributeAmount,
-        {from: accountA}
-      );
-    });
+    // // case-IV when tagAlogn does not have ether or bnt we sell 10% relay
+    // it("when tagAlong does not have ether or bnt(we sell 10% relay)", async function () {
+    //   //Lets give the tagAlong all the relay tokens(all two of them)
+    //   await this.smartToken.approve(this.tagAlong.address, one.mul(new BN(2)), {
+    //     from: accounts[0],
+    //   });
+    //   await this.tagAlong.depositeToken(
+    //     this.smartToken.address,
+    //     accounts[0],
+    //     one.mul(new BN(2)),
+    //     {
+    //       from: accounts[0],
+    //     }
+    //   );
+    //   // console.log(await web3.eth.getBalance(this.tagAlong.address));
+    //   let receipt = await this.liquidity.redemption(
+    //     mainTokenTobaseToken,
+    //     contributeAmount,
+    //     { from: accountA }
+    //   );
+    // });
   });
 });
