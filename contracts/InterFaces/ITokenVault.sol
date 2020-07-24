@@ -8,7 +8,7 @@ interface ITokenVault {
         IERC20Token _token,
         address _from,
         uint256 _amount
-    ) external;
+    ) external returns (bool);
 
     function directTransfer(
         address _token,
