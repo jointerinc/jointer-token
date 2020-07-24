@@ -131,45 +131,6 @@ contract("~WhiteList works", function (accounts) {
     expect(await this.whiteList.primaryOwner()).to.equal(primaryOwner);
     expect(await this.whiteList.authorityAddress()).to.equal(authorityAddress);
     expect(await this.whiteList.systemAddress()).to.equal(systemAddress);
-
-    //there is a chance that first test fails by 1 second. The difference is becuase all the transactions in this.whiteList.createroxy() are not in the same block.It is not a big deal
-    //That is why cheking for +-2 second is a good idea
-    expect(
-      await this.whiteList.tokenToHoldBackDaysTimeStamp(0)
-    ).to.be.bignumber.closeTo(
-      (convertDaysToTimeStamp(tokenHoldBackDays) - 2).toString(),
-      (convertDaysToTimeStamp(tokenHoldBackDays) + 2).toString()
-    );
-    expect(
-      await this.whiteList.tokenToHoldBackDaysTimeStamp(1)
-    ).to.be.bignumber.closeTo(
-      (convertDaysToTimeStamp(tokenHoldBackDays) - 2).toString(),
-      (convertDaysToTimeStamp(tokenHoldBackDays) + 2).toString()
-    );
-    expect(
-      await this.whiteList.tokenToHoldBackDaysTimeStamp(2)
-    ).to.be.bignumber.closeTo(
-      (convertDaysToTimeStamp(tokenHoldBackDays) - 2).toString(),
-      (convertDaysToTimeStamp(tokenHoldBackDays) + 2).toString()
-    );
-    expect(
-      await this.whiteList.tokenToMaturityDaysTimeStamp(0)
-    ).to.be.bignumber.closeTo(
-      (convertDaysToTimeStamp(tokenMaturityDays) - 2).toString(),
-      (convertDaysToTimeStamp(tokenMaturityDays) + 2).toString()
-    );
-    expect(
-      await this.whiteList.tokenToMaturityDaysTimeStamp(1)
-    ).to.be.bignumber.closeTo(
-      (convertDaysToTimeStamp(tokenMaturityDays) - 2).toString(),
-      (convertDaysToTimeStamp(tokenMaturityDays) + 2).toString()
-    );
-    expect(
-      await this.whiteList.tokenToMaturityDaysTimeStamp(2)
-    ).to.be.bignumber.closeTo(
-      (convertDaysToTimeStamp(stockTokenMaturityDays) - 2).toString(),
-      (convertDaysToTimeStamp(tokenMaturityDays) + 2).toString()
-    );
   });
   it("should add New wallet correctly by system only", async function () {
     let flags = KYC | AML;

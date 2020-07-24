@@ -5,7 +5,6 @@ import "../common/Ownable.sol";
 import "../Proxy/UpgradeabilityProxy.sol";
 import "../InterFaces/IERC20Token.sol";
 
-
 interface InitializeInterface {
     function initialize(
         address _primaryOwner,
@@ -14,7 +13,6 @@ interface InitializeInterface {
         address _registeryAddress
     ) external;
 }
-
 
 /**
  * @title Registry

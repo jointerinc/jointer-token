@@ -2,7 +2,6 @@ pragma solidity ^0.5.9;
 
 import "./Constant.sol";
 
-
 contract ProxyOwnable is Constant {
     address public primaryOwner;
 

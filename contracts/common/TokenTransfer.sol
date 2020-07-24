@@ -2,7 +2,6 @@ pragma solidity ^0.5.9;
 
 import "../InterFaces/IERC20Token.sol";
 
-
 contract TokenTransfer {
     function ensureTransferFrom(
         IERC20Token _token,
@@ -24,6 +23,6 @@ contract TokenTransfer {
         address _spender,
         uint256 _amount
     ) internal {
-        _token.approve(_spender, _amount);
+        require(_token.approve(_spender, _amount), "ERR_TOKEN_APPROVAL_FAIL");
     }
 }
