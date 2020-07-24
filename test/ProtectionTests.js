@@ -190,9 +190,9 @@ contract("~Protection works", function (accounts) {
     });
 
     //Allow the token
-    await this.protection.allowToken(this.erc20.address, {
-      from: systemAddress,
-    });
+    // await this.protection.allowToken(this.erc20.address, {
+    //   from: systemAddress,
+    // });
 
     // console.log("protection: " + this.protection.address);
     // console.log("main token: " + this.mockMainToken.address);
@@ -259,65 +259,21 @@ contract("~Protection works", function (accounts) {
       await this.protection.currentLockedFunds(accountA, ZERO_ADDRESS)
     ).to.be.bignumber.equal(contributeAmount);
   });
-  it("should lock tokens correctly", async function () {
-    await expectRevert.unspecified(
-      this.auctionStub.lockTokens(
-        this.erc20.address,
-        this.auctionStub.address,
-        accountA,
-        contributeAmount
-      )
-    );
-    await this.auctionStub.approve(
-      this.erc20.address,
-      this.protection.address,
-      contributeAmount
-    );
-    await expectRevert(
-      this.protection.lockTokens(
-        this.erc20.address,
-        this.auctionStub.address,
-        accountA,
-        contributeAmount,
-        {
-          from: other1,
-        }
-      ),
-      "ERR_AUTHORIZED_ADDRESS_ONLY"
-    );
-    let receipt = await this.auctionStub.lockTokens(
-      this.erc20.address,
-      this.auctionStub.address,
-      accountA,
-      contributeAmount
-    );
-    expectEvent.inTransaction(receipt.tx, Protection, "FundLocked", {
-      _token: this.erc20.address,
-      _which: accountA,
-      _amount: contributeAmount,
-    });
-
-    expect(await this.protection.lockedOn(accountA)).to.be.bignumber.equal("1");
-
-    expect(
-      await this.protection.currentLockedFunds(accountA, this.erc20.address)
-    ).to.be.bignumber.equal(contributeAmount);
-  });
   it("auction should be able to deposit token correctly", async function () {
     await this.auctionStub.lockEther(accountA, {
       value: contributeAmount,
     });
-    await this.auctionStub.approve(
-      this.erc20.address,
-      this.protection.address,
-      contributeAmount
-    );
-    await this.auctionStub.lockTokens(
-      this.erc20.address,
-      this.auctionStub.address,
-      accountA,
-      contributeAmount
-    );
+    // await this.auctionStub.approve(
+    //   this.erc20.address,
+    //   this.protection.address,
+    //   contributeAmount
+    // );
+    // await this.auctionStub.lockTokens(
+    //   this.erc20.address,
+    //   this.auctionStub.address,
+    //   accountA,
+    //   contributeAmount
+    // );
     await expectRevert.unspecified(
       this.auctionStub.depositToken(
         this.auctionStub.address,
@@ -351,9 +307,9 @@ contract("~Protection works", function (accounts) {
       _amount: contributeAmount,
     });
 
-    expect(
-      await this.protection.lockedFunds(accountA, this.erc20.address)
-    ).to.be.bignumber.equal(contributeAmount);
+    // expect(
+    //   await this.protection.lockedFunds(accountA, this.erc20.address)
+    // ).to.be.bignumber.equal(contributeAmount);
     expect(
       await this.protection.lockedFunds(accountA, ZERO_ADDRESS)
     ).to.be.bignumber.equal(contributeAmount);
@@ -365,17 +321,17 @@ contract("~Protection works", function (accounts) {
     await this.auctionStub.lockEther(accountA, {
       value: contributeAmount,
     });
-    await this.auctionStub.approve(
-      this.erc20.address,
-      this.protection.address,
-      contributeAmount
-    );
-    await this.auctionStub.lockTokens(
-      this.erc20.address,
-      this.auctionStub.address,
-      accountA,
-      contributeAmount
-    );
+    // await this.auctionStub.approve(
+    //   this.erc20.address,
+    //   this.protection.address,
+    //   contributeAmount
+    // );
+    // await this.auctionStub.lockTokens(
+    //   this.erc20.address,
+    //   this.auctionStub.address,
+    //   accountA,
+    //   contributeAmount
+    // );
     await this.auctionStub.approve(
       this.mockMainToken.address,
       this.protection.address,
@@ -413,26 +369,26 @@ contract("~Protection works", function (accounts) {
       _token: ZERO_ADDRESS,
       _amount: contributeAmount,
     });
-    expectEvent(receipt, "FundTransfer", {
-      _to: accountA,
-      _token: this.erc20.address,
-      _amount: contributeAmount,
-    });
+    // expectEvent(receipt, "FundTransfer", {
+    //   _to: accountA,
+    //   _token: this.erc20.address,
+    //   _amount: contributeAmount,
+    // });
     expectEvent(receipt, "FundTransfer", {
       _to: this.tokenVault.address,
       _token: this.mockMainToken.address,
       _amount: contributeAmount,
     });
-    expect(await this.erc20.balanceOf(accountA)).to.be.bignumber.equal(
-      contributeAmount
-    );
+    // expect(await this.erc20.balanceOf(accountA)).to.be.bignumber.equal(
+    //   contributeAmount
+    // );
     expect(
       await this.mockMainToken.balanceOf(this.tokenVault.address)
     ).to.be.bignumber.equal(contributeAmount);
 
-    expect(
-      await this.protection.lockedFunds(accountA, this.erc20.address)
-    ).to.be.bignumber.equal("0");
+    // expect(
+    //   await this.protection.lockedFunds(accountA, this.erc20.address)
+    // ).to.be.bignumber.equal("0");
     expect(
       await this.protection.lockedFunds(accountA, ZERO_ADDRESS)
     ).to.be.bignumber.equal("0");
@@ -449,17 +405,17 @@ contract("~Protection works", function (accounts) {
     await this.auctionStub.lockEther(accountA, {
       value: contributeAmount,
     });
-    await this.auctionStub.approve(
-      this.erc20.address,
-      this.protection.address,
-      contributeAmount
-    );
-    await this.auctionStub.lockTokens(
-      this.erc20.address,
-      this.auctionStub.address,
-      accountA,
-      contributeAmount
-    );
+    // await this.auctionStub.approve(
+    //   this.erc20.address,
+    //   this.protection.address,
+    //   contributeAmount
+    // );
+    // await this.auctionStub.lockTokens(
+    //   this.erc20.address,
+    //   this.auctionStub.address,
+    //   accountA,
+    //   contributeAmount
+    // );
     await this.auctionStub.approve(
       this.mockMainToken.address,
       this.protection.address,
@@ -475,16 +431,16 @@ contract("~Protection works", function (accounts) {
     let walletAmount = contributeAmount.mul(vaultRatio).div(new BN(100));
     let tagAlongAmount = contributeAmount.sub(walletAmount);
 
-    expectEvent(receipt, "FundTransfer", {
-      _to: this.tagAlong.address,
-      _token: this.erc20.address,
-      _amount: tagAlongAmount,
-    });
-    expectEvent(receipt, "FundTransfer", {
-      _to: companyFundWallet,
-      _token: this.erc20.address,
-      _amount: walletAmount,
-    });
+    // expectEvent(receipt, "FundTransfer", {
+    //   _to: this.tagAlong.address,
+    //   _token: this.erc20.address,
+    //   _amount: tagAlongAmount,
+    // });
+    // expectEvent(receipt, "FundTransfer", {
+    //   _to: companyFundWallet,
+    //   _token: this.erc20.address,
+    //   _amount: walletAmount,
+    // });
     expectEvent(receipt, "FundTransfer", {
       _to: this.tagAlong.address,
       _token: ZERO_ADDRESS,
@@ -504,18 +460,18 @@ contract("~Protection works", function (accounts) {
       _from: accountA,
       _tokenAmount: contributeAmount,
     });
-    expect(
-      await this.erc20.balanceOf(this.tagAlong.address)
-    ).to.be.bignumber.equal(tagAlongAmount);
-    expect(await this.erc20.balanceOf(companyFundWallet)).to.be.bignumber.equal(
-      walletAmount
-    );
+    // expect(
+    //   await this.erc20.balanceOf(this.tagAlong.address)
+    // ).to.be.bignumber.equal(tagAlongAmount);
+    // expect(await this.erc20.balanceOf(companyFundWallet)).to.be.bignumber.equal(
+    //   walletAmount
+    // );
     expect(await this.mockMainToken.balanceOf(accountA)).to.be.bignumber.equal(
       contributeAmount
     );
-    expect(
-      await this.protection.lockedFunds(accountA, this.erc20.address)
-    ).to.be.bignumber.equal("0");
+    // expect(
+    //   await this.protection.lockedFunds(accountA, this.erc20.address)
+    // ).to.be.bignumber.equal("0");
     expect(
       await this.protection.lockedFunds(accountA, ZERO_ADDRESS)
     ).to.be.bignumber.equal("0");
@@ -527,17 +483,17 @@ contract("~Protection works", function (accounts) {
     await this.auctionStub.lockEther(accountA, {
       value: contributeAmount,
     });
-    await this.auctionStub.approve(
-      this.erc20.address,
-      this.protection.address,
-      contributeAmount
-    );
-    await this.auctionStub.lockTokens(
-      this.erc20.address,
-      this.auctionStub.address,
-      accountA,
-      contributeAmount
-    );
+    // await this.auctionStub.approve(
+    //   this.erc20.address,
+    //   this.protection.address,
+    //   contributeAmount
+    // );
+    // await this.auctionStub.lockTokens(
+    //   this.erc20.address,
+    //   this.auctionStub.address,
+    //   accountA,
+    //   contributeAmount
+    // );
     await this.auctionStub.approve(
       this.mockMainToken.address,
       this.protection.address,
@@ -567,16 +523,16 @@ contract("~Protection works", function (accounts) {
     let walletAmount = contributeAmount.mul(vaultRatio).div(new BN(100));
     let tagAlongAmount = contributeAmount.sub(walletAmount);
 
-    expectEvent(receipt, "FundTransfer", {
-      _to: this.tagAlong.address,
-      _token: this.erc20.address,
-      _amount: tagAlongAmount,
-    });
-    expectEvent(receipt, "FundTransfer", {
-      _to: companyFundWallet,
-      _token: this.erc20.address,
-      _amount: walletAmount,
-    });
+    // expectEvent(receipt, "FundTransfer", {
+    //   _to: this.tagAlong.address,
+    //   _token: this.erc20.address,
+    //   _amount: tagAlongAmount,
+    // });
+    // expectEvent(receipt, "FundTransfer", {
+    //   _to: companyFundWallet,
+    //   _token: this.erc20.address,
+    //   _amount: walletAmount,
+    // });
     expectEvent(receipt, "FundTransfer", {
       _to: this.tagAlong.address,
       _token: ZERO_ADDRESS,
@@ -596,18 +552,18 @@ contract("~Protection works", function (accounts) {
       _from: accountA,
       _tokenAmount: contributeAmount,
     });
-    expect(
-      await this.erc20.balanceOf(this.tagAlong.address)
-    ).to.be.bignumber.equal(tagAlongAmount);
-    expect(await this.erc20.balanceOf(companyFundWallet)).to.be.bignumber.equal(
-      walletAmount
-    );
+    // expect(
+    //   await this.erc20.balanceOf(this.tagAlong.address)
+    // ).to.be.bignumber.equal(tagAlongAmount);
+    // expect(await this.erc20.balanceOf(companyFundWallet)).to.be.bignumber.equal(
+    //   walletAmount
+    // );
     expect(await this.mockMainToken.balanceOf(accountA)).to.be.bignumber.equal(
       contributeAmount
     );
-    expect(
-      await this.protection.lockedFunds(accountA, this.erc20.address)
-    ).to.be.bignumber.equal("0");
+    // expect(
+    //   await this.protection.lockedFunds(accountA, this.erc20.address)
+    // ).to.be.bignumber.equal("0");
     expect(
       await this.protection.lockedFunds(accountA, ZERO_ADDRESS)
     ).to.be.bignumber.equal("0");
@@ -620,17 +576,17 @@ contract("~Protection works", function (accounts) {
       await this.auctionStub.lockEther(accountA, {
         value: contributeAmount,
       });
-      await this.auctionStub.approve(
-        this.erc20.address,
-        this.protection.address,
-        contributeAmount
-      );
-      await this.auctionStub.lockTokens(
-        this.erc20.address,
-        this.auctionStub.address,
-        accountA,
-        contributeAmount
-      );
+      // await this.auctionStub.approve(
+      //   this.erc20.address,
+      //   this.protection.address,
+      //   contributeAmount
+      // );
+      // await this.auctionStub.lockTokens(
+      //   this.erc20.address,
+      //   this.auctionStub.address,
+      //   accountA,
+      //   contributeAmount
+      // );
       await this.auctionStub.approve(
         this.mockMainToken.address,
         this.protection.address,
@@ -657,16 +613,16 @@ contract("~Protection works", function (accounts) {
       expect(
         await this.protection.getStackBalance(accountA)
       ).to.be.bignumber.equal(contributeAmount);
-      expectEvent(receipt, "FundTransfer", {
-        _to: this.tagAlong.address,
-        _token: this.erc20.address,
-        _amount: tagAlongAmount,
-      });
-      expectEvent(receipt, "FundTransfer", {
-        _to: companyFundWallet,
-        _token: this.erc20.address,
-        _amount: walletAmount,
-      });
+      // expectEvent(receipt, "FundTransfer", {
+      //   _to: this.tagAlong.address,
+      //   _token: this.erc20.address,
+      //   _amount: tagAlongAmount,
+      // });
+      // expectEvent(receipt, "FundTransfer", {
+      //   _to: companyFundWallet,
+      //   _token: this.erc20.address,
+      //   _amount: walletAmount,
+      // });
       expectEvent(receipt, "FundTransfer", {
         _to: this.tagAlong.address,
         _token: ZERO_ADDRESS,
@@ -677,15 +633,15 @@ contract("~Protection works", function (accounts) {
         _token: ZERO_ADDRESS,
         _amount: walletAmount,
       });
-      expect(
-        await this.erc20.balanceOf(this.tagAlong.address)
-      ).to.be.bignumber.equal(tagAlongAmount);
-      expect(
-        await this.erc20.balanceOf(companyFundWallet)
-      ).to.be.bignumber.equal(walletAmount);
-      expect(
-        await this.protection.lockedFunds(accountA, this.erc20.address)
-      ).to.be.bignumber.equal("0");
+      // expect(
+      //   await this.erc20.balanceOf(this.tagAlong.address)
+      // ).to.be.bignumber.equal(tagAlongAmount);
+      // expect(
+      //   await this.erc20.balanceOf(companyFundWallet)
+      // ).to.be.bignumber.equal(walletAmount);
+      // expect(
+      //   await this.protection.lockedFunds(accountA, this.erc20.address)
+      // ).to.be.bignumber.equal("0");
       expect(
         await this.protection.lockedFunds(accountA, ZERO_ADDRESS)
       ).to.be.bignumber.equal("0");
@@ -723,17 +679,17 @@ contract("~Protection works", function (accounts) {
       await this.auctionStub.lockEther(accountA, {
         value: contributeAmount,
       });
-      await this.auctionStub.approve(
-        this.erc20.address,
-        this.protection.address,
-        contributeAmount
-      );
-      await this.auctionStub.lockTokens(
-        this.erc20.address,
-        this.auctionStub.address,
-        accountA,
-        contributeAmount
-      );
+      // await this.auctionStub.approve(
+      //   this.erc20.address,
+      //   this.protection.address,
+      //   contributeAmount
+      // );
+      // await this.auctionStub.lockTokens(
+      //   this.erc20.address,
+      //   this.auctionStub.address,
+      //   accountA,
+      //   contributeAmount
+      // );
       await this.auctionStub.approve(
         this.mockMainToken.address,
         this.protection.address,

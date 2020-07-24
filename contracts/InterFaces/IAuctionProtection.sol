@@ -2,20 +2,12 @@ pragma solidity ^0.5.9;
 
 import "./IERC20Token.sol";
 
-
 interface IAuctionProtection {
     function stackFund(uint256 _amount) external returns (bool);
 
     function lockEther(address _which) external payable returns (bool);
 
     function depositToken(
-        address _from,
-        address _which,
-        uint256 _amount
-    ) external returns (bool);
-
-    function lockTokens(
-        IERC20Token _token,
         address _from,
         address _which,
         uint256 _amount

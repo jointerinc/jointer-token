@@ -587,17 +587,6 @@ contract Liquadity is
         return _getCurrentMarketPrice();
     }
 
-    // contribution with Token is not avilable for bancor
-    //bacnor dont have stable coin base conversion
-    function contributeWithToken(
-        IERC20Token _token,
-        address _from,
-        uint256 _amount
-    ) public allowedAddressOnly(msg.sender) returns (uint256) {
-        ensureTransferFrom(_token, _from, address(this), _amount);
-        return _getCurrentMarketPrice();
-    }
-
     function _recoverReserve(bool isMainToken, uint256 _liquadateRatio)
         internal
     {

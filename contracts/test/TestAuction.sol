@@ -40,21 +40,6 @@ contract TestAuction {
             );
     }
 
-    function lockTokens(
-        IERC20Token _token,
-        address _from,
-        address _which,
-        uint256 _amount
-    ) external returns (bool) {
-        return
-            IAuctionProtection(protectionAddress).lockTokens(
-                _token,
-                _from,
-                _which,
-                _amount
-            );
-    }
-
     function stackFund(uint256 _amount) external returns (bool) {
         return IAuctionProtection(protectionAddress).stackFund(_amount);
     }

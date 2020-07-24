@@ -2,7 +2,6 @@ pragma solidity ^0.5.9;
 
 import "./Constant.sol";
 
-
 contract Ownable is Constant {
     address public primaryOwner = address(0);
 
