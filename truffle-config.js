@@ -1,10 +1,10 @@
 /*
- * NB: since truffle-hdwallet-provider 0.0.5 you must wrap HDWallet providers in a 
+ * NB: since truffle-hdwallet-provider 0.0.5 you must wrap HDWallet providers in a
  * function when declaring them. Failure to do so will cause commands to hang. ex:
  * ```
  * mainnet: {
- *     provider: function() { 
- *       return new HDWalletProvider(mnemonic, 'https://mainnet.infura.io/<infura-key>') 
+ *     provider: function() {
+ *       return new HDWalletProvider(mnemonic, 'https://mainnet.infura.io/<infura-key>')
  *     },
  *     network_id: '1',
  *     gas: 4500000,
@@ -13,7 +13,7 @@
  */
 
 var HDWalletProvider = require("@truffle/hdwallet-provider");
-const MNEMONIC = '';
+const MNEMONIC = "";
 
 module.exports = {
   compilers: {
@@ -22,26 +22,29 @@ module.exports = {
       settings: {
         optimizer: {
           enabled: true,
-          runs: 200
-        }
-      }
-    }
- },
+          runs: 200,
+        },
+      },
+    },
+  },
   networks: {
     development: {
       host: "127.0.0.1",
       port: 7545,
-      network_id: "*"
+      network_id: "*",
     },
     ropsten: {
-      provider: function() {
-        return new HDWalletProvider(MNEMONIC,"")
+      provider: function () {
+        return new HDWalletProvider(MNEMONIC, "");
       },
-      network_id: '3',
+      network_id: "3",
       gas: 8000000,
-	    gasPrice: 8000029,
-	    timeoutBlocks: 200,
-	    skipDryRun: true
-    }
-  }
+      gasPrice: 8000029,
+      timeoutBlocks: 200,
+      skipDryRun: true,
+    },
+  },
+  mocha: {
+    reporter: "eth-gas-reporter",
+  },
 };

@@ -334,7 +334,7 @@ contract("~liquidity works", function (accounts) {
       ethToMainToken,
       mainReserveAmount
     );
-    console.log(await this.liquidity.isAppreciationLimitReached());
+    // console.log(await this.liquidity.isAppreciationLimitReached());
     //Now we have added eth and taken out jntr and given them to the tokenVault
     let vaultBalanceJntr = await this.jntrToken.balanceOf(
       this.tokenVault.address
@@ -765,7 +765,7 @@ contract("~liquidity works", function (accounts) {
       // console.log(tagAlongBalanceJntr.toString())
     });
     it("when side reserve does not have enough eth (we take them from tagAlong)", async function () {
-      console.log((await balance.current(this.tagAlong.address)).toString());
+      // console.log((await balance.current(this.tagAlong.address)).toString());
 
       await this.tagAlong.sendTransaction({
         from: other1,

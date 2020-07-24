@@ -3,11 +3,9 @@ pragma solidity ^0.5.9;
 import "../common/Ownable.sol";
 import "../common/SafeMath.sol";
 
-
 interface Icontract {
     function updateAddresses() external returns (bool);
 }
-
 
 contract AuctionRegistery is Ownable, SafeMath {
     // store all contract address with bytes32 representation

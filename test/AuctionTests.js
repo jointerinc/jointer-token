@@ -585,7 +585,7 @@ contract("~Auction works", function (accounts) {
     // console.log(this.auction.address);
   });
   it("should contribute with ether correclty", async function () {
-    let contributionAmount = one;
+    let contributionAmount = getWith9Decimals(new BN(500));
 
     const companyFundWalletTracker = await balance.tracker(
       companyFundWallet,
@@ -599,6 +599,9 @@ contract("~Auction works", function (accounts) {
       this.liquidity.address,
       "wei"
     );
+    await this.currencyPrices.setCurrencyPriceUSD([ZERO_ADDRESS], [one], {
+      from: systemAddress,
+    });
     // console.log(await web3.eth.getBalance(companyFundWallet));
     await this.auction.contributeWithEther({
       from: accountA,
@@ -727,9 +730,9 @@ contract("~Auction works", function (accounts) {
   describe("Auction Ends correctly", async function () {
     beforeEach(async function () {
       //Also we would need to allow the token becuse you cannot lock tokens in protection if token is not allowed
-      await this.protection.allowToken(this.jntrToken.address, {
-        from: systemAddress,
-      });
+      // await this.protection.allowToken(this.jntrToken.address, {
+      //   from: systemAddress,
+      // });
       //set the price for ether and the jntr in the currencyPrices
       //1 eth = 1* 10 ^18
       //1 jntr =1 * 10^ 18
@@ -949,9 +952,9 @@ contract("~Auction works", function (accounts) {
       { from: systemAddress }
     );
     //need to allow the token to be able to lock the tokens
-    await this.protection.allowToken(this.jntrToken.address, {
-      from: systemAddress,
-    });
+    // await this.protection.allowToken(this.jntrToken.address, {
+    //   from: systemAddress,
+    // });
     //here lets end the first auction
     let yesterdaySupply = new BN(900000);
     // let todaySupply = new BN(300000);

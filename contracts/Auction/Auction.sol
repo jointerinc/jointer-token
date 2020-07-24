@@ -440,6 +440,8 @@ contract AuctionFundCollector is IndividualBonus {
         uint256 _mainTokenPrice = ICurrencyPrices(currencyPricesAddress)
             .getCurrencyPrice(mainTokenAddress);
 
+        require(_mainTokenPrice > 0, "ERR_TOKEN_PRICE_NOT_SET");
+
         uint256 _tokenAmount = safeDiv(
             safeMul(
                 safeDiv(
@@ -480,6 +482,8 @@ contract AuctionFundCollector is IndividualBonus {
     ) internal view returns (uint256) {
         uint256 _currencyPrices = ICurrencyPrices(currencyPricesAddress)
             .getCurrencyPrice(_token);
+
+        require(_currencyPrices > 0, "ERR_TOKEN_PRICE_NOT_SET");
 
         uint256 _contributedAmount = safeDiv(
             safeMul(_amount, _currencyPrices),

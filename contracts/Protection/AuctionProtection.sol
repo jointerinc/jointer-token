@@ -68,8 +68,6 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
 contract UtilsStorage {
     uint256 public tokenLockDuration;
 
-    address[] public allowedTokens;
-
     mapping(address => bool) public tokenAllowed;
 
     mapping(address => bool) public unLockBlock;
@@ -86,18 +84,6 @@ contract Utils is SafeMath, UtilsStorage, AuctionRegistery {
     modifier allowedAddressOnly(address _which) {
         require(_which == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
         _;
-    }
-
-    function allowToken(address _which)
-        external
-        onlySystem()
-        notZeroAddress(_which)
-        returns (bool)
-    {
-        require(!tokenAllowed[_which], "ERR_TOKEN_ALREADY_ALLOWED");
-        allowedTokens.push(_which);
-        tokenAllowed[_which] = true;
-        return true;
     }
 
     function setVaultRatio(uint256 _vaultRatio)
@@ -295,8 +281,6 @@ contract Stacking is
         lastRound[msg.sender] = 0;
         emit StackRemoved(stackRoundId, msg.sender, actulToken);
     }
-
-
 }
 
 contract AuctionProtection is Upgradeable, Stacking {
@@ -368,25 +352,7 @@ contract AuctionProtection is Upgradeable, Stacking {
             "ERR_INVESTMENT_CANCEL_PERIOD_OVER"
         );
 
-        uint256 _tokenBalance;
-        IERC20Token _token;
-        for (uint256 tempX = 0; tempX < allowedTokens.length; tempX++) {
-            _token = IERC20Token(allowedTokens[tempX]);
-            _tokenBalance = lockedFunds[msg.sender][address(_token)];
-            if (_tokenBalance > 0) {
-                ensureTransferFrom(
-                    _token,
-                    address(this),
-                    msg.sender,
-                    _tokenBalance
-                );
-                lockedFunds[msg.sender][address(_token)] = 0;
-                emit FundTransfer(msg.sender, address(_token), _tokenBalance);
-            }
-        }
-
-        _tokenBalance = lockedFunds[msg.sender][address(0)];
-
+        uint256 _tokenBalance = lockedFunds[msg.sender][address(0)];
         if (_tokenBalance > 0) {
             msg.sender.transfer(_tokenBalance);
             emit FundTransfer(msg.sender, address(0), _tokenBalance);
@@ -395,8 +361,7 @@ contract AuctionProtection is Upgradeable, Stacking {
 
         _tokenBalance = lockedTokens[msg.sender];
         if (_tokenBalance > 0) {
-            _token = IERC20Token(mainTokenAddress);
-
+            IERC20Token _token = IERC20Token(mainTokenAddress);
             approveTransferFrom(_token, vaultAddress, _tokenBalance);
 
             ITokenVault(vaultAddress).depositeToken(
@@ -417,51 +382,14 @@ contract AuctionProtection is Upgradeable, Stacking {
         internal
         returns (bool)
     {
-        uint256 _tokenBalance;
-        IERC20Token _token;
-        uint256 walletAmount;
-        uint256 tagAlongAmount;
-
-        for (uint256 tempX = 0; tempX < allowedTokens.length; tempX++) {
-            _token = IERC20Token(allowedTokens[tempX]);
-            _tokenBalance = lockedFunds[_which][address(_token)];
-            if (_tokenBalance > 0) {
-                walletAmount = safeDiv(safeMul(_tokenBalance, vaultRatio), 100);
-                tagAlongAmount = safeSub(_tokenBalance, walletAmount);
-
-                approveTransferFrom(_token, tagAlongAddress, tagAlongAmount);
-
-                IAuctionTagAlong(tagAlongAddress).depositeToken(
-                    _token,
-                    address(this),
-                    tagAlongAmount
-                );
-
-                ensureTransferFrom(
-                    _token,
-                    address(this),
-                    companyFundWalletAddress,
-                    walletAmount
-                );
-
-                emit FundTransfer(
-                    tagAlongAddress,
-                    address(_token),
-                    tagAlongAmount
-                );
-                emit FundTransfer(
-                    companyFundWalletAddress,
-                    address(_token),
-                    walletAmount
-                );
-                lockedFunds[_which][address(_token)] = 0;
-            }
-        }
-        _tokenBalance = lockedFunds[_which][address(0)];
+        uint256 _tokenBalance = lockedFunds[_which][address(0)];
 
         if (_tokenBalance > 0) {
-            walletAmount = safeDiv(safeMul(_tokenBalance, vaultRatio), 100);
-            tagAlongAmount = safeSub(_tokenBalance, walletAmount);
+            uint256 walletAmount = safeDiv(
+                safeMul(_tokenBalance, vaultRatio),
+                100
+            );
+            uint256 tagAlongAmount = safeSub(_tokenBalance, walletAmount);
 
             tagAlongAddress.transfer(tagAlongAmount);
             companyFundWalletAddress.transfer(walletAmount);
@@ -477,7 +405,8 @@ contract AuctionProtection is Upgradeable, Stacking {
         _tokenBalance = lockedTokens[_which];
 
         if (_tokenBalance > 0) {
-            _token = IERC20Token(mainTokenAddress);
+            IERC20Token _token = IERC20Token(mainTokenAddress);
+
             if (isStacking) {
                 addFundToStacking(_which, _tokenBalance);
             } else {
@@ -527,34 +456,16 @@ contract AuctionProtection is Upgradeable, Stacking {
 
         lockedTokens[_which] = safeAdd(lockedTokens[_which], _amount);
 
-        uint256 _currentTokenBalance;
-        IERC20Token _token;
-
-        for (uint256 tempX = 0; tempX < allowedTokens.length; tempX++) {
-            _token = IERC20Token(allowedTokens[tempX]);
-
-            _currentTokenBalance = currentLockedFunds[_which][address(_token)];
-
-            if (_currentTokenBalance > 0) {
-                lockedFunds[_which][address(_token)] = safeAdd(
-                    lockedFunds[_which][address(_token)],
-                    _currentTokenBalance
-                );
-
-                currentLockedFunds[_which][address(_token)] = 0;
-            }
-        }
-
         if (currentLockedFunds[_which][address(0)] > 0) {
-            _currentTokenBalance = currentLockedFunds[_which][address(0)];
+            uint256 _currentTokenBalance = currentLockedFunds[_which][address(
+                0
+            )];
             lockedFunds[_which][address(0)] = safeAdd(
                 lockedFunds[_which][address(0)],
                 _currentTokenBalance
             );
-
             currentLockedFunds[_which][address(0)] = 0;
         }
-
         emit FundLocked(address(token), _which, _amount);
         return true;
     }

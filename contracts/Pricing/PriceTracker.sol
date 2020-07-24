@@ -55,13 +55,16 @@ contract CurrencyPriceTicker is usingProvable, Ownable {
         string memory _result,
         bytes memory _proof
     ) public {
-        require(msg.sender == provable_cbAddress(),ERR_AUTHORIZED_ADDRESS_ONLY);
-        require(validIds[_myid],"ERR_NOT_VALID_ID");
+        require(msg.sender == provable_cbAddress());
+        require(validIds[_myid]);
 
-        priceUSD = parseInt(_result);
-        delete validIds[_myid];
-        emit LogNewEthPriceTicker(priceUSD);
-        emit LogProof(_proof);
+        uint256 _priceUSD = parseInt(_result);
+        if (_priceUSD > 0) {
+            priceUSD = _priceUSD;
+            delete validIds[_myid];
+            emit LogNewEthPriceTicker(priceUSD);
+            emit LogProof(_proof);
+        }
     }
 
     function getCurrencyPrice() external view returns (uint256) {
