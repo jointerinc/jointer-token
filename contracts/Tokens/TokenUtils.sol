@@ -59,6 +59,7 @@ contract AuctionRegistery is AuctionRegisteryContracts, Ownable {
 
     function updateAddresses() external returns (bool) {
         _updateAddresses();
+        return true;
     }
 }
 

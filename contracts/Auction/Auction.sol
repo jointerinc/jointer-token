@@ -75,6 +75,7 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
 
     function updateAddresses() external returns (bool) {
         _updateAddresses();
+        return true;
     }
 }
 

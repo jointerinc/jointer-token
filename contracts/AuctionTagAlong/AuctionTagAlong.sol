@@ -63,8 +63,9 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
         liquadityAddress = getAddressOf(LIQUADITY);
     }
 
-    function updateAddresses() external returns (bool) {
+     function updateAddresses() external returns (bool) {
         _updateAddresses();
+        return true;
     }
 }
 

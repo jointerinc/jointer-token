@@ -8,7 +8,7 @@ interface IAuctionTagAlong {
         IERC20Token _token,
         address _from,
         uint256 _amount
-    ) external;
+    ) external returns (bool);
 
     function contributeTowardLiquadity(uint256 _amount)
         external

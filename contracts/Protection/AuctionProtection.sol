@@ -60,15 +60,15 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
         stakingCompanyWallet = getAddressOf(STACKING_TOKEN_WALLET);
     }
 
-    function updateAddresses() external returns (bool) {
+     function updateAddresses() external returns (bool) {
         _updateAddresses();
+        return true;
     }
 }
 
 contract UtilsStorage {
     uint256 public tokenLockDuration;
 
-    mapping(address => bool) public tokenAllowed;
 
     mapping(address => bool) public unLockBlock;
 
@@ -76,10 +76,7 @@ contract UtilsStorage {
 }
 
 contract Utils is SafeMath, UtilsStorage, AuctionRegistery {
-    modifier allowedTokenOnly(address _which) {
-        require(tokenAllowed[_which], "ERR_ONLY_ALLOWED_TOKEN");
-        _;
-    }
+    
 
     modifier allowedAddressOnly(address _which) {
         require(_which == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
@@ -331,20 +328,7 @@ contract AuctionProtection is Upgradeable, Stacking {
         return lockBalance(address(0), _which, msg.value);
     }
 
-    function lockTokens(
-        IERC20Token _token,
-        address _from,
-        address _which,
-        uint256 _amount
-    )
-        public
-        allowedAddressOnly(msg.sender)
-        allowedTokenOnly(address(_token))
-        returns (bool)
-    {
-        ensureTransferFrom(_token, _from, address(this), _amount);
-        return lockBalance(address(_token), _which, _amount);
-    }
+  
 
     function cancelInvestment() external returns (bool) {
         require(
