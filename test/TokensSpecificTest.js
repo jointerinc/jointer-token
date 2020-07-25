@@ -247,7 +247,7 @@ contract("~System works", function (accounts) {
         "ERR_TOKEN_HOLDBACK_NOT_OVER"
       );
 
-      await advanceTime(86400 * tokenHoldBackDays);
+      await advanceTime(86400 * (tokenHoldBackDays + 1));
 
       let receipt = await JntrToken.transfer(accountB, transferAmount, {
         from: accountA,
@@ -265,7 +265,7 @@ contract("~System works", function (accounts) {
       );
     });
     it("should approve and transferFrom correctly", async function () {
-      // await advanceTime(86400 * tokenHoldBackDays);
+      // await advanceTime(86400 *( tokenHoldBackDays+1));
 
       await JntrToken.approve(accountB, approvedAmount, { from: accountA });
       expect(
@@ -278,7 +278,7 @@ contract("~System works", function (accounts) {
         }),
         "ERR_TOKEN_HOLDBACK_NOT_OVER"
       );
-      await advanceTime(86400 * tokenHoldBackDays);
+      await advanceTime(86400 * (tokenHoldBackDays + 1));
       await expectRevert(
         JntrToken.transferFrom(accountA, accountC, approvedAmount, {
           from: accountB,
@@ -299,7 +299,7 @@ contract("~System works", function (accounts) {
   describe("StockToken should work correctly", async function () {
     it("should be able to buy tokens", async function () {
       //transferFrom of Jntr won't work if tokenHoldbackDays are not over
-      await advanceTime(86400 * tokenHoldBackDays);
+      await advanceTime(86400 * (tokenHoldBackDays + 1));
       //modifier of buytokens
       await StockToken.setExchangeableToken(JntrToken.address, {
         from: systemAddress,
@@ -324,7 +324,7 @@ contract("~System works", function (accounts) {
     it("should be able to buy tokens", async function () {
       //transferFrom of Stock won't work if tokenHoldbackDays are not over
 
-      await advanceTime(86400 * tokenHoldBackDays);
+      await advanceTime(86400 * (tokenHoldBackDays + 1));
       //modifier of buytokens
       await EtnToken.setExchangeableToken(StockToken.address, {
         from: systemAddress,
@@ -357,7 +357,7 @@ contract("~System works", function (accounts) {
       expect(await JntrToken.balanceOf(accountB)).to.be.bignumber.equal(
         accountBAmountJntr.toString()
       );
-      await advanceTime(86400 * tokenHoldBackDays);
+      await advanceTime(86400 * (tokenHoldBackDays + 1));
       //JNTR transfer
       await JntrToken.transfer(accountB, transferAmount, { from: accountA });
 
