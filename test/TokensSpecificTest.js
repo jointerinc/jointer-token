@@ -5,9 +5,9 @@ const {
   BN,
 } = require("@openzeppelin/test-helpers");
 
-const {ZERO_ADDRESS} = constants;
+const { ZERO_ADDRESS } = constants;
 
-const {expect} = require("chai");
+const { expect } = require("chai");
 
 const advanceTime = (time) => {
   return new Promise((resolve, reject) => {
@@ -85,7 +85,7 @@ contract("~System works", function (accounts) {
     this.auctionRegistery = await AuctionRegisty.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
     //setup WhiteList
     let flags = 0;
@@ -127,25 +127,25 @@ contract("~System works", function (accounts) {
     this.currencyPrices = await CurrencyPrices.new(
       systemAddress,
       multiSigPlaceHolder,
-      {from: primaryOwner}
+      { from: primaryOwner }
     );
 
     //add addresses to the auctionRegistery
-    this.auctionRegistery.registerContractAddress(
+    await this.auctionRegistery.registerContractAddress(
       web3.utils.fromAscii("CURRENCY"),
       this.currencyPrices.address,
       {
         from: primaryOwner,
       }
     );
-    this.auctionRegistery.registerContractAddress(
+    await this.auctionRegistery.registerContractAddress(
       web3.utils.fromAscii("WHITE_LIST"),
       this.whiteList.address,
       {
         from: primaryOwner,
       }
     );
-    this.auctionRegistery.registerContractAddress(
+    await this.auctionRegistery.registerContractAddress(
       web3.utils.fromAscii("VAULT"),
       vault,
       {
@@ -205,7 +205,7 @@ contract("~System works", function (accounts) {
     await this.currencyPrices.setCurrencyPriceUSD(
       [StockToken.address, JntrToken.address, EtnToken.address],
       [stockTokenPrice, JntrTokenPrice, etnTokenPrice],
-      {from: systemAddress}
+      { from: systemAddress }
     );
   });
   describe("System should be  initialized correctly", async function () {
@@ -243,7 +243,7 @@ contract("~System works", function (accounts) {
     it("should transfer correctly", async function () {
       //before holdback days are over it should fail
       await expectRevert(
-        JntrToken.transfer(accountB, transferAmount, {from: accountA}),
+        JntrToken.transfer(accountB, transferAmount, { from: accountA }),
         "ERR_TOKEN_HOLDBACK_NOT_OVER"
       );
 
@@ -253,7 +253,7 @@ contract("~System works", function (accounts) {
         from: accountA,
       });
       await expectRevert(
-        JntrToken.transfer(accountC, transferAmount, {from: accountA}),
+        JntrToken.transfer(accountC, transferAmount, { from: accountA }),
         "ERR_TRANSFER_CHECK_WHITELIST"
       );
       //TODO check for events
@@ -267,7 +267,7 @@ contract("~System works", function (accounts) {
     it("should approve and transferFrom correctly", async function () {
       // await advanceTime(86400 * tokenHoldBackDays);
 
-      await JntrToken.approve(accountB, approvedAmount, {from: accountA});
+      await JntrToken.approve(accountB, approvedAmount, { from: accountA });
       expect(
         await JntrToken.allowance(accountA, accountB)
       ).to.be.bignumber.equal(approvedAmount.toString());
@@ -359,7 +359,7 @@ contract("~System works", function (accounts) {
       );
       await advanceTime(86400 * tokenHoldBackDays);
       //JNTR transfer
-      await JntrToken.transfer(accountB, transferAmount, {from: accountA});
+      await JntrToken.transfer(accountB, transferAmount, { from: accountA });
 
       expect(await JntrToken.balanceOf(accountA)).to.be.bignumber.equal(
         (accountAAmountJntr - transferAmount).toString()
@@ -370,7 +370,7 @@ contract("~System works", function (accounts) {
       accountAAmountJntr = accountAAmountJntr - transferAmount;
       accountBAmountJntr = accountBAmountJntr + transferAmount;
       //JNTR transferfrom
-      await JntrToken.approve(accountB, approvedAmount, {from: accountA});
+      await JntrToken.approve(accountB, approvedAmount, { from: accountA });
       expect(
         await JntrToken.allowance(accountA, accountB)
       ).to.be.bignumber.equal(approvedAmount.toString());
