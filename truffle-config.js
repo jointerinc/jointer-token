@@ -46,5 +46,9 @@ module.exports = {
   },
   mocha: {
     reporter: "eth-gas-reporter",
+    reporterOptions: {
+      currency: "USD",
+      coinmarketcap: "705ed8e9-cb41-4081-8005-8bffa83dadda",
+    },
   },
 };
