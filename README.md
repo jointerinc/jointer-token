@@ -1,3 +1,8 @@
-A NEW WAY TO INVEST IN COMMERCIAL REAL ESTATE
-
-Minimized risk, Increased returns AND Improved liquidity
+Jointer is a decentralized financial (DeFi) and property technology (PropTech) based on Decentralized Autonomous Organization (DAO) established in 2017 in Silicon Valley, CA and expanded to include Tel Aviv, Israel. Jointer has invested talent, resources, and funds to build an alternative to Commercial Real Estate syndication, scaling the needs of investors and owners in a complete and independent end-to-end blockchain syndication and investment solution. 
+Jointer is a multi-award winning company, including:
+- A $1,000,000 “Best Startup in the World” prize in 2018 during a worldwide competition between 4,000 startups and 196 countries
+- Winner of the Disruptive Startup Award at Stanford University in 2019 by a panel of Google, SoftBank, Bain Capital, Thomson Reuters, Stanford Angels, BMW, Andreessen, NEA, and   other top VC Funds, 
+- First place for the Disruptor Daily “Blockchain in Real Estate” Disruptor Award, 
+- Most promising venture from the Carnegie Mellon University US-China Innovation and Entrepreneurship Association 
+In addition to Draper Venture Network inclusion, Jointer’s prestigious advisory group includes Nobel Prize Winners, the previous Chairman of the SEC, the previous Vice Chairman of the NASDAQ, founder of Visa, the previous Chief Economist of the U.S. Department of State, founder of LA Blockchain Summit (CIS), the CFO of Yahoo, the co-creator of Bitcoin’s prototype, and other luminaries. 
+Through years of work, Jointer has created a decentralized fund of funds syndication economy utilizing the blockchain while providing uncorrelated returns, diversification, and unlimited liquidity. The syndication economy is powered by a world’s first patent-pending multilayer system that helps to increase the company’s valuation daily while preventing a value decrease, regardless of market volatility or manipulation. This syndication economy system can be applied to a multitude of industries, including insurance, venture capital, and many more. Jointer’s first use case will be commercial real estate.
