@@ -4,5 +4,7 @@ Jointer is a multi-award winning company, including:
 - Winner of the Disruptive Startup Award at Stanford University in 2019 by a panel of Google, SoftBank, Bain Capital, Thomson Reuters, Stanford Angels, BMW, Andreessen, NEA, and   other top VC Funds, 
 - First place for the Disruptor Daily “Blockchain in Real Estate” Disruptor Award, 
 - Most promising venture from the Carnegie Mellon University US-China Innovation and Entrepreneurship Association 
+
 In addition to Draper Venture Network inclusion, Jointer’s prestigious advisory group includes Nobel Prize Winners, the previous Chairman of the SEC, the previous Vice Chairman of the NASDAQ, founder of Visa, the previous Chief Economist of the U.S. Department of State, founder of LA Blockchain Summit (CIS), the CFO of Yahoo, the co-creator of Bitcoin’s prototype, and other luminaries. 
+
 Through years of work, Jointer has created a decentralized fund of funds syndication economy utilizing the blockchain while providing uncorrelated returns, diversification, and unlimited liquidity. The syndication economy is powered by a world’s first patent-pending multilayer system that helps to increase the company’s valuation daily while preventing a value decrease, regardless of market volatility or manipulation. This syndication economy system can be applied to a multitude of industries, including insurance, venture capital, and many more. Jointer’s first use case will be commercial real estate.
