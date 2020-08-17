@@ -229,41 +229,50 @@ contract WhiteList is
         return true;
     }
 
-    /**@dev allows primary whitelisted address to add wallet address controlled by them(reverts if maximum wallets is reached)*/
-    function addMoreWallets(address _which)
-        public
-        notZeroAddress(_which)
-        returns (bool)
-    {
+    function _addMoreWallets(address _from,address _which) internal returns(bool){
+        
         require(
             address_belongs[_which] == address(0),
             ERR_AUTHORIZED_ADDRESS_ONLY
         );
-
-        address sender = msg.sender;
-
+        address sender = _from;
         address primaryAddress = address_belongs[sender];
-
         require(
             _isWhiteListed(primaryAddress) && sender == primaryAddress,
             ERR_AUTHORIZED_ADDRESS_ONLY
         );
 
         UserDetails storage details = user_details[primaryAddress];
-
         require(
             details.maxWallets > details.wallets.length,
             "ERR_MAXIMUM_WALLET_LIMIT"
         );
 
         address_belongs[_which] = primaryAddress;
-
         details.wallets.push(_which);
-
         emit WalletAdded(primaryAddress, _which);
-
         return true;
+        
     }
+
+    /**@dev allows primary whitelisted address to add wallet address controlled by them(reverts if maximum wallets is reached)*/
+    
+    function addMoreWallets(address _which)
+        public
+        notZeroAddress(_which)
+        returns (bool)
+    {
+        return _addMoreWallets(msg.sender,_which);
+    }
+    
+    function addMoreWalletsBySystem(address _mainWallet,address _subWallet)
+        public
+        notZeroAddress(_subWallet)
+        returns (bool)
+    {
+        return _addMoreWallets(_mainWallet,_subWallet);
+    }
+
 
     /**@dev allows system to chage flags associated with an address*/
     function changeFlags(address _which, uint64 _flags)
