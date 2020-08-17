@@ -141,7 +141,7 @@ contract WhiteList is
     /**@dev whitelists an address*/
     function whiteListAccount(
         address _which,
-        uint64 _flags,
+        uint256 _flags,
         uint256 _maxWallets
     ) internal returns (bool) {
         UserDetails storage details = user_details[_which];
@@ -210,7 +210,7 @@ contract WhiteList is
     /**@dev whitelists an address*/
     function addNewWallet(
         address _which,
-        uint64 _flags,
+        uint256 _flags,
         uint256 _maxWallets
     ) public onlySystem() notZeroAddress(_which) returns (bool) {
         require(!_isWhiteListed(_which), "ERR_ACTION_NOT_ALLOWED");
@@ -275,7 +275,7 @@ contract WhiteList is
 
 
     /**@dev allows system to chage flags associated with an address*/
-    function changeFlags(address _which, uint64 _flags)
+    function changeFlags(address _which, uint256 _flags)
         public
         onlySystem()
         notZeroAddress(_which)
