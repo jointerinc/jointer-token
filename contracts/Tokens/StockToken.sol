@@ -88,9 +88,13 @@ contract StockToken is Exchangeable {
 
         uint256 fromTokenPrice = currencyPrice.getCurrencyPrice(_fromToken);
 
+        require(fromTokenPrice > 0, "ERR_FROM_TOKEN_PRICE_NOT_SET");
+
         uint256 currentTokenPrice = currencyPrice.getCurrencyPrice(
             address(this)
         );
+
+        require(currentTokenPrice > 0, "ERR_CURRENT_TOKEN_PRICE_NOT_SET");
 
         uint256 _assignToken = safeDiv(
             safeMul(_amount, fromTokenPrice),

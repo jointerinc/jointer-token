@@ -1,6 +1,5 @@
 pragma solidity ^0.5.9;
 
-
 interface IToken {
     function mintTokens(uint256 _amount) external returns (bool);
 

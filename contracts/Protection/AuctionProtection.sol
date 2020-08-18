@@ -1,5 +1,6 @@
 pragma solidity ^0.5.9;
 
+import "./ProtectionStorage.sol";
 import "../common/ProxyOwnable.sol";
 import "../common/SafeMath.sol";
 import "../common/TokenTransfer.sol";
@@ -9,6 +10,7 @@ import "../InterFaces/IAuctionTagAlong.sol";
 import "../InterFaces/ITokenVault.sol";
 import "../InterFaces/IERC20Token.sol";
 import "../InterFaces/IAuction.sol";
+import "../InterFaces/IWhiteList.sol";
 
 interface InitializeInterface {
     function initialize(
@@ -19,15 +21,8 @@ interface InitializeInterface {
     ) external;
 }
 
-contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
-    IAuctionRegistery public contractsRegistry;
-
-    address payable public vaultAddress;
-    address payable public auctionAddress;
-    address payable public tagAlongAddress;
-    address payable public mainTokenAddress;
-    address payable public companyFundWalletAddress;
-    address payable public stakingCompanyWallet;
+contract AuctionRegistery is ProxyOwnable,ProtectionStorage, AuctionRegisteryContracts {
+    
 
     function updateRegistery(address _address)
         external
@@ -57,7 +52,7 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
         companyFundWalletAddress = getAddressOf(COMPANY_FUND_WALLET);
         tagAlongAddress = getAddressOf(TAG_ALONG);
         auctionAddress = getAddressOf(AUCTION);
-        stakingCompanyWallet = getAddressOf(STACKING_TOKEN_WALLET);
+        whiteListAddress = getAddressOf(WHITE_LIST);
     }
 
      function updateAddresses() external returns (bool) {
@@ -66,16 +61,8 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     }
 }
 
-contract UtilsStorage {
-    uint256 public tokenLockDuration;
 
-
-    mapping(address => bool) public unLockBlock;
-
-    uint256 public vaultRatio;
-}
-
-contract Utils is SafeMath, UtilsStorage, AuctionRegistery {
+contract Utils is SafeMath, AuctionRegistery {
     
 
     modifier allowedAddressOnly(address _which) {
@@ -112,56 +99,15 @@ contract Utils is SafeMath, UtilsStorage, AuctionRegistery {
     }
 }
 
-contract ProtectionStorage {
-    // timestamp for address where first lock happen
-    mapping(address => uint256) public lockedOn;
 
-    mapping(address => mapping(address => uint256)) public lockedFunds;
 
-    mapping(address => mapping(address => uint256)) public currentLockedFunds;
-
-    mapping(address => uint256) public lockedTokens;
-}
-
-contract StackingStorage {
-    // We track Token only transfer by auction or downside
-    // Reason for tracking this bcz someone can send token direclty
-
-    uint256 public constant PERCENT_NOMINATOR = 10**6;
-
-    uint256 public constant DECIMAL_NOMINATOR = 10**18;
-
-    uint256 public totalTokenAmount;
-
-    uint256 public stackRoundId;
-
-    mapping(uint256 => uint256) dayWiseRatio;
-
-    mapping(address => uint256) lastRound;
-
-    mapping(address => mapping(uint256 => uint256)) roundWiseToken;
-
-    mapping(address => uint256) stackBalance;
-}
 
 contract Stacking is
     Utils,
-    ProtectionStorage,
-    StackingStorage,
     TokenTransfer,
     InitializeInterface
 {
-    event StackAdded(
-        uint256 indexed _roundId,
-        address indexed _whom,
-        uint256 _amount
-    );
-
-    event StackRemoved(
-        uint256 indexed _roundId,
-        address indexed _whom,
-        uint256 _amount
-    );
+    
 
     // stack fund called from auction contacrt
     // 1% of supply distributed among the stack token
@@ -188,7 +134,7 @@ contract Stacking is
             ensureTransferFrom(
                 mainToken,
                 msg.sender,
-                stakingCompanyWallet,
+                vaultAddress,
                 _amount
             );
 
@@ -264,19 +210,28 @@ contract Stacking is
     }
 
     // unlocking stack token
-    function unlockTokenFromStack() external returns (bool) {
-        uint256 _stackToken = calulcateStackFund(msg.sender);
-        uint256 actulToken = safeAdd(stackBalance[msg.sender], _stackToken);
+    function _unlockTokenFromStack(address _whom) internal returns (bool) {
+        uint256 _stackToken = calulcateStackFund(_whom);
+        uint256 actulToken = safeAdd(stackBalance[_whom], _stackToken);
         ensureTransferFrom(
             IERC20Token(mainTokenAddress),
             address(this),
-            msg.sender,
+            _whom,
             actulToken
         );
         totalTokenAmount = safeSub(totalTokenAmount, actulToken);
-        stackBalance[msg.sender] = 0;
-        lastRound[msg.sender] = 0;
-        emit StackRemoved(stackRoundId, msg.sender, actulToken);
+        stackBalance[_whom] = 0;
+        lastRound[_whom] = 0;
+        emit StackRemoved(stackRoundId, _whom, actulToken);
+    }
+    
+    function unlockTokenFromStack() external returns (bool) {
+        return _unlockTokenFromStack(msg.sender);
+    }
+    
+    function unlockTokenFromStackBehalf(address _whom) external returns (bool) {
+        require(IWhiteList(whiteListAddress).address_belongs(_whom) == msg.sender,ERR_AUTHORIZED_ADDRESS_ONLY);
+        return _unlockTokenFromStack(_whom);
     }
 }
 
@@ -297,14 +252,7 @@ contract AuctionProtection is Upgradeable, Stacking {
         vaultRatio = 90;
     }
 
-    event TokenUnLocked(address indexed _from, uint256 _tokenAmount);
-
-    event InvestMentCancelled(address indexed _from, uint256 _tokenAmount);
-
-    event FundLocked(address _token, address indexed _which, uint256 _amount);
-
-    event FundTransfer(address indexed _to, address _token, uint256 _amount);
-
+   
     function lockBalance(
         address _token,
         address _which,
@@ -330,20 +278,20 @@ contract AuctionProtection is Upgradeable, Stacking {
 
   
 
-    function cancelInvestment() external returns (bool) {
+    function _cancelInvestment(address payable _whom) internal returns (bool) {
         require(
-            !isTokenLockEndDay(lockedOn[msg.sender]),
+            !isTokenLockEndDay(lockedOn[_whom]),
             "ERR_INVESTMENT_CANCEL_PERIOD_OVER"
         );
 
-        uint256 _tokenBalance = lockedFunds[msg.sender][address(0)];
+        uint256 _tokenBalance = lockedFunds[_whom][address(0)];
         if (_tokenBalance > 0) {
-            msg.sender.transfer(_tokenBalance);
-            emit FundTransfer(msg.sender, address(0), _tokenBalance);
-            lockedFunds[msg.sender][address(0)] = 0;
+            _whom.transfer(_tokenBalance);
+            emit FundTransfer(_whom, address(0), _tokenBalance);
+            lockedFunds[_whom][address(0)] = 0;
         }
 
-        _tokenBalance = lockedTokens[msg.sender];
+        _tokenBalance = lockedTokens[_whom];
         if (_tokenBalance > 0) {
             IERC20Token _token = IERC20Token(mainTokenAddress);
             approveTransferFrom(_token, vaultAddress, _tokenBalance);
@@ -355,10 +303,10 @@ contract AuctionProtection is Upgradeable, Stacking {
             );
 
             emit FundTransfer(vaultAddress, address(_token), _tokenBalance);
-            lockedTokens[msg.sender] = 0;
+            lockedTokens[_whom] = 0;
         }
-        lockedOn[msg.sender] = 0;
-        emit InvestMentCancelled(msg.sender, _tokenBalance);
+        lockedOn[_whom] = 0;
+        emit InvestMentCancelled(_whom, _tokenBalance);
         return true;
     }
 
@@ -415,6 +363,26 @@ contract AuctionProtection is Upgradeable, Stacking {
 
     function stackToken() external returns (bool) {
         return _unLockTokens(msg.sender, true);
+    }
+    
+    function cancelInvestment() external returns (bool) {
+        return _cancelInvestment(msg.sender);
+    }
+    
+    
+    function unLockTokensBehalf(address _whom) external returns (bool) {
+        require(IWhiteList(whiteListAddress).address_belongs(_whom) == msg.sender,ERR_AUTHORIZED_ADDRESS_ONLY);
+        return _unLockTokens(_whom, false);
+    }
+
+    function stackTokenBehalf(address _whom) external returns (bool) {
+        require(IWhiteList(whiteListAddress).address_belongs(_whom) == msg.sender,ERR_AUTHORIZED_ADDRESS_ONLY);
+        return _unLockTokens(_whom, true);
+    }
+    
+    function cancelInvestmentBehalf(address payable _whom) external returns (bool) {
+        require(IWhiteList(whiteListAddress).address_belongs(_whom) == msg.sender,ERR_AUTHORIZED_ADDRESS_ONLY);
+        return _cancelInvestment(_whom);
     }
 
     function unLockFundByAdmin(address _which)

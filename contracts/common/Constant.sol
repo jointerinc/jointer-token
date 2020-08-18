@@ -1,6 +1,5 @@
 pragma solidity ^0.5.9;
 
-
 contract Constant {
     string constant ERR_CONTRACT_SELF_ADDRESS = "ERR_CONTRACT_SELF_ADDRESS";
 
