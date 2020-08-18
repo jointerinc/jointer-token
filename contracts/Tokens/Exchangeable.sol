@@ -37,6 +37,8 @@ contract ForceSwap is TokenUtils {
 
         uint256 retunTokenPrice = currencyPrice.getCurrencyPrice(returnToken);
 
+        require(retunTokenPrice > 0, "ERR_TOKEN_PRICE_NOT_SET");
+
         uint256 currentTokenPrice = currencyPrice.getCurrencyPrice(
             address(this)
         );

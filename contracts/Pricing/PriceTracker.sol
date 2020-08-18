@@ -39,7 +39,7 @@ contract CurrencyPriceTicker is usingProvable, Ownable {
         currentGasPrice = _gasPrice;
     }
 
-    function setGasLimit(uint256 _gasLimit) external onlySystem() {
+    function setGasLimit(uint256 _gasLimit) external onlyOwner() {
         currentGasLimit = _gasLimit;
     }
 

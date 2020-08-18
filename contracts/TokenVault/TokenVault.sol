@@ -1,5 +1,6 @@
 pragma solidity ^0.5.9;
 
+import "./TokenVaultStorage.sol";
 import "../common/ProxyOwnable.sol";
 import "../common/SafeMath.sol";
 import "../common/TokenTransfer.sol";
@@ -7,7 +8,6 @@ import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IERC20Token.sol";
 import "../InterFaces/IAuctionProtection.sol";
-
 
 interface InitializeInterface {
     function initialize(
@@ -18,12 +18,11 @@ interface InitializeInterface {
     ) external;
 }
 
-
-contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
-    IAuctionRegistery public contractsRegistry;
-
-    address payable public auctionProtectionAddress;
-
+contract AuctionRegistery is
+    ProxyOwnable,
+    TokenVaultStorage,
+    AuctionRegisteryContracts
+{
     function updateRegistery(address _address)
         external
         onlyAuthorized()
@@ -52,22 +51,10 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
 
     function updateAddresses() external returns (bool) {
         _updateAddresses();
-        return true;
     }
 }
 
-
 contract TokenSpenders is AuctionRegistery, SafeMath {
-    mapping(address => bool) public isSpender;
-
-    mapping(address => uint256) public spenderIndex;
-
-    address[] public spenders;
-
-    event TokenSpenderAdded(address indexed _which);
-
-    event TokenSpenderRemoved(address indexed _which);
-
     modifier onlySpender() {
         require(isSpender[msg.sender], ERR_AUTHORIZED_ADDRESS_ONLY);
         _;
@@ -103,22 +90,12 @@ contract TokenSpenders is AuctionRegistery, SafeMath {
     }
 }
 
-
 contract TokenVault is
     Upgradeable,
     TokenSpenders,
     InitializeInterface,
     TokenTransfer
 {
-    event FundTransfer(
-        address indexed _by,
-        address _to,
-        address _token,
-        uint256 amount
-    );
-
-    event FundDeposited(address _token, address _from, uint256 _amount);
-
     function initialize(
         address _primaryOwner,
         address _systemAddress,
@@ -129,7 +106,6 @@ contract TokenVault is
         contractsRegistry = IAuctionRegistery(_registeryAddress);
 
         initializeOwner(_primaryOwner, _systemAddress, _authorityAddress);
-        _updateAddresses();
     }
 
     function() external payable {
@@ -142,7 +118,7 @@ contract TokenVault is
         uint256 _amount
     ) external returns (bool) {
         ensureTransferFrom(_token, _from, address(this), _amount);
-        emit FundDeposited(address(_token), _from, _amount);
+        emit FundDeposited(address(0), _from, _amount);
         return true;
     }
 
@@ -170,13 +146,5 @@ contract TokenVault is
     // vault address set when contribution is 0
     function unLockTokens() external onlySystem() returns (bool) {
         return IAuctionProtection(auctionProtectionAddress).unLockTokens();
-    }
-
-    function stackToken() external onlySystem() returns (bool) {
-        return IAuctionProtection(auctionProtectionAddress).stackToken();
-    }
-
-    function cancelInvestment() external onlySystem() returns (bool) {
-        return IAuctionProtection(auctionProtectionAddress).cancelInvestment();
     }
 }

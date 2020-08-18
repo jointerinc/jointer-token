@@ -1,11 +1,10 @@
 pragma solidity ^0.5.9;
 
 interface IWhiteList {
-
     function address_belongs(address _who) external view returns (address);
 
     function isWhiteListed(address _who) external view returns (bool);
-    
+
     function isAllowedInAuction(address _which) external view returns (bool);
 
     function isAddressByPassed(address _which) external view returns (bool);
@@ -35,5 +34,4 @@ interface IWhiteList {
     function etn_isReceiveAllowed(address user) external view returns (bool);
 
     function stock_isReceiveAllowed(address user) external view returns (bool);
-    
 }

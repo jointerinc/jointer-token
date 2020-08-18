@@ -23,8 +23,9 @@ interface InitializeInterface {
 
 contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
     IAuctionRegistery public contractsRegistry;
-
     address payable public liquadityAddress;
+
+    event FundDeposited(address _token, address _from, uint256 _amount);
 
     function initilizeRegistry(
         address _primaryOwner,
@@ -63,55 +64,15 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
         liquadityAddress = getAddressOf(LIQUADITY);
     }
 
-     function updateAddresses() external returns (bool) {
+    function updateAddresses() external returns (bool) {
         _updateAddresses();
-        return true;
-    }
-}
-
-contract Utils is AuctionRegistery, SafeMath {
-    uint256 public liquadityRatio;
-
-    uint256 public contributionRatio;
-
-    function initializeUtils(
-        address _primaryOwner,
-        address _systemAddress,
-        address _multisigAdress,
-        address _registeryAddress
-    ) internal {
-        initilizeRegistry(
-            _primaryOwner,
-            _systemAddress,
-            _multisigAdress,
-            _registeryAddress
-        );
-        liquadityRatio = 100;
-        contributionRatio = 100;
-    }
-
-    function setLiquadityRatio(uint256 _ratio)
-        external
-        onlySystem()
-        returns (bool)
-    {
-        liquadityRatio = _ratio;
-        return true;
-    }
-
-    function setcContributionRatio(uint256 _ratio)
-        external
-        onlySystem()
-        returns (bool)
-    {
-        contributionRatio = _ratio;
         return true;
     }
 }
 
 contract AuctionTagAlong is
     Upgradeable,
-    Utils,
+    AuctionRegistery,
     TokenTransfer,
     InitializeInterface
 {
@@ -122,15 +83,13 @@ contract AuctionTagAlong is
         address _registeryAddress
     ) external {
         super.initialize();
-        initializeUtils(
+        initilizeRegistry(
             _primaryOwner,
             _systemAddress,
             _multisigAdress,
             _registeryAddress
         );
     }
-
-    event FundDeposited(address _token, address _from, uint256 _amount);
 
     function contributeTowardLiquadity(uint256 _amount)
         external
