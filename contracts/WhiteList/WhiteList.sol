@@ -4,7 +4,6 @@ import "./WhiteListStorage.sol";
 import "../common/ProxyOwnable.sol";
 import "../common/SafeMath.sol";
 import "../Proxy/Upgradeable.sol";
-import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IERC20Token.sol";
 
 interface InitializeInterface {
@@ -207,6 +206,7 @@ contract WhiteList is
     
     function addMoreWallets(address _mainWallet,address _subWallet)
         public
+        onlySystem()
         notZeroAddress(_subWallet)
         returns (bool)
     {
