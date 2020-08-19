@@ -29,6 +29,7 @@ const WhiteListRegistry = artifacts.require("WhiteListRegistery");
 const Protection = artifacts.require("AuctionProtection");
 const ProtectionRegistry = artifacts.require("ProtectionRegistry");
 const JNTRToken = artifacts.require("MainToken");
+const TestEscrow = artifacts.require("TestEscrow");
 
 const denominator = new BN(10).pow(new BN(18));
 const priceDenominator = new BN(10).pow(new BN(9));
@@ -127,7 +128,7 @@ contract("~Auction works", function (accounts) {
 
     let proxyAddress = await whiteListRegistry.proxyAddress();
     this.whiteList = await whiteListContract.at(proxyAddress);
-
+    
     await this.auctionRegistry.registerContractAddress(
       web3.utils.fromAscii("WHITE_LIST"),
       this.whiteList.address,
@@ -135,6 +136,8 @@ contract("~Auction works", function (accounts) {
         from: primaryOwner,
       }
     );
+    
+    
 
     //setup WhiteList
     //add acounts[0] to whitlist(make it bypassed)
@@ -145,6 +148,8 @@ contract("~Auction works", function (accounts) {
     await this.whiteList.addNewWallet(accounts[0], flags, maxWallets, {
       from: systemAddress,
     });
+
+    
     //converter needs to be whitelisted too
     // flags = BANCOR_ADDRESS || IS_ALLOWED_AUCTION;
     flags = 49152;
@@ -187,6 +192,19 @@ contract("~Auction works", function (accounts) {
       [thousand],
       { from: primaryOwner }
     );
+
+    this.escrow = await TestEscrow.new(this.mainToken.address);
+    await this.auctionRegistry.registerContractAddress(
+      web3.utils.fromAscii("ESCROW"),
+      this.escrow.adress,
+      {
+        from: primaryOwner,
+      }
+    );
+    
+    await this.whiteList.addNewWallet(this.escrow.adress, flags, maxWallets, {
+      from: systemAddress,
+    });
     //With this lets fast forward in future where token holdeback days are over
 
     //Now add it as a reserve
@@ -355,15 +373,15 @@ contract("~Auction works", function (accounts) {
       etherToken.address,
     ];
     //set the paths
-    this.liquidity.setTokenPath(0, ethToMainToken, { from: systemAddress });
+    this.liquidity.setTokenPath(0, ethToMainToken, { from: primaryOwner });
     this.liquidity.setTokenPath(1, baseTokenToMainToken, {
-      from: systemAddress,
+      from: primaryOwner,
     });
     this.liquidity.setTokenPath(2, mainTokenTobaseToken, {
-      from: systemAddress,
+      from: primaryOwner,
     });
-    this.liquidity.setTokenPath(3, ethToBaseToken, { from: systemAddress });
-    this.liquidity.setTokenPath(4, baseTokenToEth, { from: systemAddress });
+    this.liquidity.setTokenPath(3, ethToBaseToken, { from: primaryOwner });
+    this.liquidity.setTokenPath(4, baseTokenToEth, { from: primaryOwner });
     //Put all these addresses in the auction Registry
     await this.auctionRegistry.registerContractAddress(
       web3.utils.fromAscii("LIQUADITY"),
@@ -450,6 +468,7 @@ contract("~Auction works", function (accounts) {
       startTime,
       minAuctionTime,
       interval,
+      9,
       primaryOwner,
       systemAddress,
       multiSigPlaceHolder,
@@ -599,10 +618,16 @@ contract("~Auction works", function (accounts) {
       this.liquidity.address,
       "wei"
     );
-    await this.currencyPrices.setCurrencyPriceUSD([ZERO_ADDRESS], [one], {
+    await this.currencyPrices.setCurrencyPriceUSD([ZERO_ADDRESS,this.jntrToken.address], [one,one], {
       from: systemAddress,
     });
+    // await this.currencyPrices.setCurrencyPriceUSD([joie], [one], {
+    //   from: systemAddress,
+    // });
     // console.log(await web3.eth.getBalance(companyFundWallet));
+    let auctionDay = await this.auction.auctionDay();
+    console.log("auctionDay",auctionDay);
+
     await this.auction.contributeWithEther({
       from: accountA,
       value: contributionAmount,
@@ -702,7 +727,7 @@ contract("~Auction works", function (accounts) {
       });
     }
     let auctionDay = await this.auction.auctionDay();
-
+    console.log(auctionDay);
     //following is true only becuase I have set the price of ether to be 1* 10^18
     for (let i = 0; i < contributionInEth.length; i++) {
       expect(
@@ -848,6 +873,7 @@ contract("~Auction works", function (accounts) {
         from: accountA,
         value: yesterdaySupply,
       });
+
       await this.auction.auctionEnd({ from: systemAddress });
 
       //contribute today supply and end the auction
