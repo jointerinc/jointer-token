@@ -5,6 +5,7 @@ import "../common/ProxyOwnable.sol";
 import "../common/SafeMath.sol";
 import "../common/TokenTransfer.sol";
 import "../Proxy/Upgradeable.sol";
+import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IAuctionTagAlong.sol";
 import "../InterFaces/IAuctionProtection.sol";
 import "../InterFaces/IERC20Token.sol";
@@ -427,7 +428,7 @@ contract AuctionFundCollector is IndividualBonus {
         );
         
         // Here we check caller balanace 
-        if (mainTokencheckDay >= auctionDay) {
+        if (auctionDay >= mainTokencheckDay) {
             mainTokenCheck(_caller, _contributedAmount);
         }
 
@@ -474,7 +475,7 @@ contract AuctionFundCollector is IndividualBonus {
     {
         uint256 returnAmount = calculateFund(address(0), _value, 18);
         
-        // trasnfer Bakc Extra Amount To the _recipient
+        // trasnfer Back Extra Amount To the _recipient
         if (returnAmount != 0) {
             _recipient.transfer(returnAmount);
             _value = safeSub(_value, returnAmount);
