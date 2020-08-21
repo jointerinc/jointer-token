@@ -725,7 +725,7 @@ contract Liquadity is
         );
 
         address primaryWallet = IWhiteList(whiteListAddress).address_belongs(
-            _caller
+            _reciver
         );
         uint256 auctionDay = IAuction(auctionAddress).auctionDay();
 
@@ -759,7 +759,7 @@ contract Liquadity is
                 returnAmount
             );
 
-        lastReedeemDay[_reciver] = auctionDay;
+        lastReedeemDay[primaryWallet] = auctionDay;
         uint256 _afterBalance = baseToken.balanceOf(converter);
         emit Redemption(
             address(_path[safeSub(_path.length, 1)]),
