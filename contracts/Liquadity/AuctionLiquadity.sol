@@ -719,35 +719,37 @@ contract Liquadity is
     {
         require(address(_path[0]) == address(mainToken), "ERR_MAIN_TOKEN");
 
-        require(
-            IWhiteList(whiteListAddress).isAllowedBuyBack(_reciver),
-            "ERR_NOT_ALLOWED_BUYBACK"
-        );
-
         address primaryWallet = IWhiteList(whiteListAddress).address_belongs(
-            _reciver
+        _reciver
         );
         uint256 auctionDay = IAuction(auctionAddress).auctionDay();
 
+
         require(primaryWallet != address(0), "ERR_WHITELIST");
+
 
         require(
             auctionDay > lastReedeemDay[primaryWallet],
             "ERR_WALLET_ALREADY_REDEEM"
         );
 
+
         uint256 _beforeBalance = baseToken.balanceOf(converter);
+
 
         if (_beforeBalance != lastReserveBalance) {
             _recoverPriceDueToManipulation();
         }
 
+
         ensureTransferFrom(_path[0],_caller, address(this), _amount);
         approveTransferFrom(_path[0], converter, _amount);
+
 
         uint256 returnAmount = IBancorConverter(converter).quickConvert2.value(
             0
         )(_path, _amount, 1, address(0), 0);
+
 
         if (etherTokens(address(_path[safeSub(_path.length, 1)])))
             _reciver.transfer(returnAmount);
@@ -758,6 +760,7 @@ contract Liquadity is
                 _reciver,
                 returnAmount
             );
+
 
         lastReedeemDay[primaryWallet] = auctionDay;
         uint256 _afterBalance = baseToken.balanceOf(converter);
