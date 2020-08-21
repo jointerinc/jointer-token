@@ -18,7 +18,7 @@ interface TagAlongProxyInitializeInterface {
  * @title Registry
  * @dev This contract works as a registry of versions, it holds the implementations for the registered versions.
  */
-contract AuctionTagAlongRegistry is Ownable, IRegistry {
+contract TagAlongRegistry is Ownable, IRegistry {
     // Mapping of versions to implementations of different functions
     mapping(uint256 => address) internal versions;
 

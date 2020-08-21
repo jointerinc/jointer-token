@@ -878,6 +878,7 @@ contract Liquadity is
                 ensureTransferFrom(_token, address(this), _which, _value);
             }
         }
+        return true;
     }
     
     function returnFundToTagAlong(
