@@ -4,7 +4,7 @@ import "../Proxy/IRegistry.sol";
 import "../common/Ownable.sol";
 import "../Proxy/UpgradeabilityProxy.sol";
 
-interface InitializeInterface {
+interface ProtectionProxyInitializeInterface {
     function initialize(
         address _primaryOwner,
         address _systemAddress,
@@ -76,7 +76,7 @@ contract ProtectionRegistry is Ownable, IRegistry {
         
         UpgradeabilityProxy proxy = new UpgradeabilityProxy(version);
         
-        InitializeInterface(address(proxy)).initialize(
+        ProtectionProxyInitializeInterface(address(proxy)).initialize(
             _primaryOwner,
             _systemAddress,
             _authorityAddress,

@@ -11,6 +11,8 @@ interface IWhiteList {
 
     function isAllowedBuyBack(address _which) external view returns (bool);
 
+    function isExchangeAddress(address _which) external view returns (bool);
+
     function main_isTransferAllowed(
         address _msgSender,
         address _from,
@@ -28,6 +30,10 @@ interface IWhiteList {
         address _from,
         address _to
     ) external view returns (bool);
+
+    function addWalletBehalfExchange(address _mainWallet, address _subWallet)
+        external
+        returns (bool);
 
     function main_isReceiveAllowed(address user) external view returns (bool);
 

@@ -9,7 +9,7 @@ import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IERC20Token.sol";
 import "../InterFaces/IAuctionProtection.sol";
 
-interface InitializeInterface {
+interface VaultInitializeInterface {
     function initialize(
         address _primaryOwner,
         address _systemAddress,
@@ -18,7 +18,7 @@ interface InitializeInterface {
     ) external;
 }
 
-contract AuctionRegistery is
+contract RegisteryVault is
     ProxyOwnable,
     TokenVaultStorage,
     AuctionRegisteryContracts
@@ -54,7 +54,7 @@ contract AuctionRegistery is
     }
 }
 
-contract TokenSpenders is AuctionRegistery, SafeMath {
+contract TokenSpenders is RegisteryVault, SafeMath {
     modifier onlySpender() {
         require(isSpender[msg.sender], ERR_AUTHORIZED_ADDRESS_ONLY);
         _;
@@ -93,7 +93,7 @@ contract TokenSpenders is AuctionRegistery, SafeMath {
 contract TokenVault is
     Upgradeable,
     TokenSpenders,
-    InitializeInterface,
+    VaultInitializeInterface,
     TokenTransfer
 {
     function initialize(

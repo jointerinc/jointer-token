@@ -14,7 +14,7 @@ import "../InterFaces/IWhiteList.sol";
 
 
 
-interface InitializeInterface {
+interface LiquadityInitializeInterface {
     function initialize(
         address _converter,
         address _baseToken,
@@ -141,7 +141,7 @@ contract BancorConverter is ProxyOwnable, SafeMath,LiquadityStorage {
     }
 }
 
-contract AuctionRegistery is BancorConverter, AuctionRegisteryContracts {
+contract RegisteryLiquadity is BancorConverter, AuctionRegisteryContracts {
     
 
     function updateRegistery(address _address)
@@ -180,7 +180,7 @@ contract AuctionRegistery is BancorConverter, AuctionRegisteryContracts {
     }
 }
 
-contract LiquadityUtils is AuctionRegistery {
+contract LiquadityUtils is RegisteryLiquadity {
     
     
     modifier allowedAddressOnly(address _which) {
@@ -326,7 +326,7 @@ contract Liquadity is
     Upgradeable,
     LiquadityFormula,
     TokenTransfer,
-    InitializeInterface
+    LiquadityInitializeInterface
 {
     function initialize(
         address _converter,
@@ -720,7 +720,7 @@ contract Liquadity is
         require(address(_path[0]) == address(mainToken), "ERR_MAIN_TOKEN");
 
         require(
-            IWhiteList(whiteListAddress).isAllowedBuyBack(_caller),
+            IWhiteList(whiteListAddress).isAllowedBuyBack(_reciver),
             "ERR_NOT_ALLOWED_BUYBACK"
         );
 
@@ -759,7 +759,7 @@ contract Liquadity is
                 returnAmount
             );
 
-        lastReedeemDay[_caller] = auctionDay;
+        lastReedeemDay[_reciver] = auctionDay;
         uint256 _afterBalance = baseToken.balanceOf(converter);
         emit Redemption(
             address(_path[safeSub(_path.length, 1)]),
@@ -890,6 +890,7 @@ contract Liquadity is
         } else {
             ensureTransferFrom(_token, address(this), tagAlongAddress, _value);
         }
+        return true;
     }
     
 

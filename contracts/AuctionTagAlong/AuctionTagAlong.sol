@@ -12,7 +12,7 @@ import "../InterFaces/IAuctionLiquadity.sol";
 import "../InterFaces/IAuction.sol";
 import "../InterFaces/ITokenVault.sol";
 
-interface InitializeInterface {
+interface TagAlongInitializeInterface {
     function initialize(
         address _primaryOwner,
         address _systemAddress,
@@ -21,7 +21,7 @@ interface InitializeInterface {
     ) external;
 }
 
-contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
+contract RegisteryTagAlong is ProxyOwnable, AuctionRegisteryContracts {
     IAuctionRegistery public contractsRegistry;
     address payable public liquadityAddress;
 
@@ -72,9 +72,9 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts {
 
 contract AuctionTagAlong is
     Upgradeable,
-    AuctionRegistery,
+    RegisteryTagAlong,
     TokenTransfer,
-    InitializeInterface
+    TagAlongInitializeInterface
 {
     function initialize(
         address _primaryOwner,

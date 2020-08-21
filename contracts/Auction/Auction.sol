@@ -16,7 +16,7 @@ import "../InterFaces/IToken.sol";
 import "../InterFaces/IWhiteList.sol";
 import "../InterFaces/IEscrow.sol";
 
-interface InitializeInterface {
+interface AuctionInitializeInterface {
     function initialize(
         uint256 _startTime,
         uint256 _minAuctionTime,
@@ -29,7 +29,7 @@ interface InitializeInterface {
     ) external;
 }
 
-contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts,AuctionStorage {
+contract RegisteryAuction is ProxyOwnable, AuctionRegisteryContracts,AuctionStorage {
     
 
     function updateRegistery(address _address)
@@ -78,7 +78,7 @@ contract AuctionRegistery is ProxyOwnable, AuctionRegisteryContracts,AuctionStor
 
 
 
-contract AuctionUtils is AuctionRegistery {
+contract AuctionUtils is RegisteryAuction {
     
 
     function initializeStorage() internal {
@@ -514,13 +514,16 @@ contract AuctionFundCollector is IndividualBonus {
     // Exchange invest behalf of their users
     // so we check caller maintoken balanace 
     function contributeWithEtherBehalf(address payable _whom) external payable returns (bool) {
-        require(_checkContribution(msg.sender));
-        require(IWhiteList(whiteListAddress).address_belongs(_whom) == msg.sender,ERR_AUTHORIZED_ADDRESS_ONLY);
+        require(IWhiteList(whiteListAddress).isExchangeAddress(msg.sender),ERR_AUTHORIZED_ADDRESS_ONLY);
+        if(IWhiteList(whiteListAddress).address_belongs(_whom) == address(0)){
+            IWhiteList(whiteListAddress).addWalletBehalfExchange(msg.sender,_whom);
+        }
+        require(IWhiteList(whiteListAddress).address_belongs(_whom) == msg.sender);
         return _contributeWithEther(msg.value,msg.sender,_whom);
     }
 }
 
-contract Auction is Upgradeable, AuctionFundCollector, InitializeInterface {
+contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterface {
     
 
     function changeTimings(uint256 _flag, uint256 _time)

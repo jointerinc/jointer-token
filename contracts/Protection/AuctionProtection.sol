@@ -11,7 +11,7 @@ import "../InterFaces/IERC20Token.sol";
 import "../InterFaces/IAuction.sol";
 import "../InterFaces/IWhiteList.sol";
 
-interface InitializeInterface {
+interface ProtectionInitializeInterface {
     function initialize(
         address _primaryOwner,
         address _systemAddress,
@@ -20,7 +20,7 @@ interface InitializeInterface {
     ) external;
 }
 
-contract AuctionRegistery is ProxyOwnable,ProtectionStorage, AuctionRegisteryContracts {
+contract RegisteryProtection is ProxyOwnable,ProtectionStorage, AuctionRegisteryContracts {
     
 
     function updateRegistery(address _address)
@@ -61,7 +61,7 @@ contract AuctionRegistery is ProxyOwnable,ProtectionStorage, AuctionRegisteryCon
 }
 
 
-contract Utils is SafeMath, AuctionRegistery {
+contract Utils is SafeMath, RegisteryProtection {
     
 
     modifier allowedAddressOnly(address _which) {
@@ -104,7 +104,7 @@ contract Utils is SafeMath, AuctionRegistery {
 contract Stacking is
     Utils,
     TokenTransfer,
-    InitializeInterface
+    ProtectionInitializeInterface
 {
     
 

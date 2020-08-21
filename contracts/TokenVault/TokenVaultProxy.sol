@@ -5,7 +5,7 @@ import "../Proxy/IRegistry.sol";
 import "../Proxy/UpgradeabilityProxy.sol";
 
 
-interface InitializeInterface {
+interface VaultProxyInitializeInterface {
     function initialize(
         address _primaryOwner,
         address _systemAddress,
@@ -77,7 +77,7 @@ contract TokenVaultRegistery is Ownable, IRegistry {
 
         UpgradeabilityProxy proxy = new UpgradeabilityProxy(version);
 
-        InitializeInterface(address(proxy)).initialize(
+        VaultProxyInitializeInterface(address(proxy)).initialize(
             _primaryOwner,
             _systemAddress,
             _authorityAddress,

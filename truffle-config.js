@@ -13,7 +13,11 @@
  */
 
 var HDWalletProvider = require("@truffle/hdwallet-provider");
-const MNEMONIC = "";
+
+const MNEMONIC = ["0x961309332f06b62acd4b950fc0cf77ab38723e8af47f88735764ed4b7d8c6924",
+                  "0x1fb8b5f4f70f9d3c6ab130a53b56fb129f7bd91311d1665f95b83f343b7ab1f3",
+                  "0xbdd95786b4e22f5bc317e87d1068e6820702e03ac971c43a398038dd6409707c",
+                  "0xecb8e658f4a90a45f3b978f29e5f7bb6ce7457328d6c748a99e3d34643387450"];
 
 module.exports = {
   compilers: {
@@ -30,16 +34,16 @@ module.exports = {
   networks: {
     development: {
       host: "127.0.0.1",
-      port: 7545,
+      port: 9545,
       network_id: "*",
     },
     ropsten: {
       provider: function () {
-        return new HDWalletProvider(MNEMONIC, "");
+        return new HDWalletProvider(MNEMONIC,"https://ropsten.infura.io/v3/708ba26d4eab49ecad5d3b4dd2f4b347");
       },
       network_id: "3",
       gas: 8000000,
-      gasPrice: 8000029,
+      gasPrice: 100000000000,
       timeoutBlocks: 200,
       skipDryRun: true,
     },

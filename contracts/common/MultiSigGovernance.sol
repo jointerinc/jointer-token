@@ -2,7 +2,7 @@ pragma solidity ^0.5.9;
 
 import "./SafeMath.sol";
 
-contract Constant {
+contract MultiSigConstant {
     string constant ERR_SAME_ADDRESS = "ERR_SAME_ADDRESS";
 
     string constant ERR_CONTRACT_SELF_ADDRESS = "ERR_CONTRACT_SELF_ADDRESS";
@@ -34,7 +34,7 @@ contract Constant {
     }
 }
 
-contract Ownable is Constant, SafeMath {
+contract MultiSigOwnable is MultiSigConstant, SafeMath {
     uint256 public constant MAX_OWNERS_ALLOWED = 30;
 
     mapping(address => bool) public isOwner;
@@ -127,7 +127,7 @@ contract Ownable is Constant, SafeMath {
     }
 }
 
-contract MultiSigGovernance is Ownable {
+contract MultiSigGovernance is MultiSigOwnable {
     struct Transaction {
         address destination;
         uint256 value;

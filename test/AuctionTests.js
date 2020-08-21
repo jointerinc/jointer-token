@@ -15,12 +15,12 @@ const { deployBancor } = require("./deployBancor");
 const { forEach } = require("lodash");
 
 const Auction = artifacts.require("Auction");
-const AuctionRegistry = artifacts.require("AuctionRegistry");
+const AuctionProxyRegistry = artifacts.require("AuctionProxyRegistry");
 const Liquidity = artifacts.require("Liquadity");
 const LiquidityRegistry = artifacts.require("LiquadityRegistery");
 const TagAlong = artifacts.require("AuctionTagAlong");
 const TagAlongRegistry = artifacts.require("AuctionTagAlongRegistry");
-const AuctionRegisty = artifacts.require("TestAuctionRegistery");
+const AuctionRegisty = artifacts.require("AuctionRegistery");
 const CurrencyPrices = artifacts.require("TestCurrencyPrices");
 const TokenVault = artifacts.require("TokenVault");
 const TokenVaultRegistry = artifacts.require("TokenVaultRegistery");
@@ -98,9 +98,9 @@ contract("~Auction works", function (accounts) {
       { from: primaryOwner }
     );
     //Deploy Whitelist
-    let stockTokenMaturityDays = 3560;
+    let stockTokenMaturityDays = 0;
     let tokenMaturityDays = 0;
-    let tokenHoldBackDays = 90;
+    let tokenHoldBackDays = 5;
     var whiteListRegistry = await WhiteListRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
@@ -196,13 +196,13 @@ contract("~Auction works", function (accounts) {
     this.escrow = await TestEscrow.new(this.mainToken.address);
     await this.auctionRegistry.registerContractAddress(
       web3.utils.fromAscii("ESCROW"),
-      this.escrow.adress,
+      this.escrow.address,
       {
         from: primaryOwner,
       }
     );
     
-    await this.whiteList.addNewWallet(this.escrow.adress, flags, maxWallets, {
+    await this.whiteList.addNewWallet(this.escrow.address, flags, maxWallets, {
       from: systemAddress,
     });
     //With this lets fast forward in future where token holdeback days are over
@@ -454,28 +454,28 @@ contract("~Auction works", function (accounts) {
     let startTime = await time.latest();
     let minAuctionTime = time.duration.hours(23);
     let interval = time.duration.days(1);
-    var auctionRegistry = await AuctionRegistry.new(
+    var auctionProxyRegistry = await AuctionProxyRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
       { from: primaryOwner }
     );
     let tempAuction = await Auction.new({ from: primaryOwner });
-    await auctionRegistry.addVersion(1, tempAuction.address, {
+    await auctionProxyRegistry.addVersion(1, tempAuction.address, {
       from: primaryOwner,
     });
-    await auctionRegistry.createProxy(
+    await auctionProxyRegistry.createProxy(
       1,
       startTime,
       minAuctionTime,
       interval,
-      9,
+      21,
       primaryOwner,
       systemAddress,
       multiSigPlaceHolder,
       this.auctionRegistry.address,
       { from: primaryOwner }
     );
-    proxyAddress = await auctionRegistry.proxyAddress();
+    proxyAddress = await auctionProxyRegistry.proxyAddress();
     this.auction = await Auction.at(proxyAddress);
 
     //Add this address to the registry
@@ -501,7 +501,6 @@ contract("~Auction works", function (accounts) {
     //Whitelist accountA and AccountB
     // flags = IS_BYPASSED || IS_ALLOWED_AUCTION; // KYC|AML
     flags = 49152;
-    // console.log(flags);
     maxWallets = 10;
     await this.whiteList.addNewWallet(accountA, flags, maxWallets, {
       from: systemAddress,
@@ -570,11 +569,7 @@ contract("~Auction works", function (accounts) {
   it("Auction should be initialized correctly", async function () {
     //lets see if converting eth to main token works
 
-    // await this.converter.quickConvert2(ethToMainToken, 10, 1, ZERO_ADDRESS, 0, {
-    //   from: accountA,
-    //   value: 10,
-    // });
-    //console.log(await this.auction.lastAuctionStart());
+ 
     //90% goes to DownsideProtection
     expect(
       await this.auction.dayWiseDownSideProtectionRatio(1)
@@ -598,10 +593,7 @@ contract("~Auction works", function (accounts) {
       getWith18Decimals(50000)
     );
 
-    // //To make sure everybody has everybody's address
-    // console.log(await this.protection.auctionAddress());
-    // console.log(await this.protection.auctionAddress());
-    // console.log(this.auction.address);
+
   });
   it("should contribute with ether correclty", async function () {
     let contributionAmount = getWith9Decimals(new BN(500));
@@ -621,19 +613,9 @@ contract("~Auction works", function (accounts) {
     await this.currencyPrices.setCurrencyPriceUSD([ZERO_ADDRESS,this.jntrToken.address], [one,one], {
       from: systemAddress,
     });
-    // await this.currencyPrices.setCurrencyPriceUSD([joie], [one], {
-    //   from: systemAddress,
-    // });
-    // console.log(await web3.eth.getBalance(companyFundWallet));
-    let auctionDay = await this.auction.auctionDay();
-    console.log("auctionDay",auctionDay);
-
-    await this.auction.contributeWithEther({
-      from: accountA,
-      value: contributionAmount,
-    });
-    //lets calulate and make sure that amount went where it was supposed to
-
+    
+    
+    
     //90% of it goes to the downside protection
     //Ether gets locked
     let downSideAmount = contributionAmount
@@ -642,6 +624,7 @@ contract("~Auction works", function (accounts) {
 
     //90% of reamaning goes to the comany fund wallet
     let temp = contributionAmount.sub(downSideAmount);
+
     let companyFundWalletAmount = temp
       .mul(fundWalletRatio)
       .div(hundreadPercentage);
@@ -650,7 +633,27 @@ contract("~Auction works", function (accounts) {
     //Remainig goes to reserves
     let reserveAmount = temp;
 
-    // console.log(await web3.eth.getBalance(companyFundWallet));
+    //0.1% to main reserve(Which is bancor) and 0.9% to side reserve ( Which will stay in the
+    //liqudity contract itself??
+    // Thats suprising but that is what is happening)
+    let sideReserveRatio = await this.liquidity.sideReseverRatio(); //Which is 90%
+    
+    let sideReserveAmount = reserveAmount
+      .mul(sideReserveRatio)
+      .div(hundreadPercentage);
+    
+    let mainReserveAmount = reserveAmount
+    .mul((hundreadPercentage).sub(sideReserveRatio))
+    .div(hundreadPercentage);
+    
+    await this.auction.contributeWithEther({
+      from: accountA,
+      value: contributionAmount,
+    });
+    //lets calulate and make sure that amount went where it was supposed to
+
+    sideReserveAmount  = sideReserveAmount.sub(mainReserveAmount);
+
 
     //lest start checking if they did go to where they were supposed to
     expect(await companyFundWalletTracker.delta()).to.be.bignumber.equal(
@@ -663,14 +666,7 @@ contract("~Auction works", function (accounts) {
 
     //Now lets see how the remaiing 1% is divides in to main reserve and side reserve
 
-    //0.1% to main reserve(Which is bancor) and 0.9% to side reserve ( Which will stay in the
-    //liqudity contract itself??
-    // Thats suprising but that is what is happening)
-    let sideReserveRatio = await this.liquidity.sideReseverRatio(); //Which is 90%
-    // console.log(sideReserveRatio.toString());
-    let sideReserveAmount = reserveAmount
-      .mul(sideReserveRatio)
-      .div(hundreadPercentage);
+    
 
     expect(await liquidityEthTracker.delta()).to.be.bignumber.equal(
       sideReserveAmount
@@ -727,7 +723,7 @@ contract("~Auction works", function (accounts) {
       });
     }
     let auctionDay = await this.auction.auctionDay();
-    console.log(auctionDay);
+  
     //following is true only becuase I have set the price of ether to be 1* 10^18
     for (let i = 0; i < contributionInEth.length; i++) {
       expect(
@@ -776,6 +772,7 @@ contract("~Auction works", function (accounts) {
       await this.jntrToken.transfer(accountB, one, {
         from: accounts[0],
       });
+
     });
     it("when today's supply is less then the yesterday's supply", async function () {
       let yesterdaySupply = new BN(200000);
@@ -795,15 +792,16 @@ contract("~Auction works", function (accounts) {
       });
       let auctionDay = await this.auction.auctionDay();
       let supplyOfJNTR = await this.auction.todaySupply();
-      let stackingWalletJNTRBalance = await this.jntrToken.balanceOf(
-        stackingFundWallet
+      
+      let tokenVAULTJNTRBalance = await this.jntrToken.balanceOf(
+        this.tokenVault.address
       );
-      let companyTokenWalletJNTRBalnce = await this.jntrToken.balanceOf(
-        companyMainTokenWallet
-      );
-      // console.log(companyTokenWalletJNTRBalnce.toString());
-      await this.auction.auctionEnd({ from: systemAddress });
 
+      let companyTokenWalletJNTRBalnce = await this.jntrToken.balanceOf(
+        this.escrow.address
+      );
+  
+      await this.auction.auctionEnd({ from: systemAddress });
       //lets make sure everything is set correctly
 
       let allowedMaxContributionPercent = await this.auction.maxContributionAllowed(); //Which is 150
@@ -828,8 +826,7 @@ contract("~Auction works", function (accounts) {
         await this.auction.dayWiseSupplyBonus(auctionDay)
       ).to.be.bignumber.equal("0");
 
-      // console.log((await this.auction.dayWiseSupply(auctionDay)).toString());
-
+  
       expect(
         await this.auction.dayWiseSupply(auctionDay)
       ).to.be.bignumber.equal(supplyOfJNTR);
@@ -837,9 +834,9 @@ contract("~Auction works", function (accounts) {
       let dayWiseSupply = await this.auction.dayWiseSupply(auctionDay);
       //calculate the stacking Amount(Which is 1% of the dayWiseSupply)
       //Find the difference of jntrBalance
-      stackingWalletJNTRBalance = (
-        await this.jntrToken.balanceOf(stackingFundWallet)
-      ).sub(stackingWalletJNTRBalance);
+      tokenVAULTJNTRBalance = (
+        await this.jntrToken.balanceOf(this.tokenVault.address)
+      ).sub(tokenVAULTJNTRBalance);
 
       //This difference should be same as 1% of the dayWise supply
       let stackingRatio = await this.auction.stacking();
@@ -847,7 +844,7 @@ contract("~Auction works", function (accounts) {
         .mul(stackingRatio)
         .div(hundreadPercentage);
 
-      expect(stackingAmount).to.be.bignumber.equal(stackingWalletJNTRBalance);
+      expect(stackingAmount).to.be.bignumber.equal(tokenVAULTJNTRBalance);
 
       //calculate the management fees (which is (100/98 -1) of the supply + stackingAmount)
       let totalSupply = dayWiseSupply.add(stackingAmount);
@@ -859,7 +856,7 @@ contract("~Auction works", function (accounts) {
 
       //Find the difference of jntrBalance
       companyTokenWalletJNTRBalnce = (
-        await this.jntrToken.balanceOf(companyMainTokenWallet)
+        await this.jntrToken.balanceOf(this.escrow.address)
       ).sub(companyTokenWalletJNTRBalnce);
 
       expect(fees).to.be.bignumber.equal(companyTokenWalletJNTRBalnce);
@@ -883,16 +880,16 @@ contract("~Auction works", function (accounts) {
       });
       let auctionDay = await this.auction.auctionDay();
       let supplyOfJNTR = await this.auction.todaySupply();
-      let stackingWalletJNTRBalance = await this.jntrToken.balanceOf(
-        stackingFundWallet
+
+      let tokenVaultJNTRBalance = await this.jntrToken.balanceOf(
+        this.tokenVault.address
       );
+      
       let companyTokenWalletJNTRBalnce = await this.jntrToken.balanceOf(
-        companyMainTokenWallet
+        this.escrow.address
       );
-      // console.log(companyTokenWalletJNTRBalnce.toString());
-
+  
       await this.auction.auctionEnd({ from: systemAddress });
-
       //lets make sure everything is set correctly
 
       let allowedMaxContributionPercent = await this.auction.maxContributionAllowed(); //Which is 150
@@ -937,9 +934,9 @@ contract("~Auction works", function (accounts) {
       );
       //calculate the stacking Amount(Which is 1% of the dayWiseSupply)
       //Find the difference of jntrBalance
-      stackingWalletJNTRBalance = (
-        await this.jntrToken.balanceOf(stackingFundWallet)
-      ).sub(stackingWalletJNTRBalance);
+      tokenVaultJNTRBalance = (
+        await this.jntrToken.balanceOf(this.tokenVault.address)
+      ).sub(tokenVaultJNTRBalance);
 
       //This difference should be same as 1% of the dayWise supply
       let stackingRatio = await this.auction.stacking();
@@ -947,7 +944,7 @@ contract("~Auction works", function (accounts) {
         .mul(stackingRatio)
         .div(hundreadPercentage);
 
-      expect(stackingAmount).to.be.bignumber.equal(stackingWalletJNTRBalance);
+      expect(stackingAmount).to.be.bignumber.equal(tokenVaultJNTRBalance);
 
       //calculate the management fees (which is (100/98 -1) of the supply + stackingAmount)
       let totalSupply = dayWiseSupply.add(stackingAmount);
@@ -959,7 +956,7 @@ contract("~Auction works", function (accounts) {
 
       //Find the difference of jntrBalance
       companyTokenWalletJNTRBalnce = (
-        await this.jntrToken.balanceOf(companyMainTokenWallet)
+        await this.jntrToken.balanceOf(this.escrow.address)
       ).sub(companyTokenWalletJNTRBalnce);
 
       expect(fees).to.be.bignumber.equal(companyTokenWalletJNTRBalnce);
@@ -990,6 +987,7 @@ contract("~Auction works", function (accounts) {
       from: accountA,
       value: yesterdaySupply,
     });
+
     await this.auction.auctionEnd({ from: systemAddress });
 
     //Made this just so that yesterdays supply is not a too big of a number(i.e 50000 * DECIMAL_NOMINATOR)
@@ -1005,7 +1003,7 @@ contract("~Auction works", function (accounts) {
     //Whitelist them
     for (let i = 0; i < contributionInEth.length; i++) {
       let isWhiteListed = await this.whiteList.isWhiteListed(accounts[i]);
-      //console.log(isWhiteListed);
+  
       let flags = 32768;
       let maxWallets = 10;
 
@@ -1077,13 +1075,9 @@ contract("~Auction works", function (accounts) {
         auctionDay,
         accounts[i]
       );
-      // console.log(accountIndex.toString());
+      
       let individualBonusPercetage = individualBonusBN[accountIndex.toString()];
-      // console.log(individualBonusPercetage.mul(priceDenominator).toString());
-      // console.log(
-      //   (await this.auction.calculateBouns(auctionDay, accounts[i])).toString()
-      // );
-      // console.log((await this.auction.indexReturn[2]).toString());
+      
 
       let newAccountCoreAndBonus = new BN(0);
       let fees = new BN(0);
@@ -1118,9 +1112,5 @@ contract("~Auction works", function (accounts) {
   });
 });
 //minimium for contribution with eth is 10000 wei
-//if 1000 it fails
-//somewhere in dividing it fails
-//I dont know where
-
 //Note: when the first auction ends the 500*Price denomitors's 1% gets added to stacking Wallet
 //Keep in mind that in the first auction end the vaules being used

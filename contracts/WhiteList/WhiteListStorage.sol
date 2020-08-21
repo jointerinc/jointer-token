@@ -1,8 +1,11 @@
 pragma solidity ^0.5.9;
-
+import "../InterFaces/IAuctionRegistery.sol";
 
 contract WhiteListStorage {
-    
+    IAuctionRegistery public contractsRegistry;
+
+    address payable public auctionAddress;
+
     struct UserDetails {
         uint256 flags; // bitmap, where each bit correspondent to some properties (additional flags can be added in future).
         uint256 maxWallets;
@@ -42,6 +45,9 @@ contract WhiteListStorage {
     //timestamp when token matures
     mapping(uint8 => uint256) public tokenToMaturityDaysTimeStamp;
 
+    // check if exchange address
+    mapping(address => bool) public isExchangeAddress;
+
     uint256 public constant KYC = 1 << 0; //0x01
     uint256 public constant AML = 1 << 1; //0x02
     uint256 public constant ACCREDIATED_INVESTOR = 1 << 2;
@@ -58,12 +64,9 @@ contract WhiteListStorage {
     uint256 public constant IS_BYPASSED = 1 << 13;
     uint256 public constant BANCOR_ADDRESS = 1 << 14;
     uint256 public constant IS_ALLOWED_AUCTION = 1 << 15;
-    
+
     event AccountWhiteListed(address indexed which, uint256 flags);
     event WalletAdded(address indexed from, address indexed which);
     event WalletRemoved(address indexed from, address indexed which);
     event FlagsChanged(address indexed which, uint256 flags);
-
-    
-    
 }
