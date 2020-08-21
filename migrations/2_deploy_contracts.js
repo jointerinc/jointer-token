@@ -292,7 +292,7 @@ module.exports = async function (deployer) {
     { from: otherSecondary }
   );
 
-  relayTokenInstance = await SmartToken.at(smartToken);
+  relayTokenInstance = await SmartToken.at(smartToken); 
   await relayTokenInstance.issue(tagAlongProxyAddress,web3.utils.toWei(1000));
     
   await whiteListInstance.addNewWallet(bancorNetwork, bancorCode, 0, {
