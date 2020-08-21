@@ -719,11 +719,21 @@ contract Liquadity is
     {
         require(address(_path[0]) == address(mainToken), "ERR_MAIN_TOKEN");
 
+        require(	
+            IWhiteList(whiteListAddress).isAllowedBuyBack(_reciver),	
+            "ERR_NOT_ALLOWED_BUYBACK"	
+        );
+
         address primaryWallet = IWhiteList(whiteListAddress).address_belongs(
         _reciver
         );
+        
         uint256 auctionDay = IAuction(auctionAddress).auctionDay();
 
+        require(
+            IWhiteList(whiteListAddress).isAllowedBuyBack(_reciver),
+            "ERR_NOT_ALLOWED_BUYBACK"
+        );
 
         require(primaryWallet != address(0), "ERR_WHITELIST");
 
