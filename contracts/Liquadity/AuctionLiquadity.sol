@@ -719,24 +719,17 @@ contract Liquadity is
     {
         require(address(_path[0]) == address(mainToken), "ERR_MAIN_TOKEN");
 
-        require(	
-            IWhiteList(whiteListAddress).isAllowedBuyBack(_reciver),	
-            "ERR_NOT_ALLOWED_BUYBACK"	
-        );
-
         address primaryWallet = IWhiteList(whiteListAddress).address_belongs(
         _reciver
         );
-        
-        uint256 auctionDay = IAuction(auctionAddress).auctionDay();
-
-        require(
-            IWhiteList(whiteListAddress).isAllowedBuyBack(_reciver),
-            "ERR_NOT_ALLOWED_BUYBACK"
+        require(	
+            IWhiteList(whiteListAddress).isAllowedBuyBack(primaryWallet),	
+            "ERR_NOT_ALLOWED_BUYBACK"	
         );
 
+        uint256 auctionDay = IAuction(auctionAddress).auctionDay();
+        
         require(primaryWallet != address(0), "ERR_WHITELIST");
-
 
         require(
             auctionDay > lastReedeemDay[primaryWallet],
@@ -773,6 +766,7 @@ contract Liquadity is
 
 
         lastReedeemDay[primaryWallet] = auctionDay;
+
         uint256 _afterBalance = baseToken.balanceOf(converter);
         emit Redemption(
             address(_path[safeSub(_path.length, 1)]),
