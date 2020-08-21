@@ -90,7 +90,7 @@ interface IBancorConverter {
         returns (uint256);
 }
 
-contract BancorConverter is ProxyOwnable, SafeMath,LiquadityStorage {
+contract BancorConverterLiquadity is ProxyOwnable, SafeMath,LiquadityStorage {
     
 
     function updateConverter(address _converter)
@@ -141,7 +141,7 @@ contract BancorConverter is ProxyOwnable, SafeMath,LiquadityStorage {
     }
 }
 
-contract RegisteryLiquadity is BancorConverter, AuctionRegisteryContracts {
+contract RegisteryLiquadity is BancorConverterLiquadity, AuctionRegisteryContracts {
     
 
     function updateRegistery(address _address)
