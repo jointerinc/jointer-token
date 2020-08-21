@@ -21,11 +21,9 @@ interface WhiteListInitializeInterface {
     ) external;
 }
 
-contract RegisteryWhiteList is
-    ProxyOwnable,
-    WhiteListStorage,
-    AuctionRegisteryContracts
-{
+contract RegisteryWhiteList is ProxyOwnable,WhiteListStorage,AuctionRegisteryContracts {
+    
+
     function updateRegistery(address _address)
         external
         onlyAuthorized()
@@ -52,11 +50,12 @@ contract RegisteryWhiteList is
         auctionAddress = getAddressOf(AUCTION);
     }
 
-    function updateAddresses() external returns (bool) {
+     function updateAddresses() external returns (bool) {
         _updateAddresses();
         return true;
     }
 }
+
 
 contract WhiteList is
     Upgradeable,
@@ -65,6 +64,7 @@ contract WhiteList is
     SafeMath,
     WhiteListInitializeInterface
 {
+    
     /**@dev converts _days into unix timestamp _days from now*/
     function convertDaysToTimeStamp(uint256 _days)
         internal
@@ -94,7 +94,7 @@ contract WhiteList is
 
         initializeOwner(_primaryOwner, _systemAddress, _authorityAddress);
         contractsRegistry = IAuctionRegistery(_registeryAddress);
-
+        
         tokenToMaturityDaysTimeStamp[0] = convertDaysToTimeStamp(
             _mainMaturityDays
         );
@@ -114,6 +114,7 @@ contract WhiteList is
         tokenToHoldBackDaysTimeStamp[2] = convertDaysToTimeStamp(
             _stockHoldBackDays
         );
+        
     }
 
     /**@dev whitelists an address*/
@@ -194,17 +195,15 @@ contract WhiteList is
         require(!_isWhiteListed(_which), "ERR_ACTION_NOT_ALLOWED");
         return whiteListAccount(_which, _flags, _maxWallets);
     }
-
+    
+    
     /**@dev whitelists an address*/
-    function addNewExchangeWallet(
-        address _which,
-        uint256 _flags,
-        uint256 _maxWallets
-    ) public onlySystem() notZeroAddress(_which) returns (bool) {
-        require(!_isWhiteListed(_which), "ERR_ACTION_NOT_ALLOWED");
-        isExchangeAddress[_which] = true;
-        return whiteListAccount(_which, _flags, _maxWallets);
+    function isExchangeAddress(address _which) public view returns (bool) {
+        address primaryAddress = address_belongs[_which];
+        uint256 flags = user_details[primaryAddress].flags;
+        return _checkRule(flags,CENTRALIZE_EXCHANGE, CENTRALIZE_EXCHANGE);
     }
+    
 
     /**@dev updates the maximum wallets allowed for a primary whitelisted address*/
     function updateMaxWallet(address _which, uint256 _maxWallets)
@@ -218,10 +217,8 @@ contract WhiteList is
         return true;
     }
 
-    function _addMoreWallets(address _from, address _which)
-        internal
-        returns (bool)
-    {
+    function _addMoreWallets(address _from,address _which) internal returns(bool){
+        
         require(
             address_belongs[_which] == address(0),
             ERR_AUTHORIZED_ADDRESS_ONLY
@@ -243,38 +240,37 @@ contract WhiteList is
         details.wallets.push(_which);
         emit WalletAdded(primaryAddress, _which);
         return true;
+        
     }
 
     /**@dev allows primary whitelisted address to add wallet address controlled by them(reverts if maximum wallets is reached)*/
-
+    
     function addMoreWallets(address _which)
         public
         notZeroAddress(_which)
         returns (bool)
     {
-        return _addMoreWallets(msg.sender, _which);
+        return _addMoreWallets(msg.sender,_which);
     }
-
-    function addMoreWallets(address _mainWallet, address _subWallet)
+    
+    function addMoreWallets(address _mainWallet,address _subWallet)
         public
         onlySystem()
         notZeroAddress(_subWallet)
         returns (bool)
     {
-        return _addMoreWallets(_mainWallet, _subWallet);
+        return _addMoreWallets(_mainWallet,_subWallet);
     }
-
-    function addWalletBehalfExchange(address _mainWallet, address _subWallet)
+    
+    function addWalletBehalfExchange(address _mainWallet,address _subWallet)
         public
         notZeroAddress(_subWallet)
         returns (bool)
-    {
-        require(
-            auctionAddress == msg.sender,
-            "ERR_ONLY_AUCTION_ADDRESS_ALLOWED"
-        );
-        return _addMoreWallets(_mainWallet, _subWallet);
+    {   
+        require(auctionAddress == msg.sender,"ERR_ONLY_AUCTION_ADDRESS_ALLOWED");
+        return _addMoreWallets(_mainWallet,_subWallet);
     }
+
 
     /**@dev allows system to chage flags associated with an address*/
     function changeFlags(address _which, uint256 _flags)
