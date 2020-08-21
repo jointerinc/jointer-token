@@ -5,7 +5,7 @@ import "../common/Ownable.sol";
 import "../Proxy/UpgradeabilityProxy.sol";
 import "../InterFaces/IERC20Token.sol";
 
-interface InitializeInterface {
+interface AuctionProxyInitializeInterface {
     function initialize(
         uint256 _startTime,
         uint256 _minAuctionTime,
@@ -22,7 +22,7 @@ interface InitializeInterface {
  * @title Registry
  * @dev This contract works as a registry of versions, it holds the implementations for the registered versions.
  */
-contract AuctionRegistry is Ownable, IRegistry {
+contract AuctionProxyRegistry is Ownable, IRegistry {
     // Mapping of versions to implementations of different functions
     mapping(uint256 => address) internal versions;
 
@@ -84,7 +84,7 @@ contract AuctionRegistry is Ownable, IRegistry {
 
         UpgradeabilityProxy proxy = new UpgradeabilityProxy(version);
 
-        InitializeInterface(address(proxy)).initialize(
+        AuctionProxyInitializeInterface(address(proxy)).initialize(
             _startTime,
             _minAuctionTime,
             _interval,

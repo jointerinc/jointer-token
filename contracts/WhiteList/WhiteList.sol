@@ -6,7 +6,7 @@ import "../common/SafeMath.sol";
 import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IERC20Token.sol";
 
-interface InitializeInterface {
+interface WhiteListInitializeInterface {
     function initialize(
         address _primaryOwner,
         address _systemAddress,
@@ -16,19 +16,55 @@ interface InitializeInterface {
         uint256 _stockHoldBackDays,
         uint256 _mainMaturityDays,
         uint256 _etnMaturityDays,
-        uint256 _stockMaturityDays
+        uint256 _stockMaturityDays,
+        address _registeryAddress
     ) external;
 }
 
+contract RegisteryWhiteList is
+    ProxyOwnable,
+    WhiteListStorage,
+    AuctionRegisteryContracts
+{
+    function updateRegistery(address _address)
+        external
+        onlyAuthorized()
+        notZeroAddress(_address)
+        returns (bool)
+    {
+        contractsRegistry = IAuctionRegistery(_address);
+        _updateAddresses();
+        return true;
+    }
+
+    function getAddressOf(bytes32 _contractName)
+        internal
+        view
+        returns (address payable)
+    {
+        return contractsRegistry.getAddressOf(_contractName);
+    }
+
+    /**@dev updates all the address from the registry contract
+    this decision was made to save gas that occurs from calling an external view function */
+
+    function _updateAddresses() internal {
+        auctionAddress = getAddressOf(AUCTION);
+    }
+
+    function updateAddresses() external returns (bool) {
+        _updateAddresses();
+        return true;
+    }
+}
 
 contract WhiteList is
     Upgradeable,
     ProxyOwnable,
+    RegisteryWhiteList,
     SafeMath,
-    WhiteListStorage,
-    InitializeInterface
+    WhiteListInitializeInterface
 {
-    
     /**@dev converts _days into unix timestamp _days from now*/
     function convertDaysToTimeStamp(uint256 _days)
         internal
@@ -51,11 +87,14 @@ contract WhiteList is
         uint256 _stockHoldBackDays,
         uint256 _mainMaturityDays,
         uint256 _etnMaturityDays,
-        uint256 _stockMaturityDays
+        uint256 _stockMaturityDays,
+        address _registeryAddress
     ) public {
         super.initialize();
 
         initializeOwner(_primaryOwner, _systemAddress, _authorityAddress);
+        contractsRegistry = IAuctionRegistery(_registeryAddress);
+
         tokenToMaturityDaysTimeStamp[0] = convertDaysToTimeStamp(
             _mainMaturityDays
         );
@@ -80,7 +119,7 @@ contract WhiteList is
     /**@dev whitelists an address*/
     function whiteListAccount(
         address _which,
-        uint64 _flags,
+        uint256 _flags,
         uint256 _maxWallets
     ) internal returns (bool) {
         UserDetails storage details = user_details[_which];
@@ -149,10 +188,21 @@ contract WhiteList is
     /**@dev whitelists an address*/
     function addNewWallet(
         address _which,
-        uint64 _flags,
+        uint256 _flags,
         uint256 _maxWallets
     ) public onlySystem() notZeroAddress(_which) returns (bool) {
         require(!_isWhiteListed(_which), "ERR_ACTION_NOT_ALLOWED");
+        return whiteListAccount(_which, _flags, _maxWallets);
+    }
+
+    /**@dev whitelists an address*/
+    function addNewExchangeWallet(
+        address _which,
+        uint256 _flags,
+        uint256 _maxWallets
+    ) public onlySystem() notZeroAddress(_which) returns (bool) {
+        require(!_isWhiteListed(_which), "ERR_ACTION_NOT_ALLOWED");
+        isExchangeAddress[_which] = true;
         return whiteListAccount(_which, _flags, _maxWallets);
     }
 
@@ -168,8 +218,10 @@ contract WhiteList is
         return true;
     }
 
-    function _addMoreWallets(address _from,address _which) internal returns(bool){
-        
+    function _addMoreWallets(address _from, address _which)
+        internal
+        returns (bool)
+    {
         require(
             address_belongs[_which] == address(0),
             ERR_AUTHORIZED_ADDRESS_ONLY
@@ -191,31 +243,41 @@ contract WhiteList is
         details.wallets.push(_which);
         emit WalletAdded(primaryAddress, _which);
         return true;
-        
     }
 
     /**@dev allows primary whitelisted address to add wallet address controlled by them(reverts if maximum wallets is reached)*/
-    
+
     function addMoreWallets(address _which)
         public
         notZeroAddress(_which)
         returns (bool)
     {
-        return _addMoreWallets(msg.sender,_which);
+        return _addMoreWallets(msg.sender, _which);
     }
-    
-    function addMoreWallets(address _mainWallet,address _subWallet)
+
+    function addMoreWallets(address _mainWallet, address _subWallet)
         public
         onlySystem()
         notZeroAddress(_subWallet)
         returns (bool)
     {
-        return _addMoreWallets(_mainWallet,_subWallet);
+        return _addMoreWallets(_mainWallet, _subWallet);
     }
 
+    function addWalletBehalfExchange(address _mainWallet, address _subWallet)
+        public
+        notZeroAddress(_subWallet)
+        returns (bool)
+    {
+        require(
+            auctionAddress == msg.sender,
+            "ERR_ONLY_AUCTION_ADDRESS_ALLOWED"
+        );
+        return _addMoreWallets(_mainWallet, _subWallet);
+    }
 
     /**@dev allows system to chage flags associated with an address*/
-    function changeFlags(address _which, uint64 _flags)
+    function changeFlags(address _which, uint256 _flags)
         public
         onlySystem()
         notZeroAddress(_which)

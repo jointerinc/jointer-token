@@ -5,7 +5,7 @@ import "../common/Ownable.sol";
 import "../Proxy/UpgradeabilityProxy.sol";
 import "../InterFaces/IERC20Token.sol";
 
-interface InitializeInterface {
+interface LiquadityProxyInitializeInterface {
     function initialize(
         address _converter,
         address _baseToken,
@@ -89,7 +89,7 @@ contract LiquadityRegistery is Ownable, IRegistry {
         
         UpgradeabilityProxy proxy = new UpgradeabilityProxy(version);
         
-        InitializeInterface(address(proxy)).initialize(
+        LiquadityProxyInitializeInterface(address(proxy)).initialize(
             _converter,
             _baseToken,
             _mainToken,

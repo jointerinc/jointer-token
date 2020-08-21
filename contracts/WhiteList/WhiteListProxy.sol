@@ -4,7 +4,6 @@ import "../common/Ownable.sol";
 import "../Proxy/IRegistry.sol";
 import "../Proxy/UpgradeabilityProxy.sol";
 
-
 interface InitializeInterface {
     function initialize(
         address _primaryOwner,
@@ -15,10 +14,10 @@ interface InitializeInterface {
         uint256 _stockHoldBackDays,
         uint256 _mainMaturityDays,
         uint256 _etnMaturityDays,
-        uint256 _stockMaturityDays
+        uint256 _stockMaturityDays,
+        address _registeryAddress
     ) external;
 }
-
 
 /**
  * @title Registry
@@ -81,7 +80,8 @@ contract WhiteListRegistery is Ownable, IRegistry {
         uint256 _stockHoldBackDays,
         uint256 _mainMaturityDays,
         uint256 _etnMaturityDays,
-        uint256 _stockMaturityDays
+        uint256 _stockMaturityDays,
+        address _registeryAddress
     ) public onlyOneOfOnwer() returns (address) {
         require(proxyAddress == address(0), "ERR_PROXY_ALREADY_CREATED");
 
@@ -96,7 +96,8 @@ contract WhiteListRegistery is Ownable, IRegistry {
             _stockHoldBackDays,
             _mainMaturityDays,
             _etnMaturityDays,
-            _stockMaturityDays
+            _stockMaturityDays,
+            _registeryAddress
         );
 
         currentVersion = version;

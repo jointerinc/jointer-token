@@ -7,7 +7,7 @@ import "../InterFaces/IAuctionRegistery.sol";
 
 
 /**@dev keeps track of registry contract at which all the addresses of the wholes system's contracts are stored */
-contract AuctionRegistery is AuctionRegisteryContracts, Ownable {
+contract RegisteryToken is AuctionRegisteryContracts, Ownable {
     IAuctionRegistery public contractsRegistry;
 
     address public whiteListAddress;
@@ -65,7 +65,7 @@ contract AuctionRegistery is AuctionRegisteryContracts, Ownable {
 
 
 /**@dev Also is a standard ERC20 token*/
-contract TokenUtils is StandardToken, AuctionRegistery {
+contract TokenUtils is StandardToken, RegisteryToken {
     /**
      *@dev contructs standard erc20 token and auction registry
      *@param _name name of the token
@@ -83,6 +83,6 @@ contract TokenUtils is StandardToken, AuctionRegistery {
     )
         public
         StandardToken(_name, _symbol, _systemAddress, _authorityAddress)
-        AuctionRegistery(_registeryAddress)
+        RegisteryToken(_registeryAddress)
     {}
 }
