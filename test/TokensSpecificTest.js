@@ -107,7 +107,8 @@ contract("~System works", function (accounts) {
       tokenHoldBackDays,
       tokenMaturityDays,
       tokenMaturityDays,
-      stockTokenMaturityDays
+      stockTokenMaturityDays,
+      this.auctionRegistery.address
     );
     let proxyAddress = await whiteListRegistry.proxyAddress();
     this.whiteList = await whiteListContract.at(proxyAddress);
