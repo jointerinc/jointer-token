@@ -19,7 +19,8 @@ const AuctionProxyRegistry = artifacts.require("AuctionProxyRegistry");
 const Liquidity = artifacts.require("Liquadity");
 const LiquidityRegistry = artifacts.require("LiquadityRegistery");
 const TagAlong = artifacts.require("AuctionTagAlong");
-const TagAlongRegistry = artifacts.require("AuctionTagAlongRegistry");
+const TagAlongRegistry = artifacts.require("TagAlongRegistry");
+
 const AuctionRegisty = artifacts.require("AuctionRegistery");
 const CurrencyPrices = artifacts.require("TestCurrencyPrices");
 const TokenVault = artifacts.require("TokenVault");
@@ -101,11 +102,13 @@ contract("~Auction works", function (accounts) {
     let stockTokenMaturityDays = 0;
     let tokenMaturityDays = 0;
     let tokenHoldBackDays = 5;
+
     var whiteListRegistry = await WhiteListRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
       { from: primaryOwner }
     );
+
     let tempWhiteList = await whiteListContract.new();
     await whiteListRegistry.addVersion(1, tempWhiteList.address, {
       from: primaryOwner,
@@ -123,6 +126,7 @@ contract("~Auction works", function (accounts) {
       tokenMaturityDays,
       tokenMaturityDays,
       stockTokenMaturityDays,
+      this.auctionRegistry.address,
       { from: primaryOwner }
     );
 

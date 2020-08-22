@@ -255,9 +255,7 @@ contract MultiSigGovernance is MultiSigOwnable {
         );
 
         emit TransactionConfirmed(transactionId, msg.sender);
-
         executeTransaction(transactionId);
-
         return true;
     }
 

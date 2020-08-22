@@ -29,11 +29,13 @@ contract("~Token vault works", function (accounts) {
   const transferringAmount = new BN(10);
 
   beforeEach(async function () {
+
     this.auctionRegistry = await AuctionRegisty.new(
       systemAddress,
       multiSigPlaceHolder,
       {from: primaryOwner}
     );
+
     await this.auctionRegistry.registerContractAddress(
       web3.utils.fromAscii("AUCTION_PROTECTION"),
       auctionProtectionPlaceHolder,
@@ -41,13 +43,16 @@ contract("~Token vault works", function (accounts) {
         from: primaryOwner,
       }
     );
+
     var tokenVaultRegistry = await TokenVaultRegistry.new(
       systemAddress,
       multiSigPlaceHolder,
       {from: primaryOwner}
     );
+
     let tempTokenVault = await TokenVault.new();
     await tokenVaultRegistry.addVersion(1, tempTokenVault.address);
+
     await tokenVaultRegistry.createProxy(
       1,
       primaryOwner,
@@ -56,6 +61,7 @@ contract("~Token vault works", function (accounts) {
       this.auctionRegistry.address,
       {from: primaryOwner}
     );
+
     let proxyAddress = await tokenVaultRegistry.proxyAddress();
     this.tokenVault = await TokenVault.at(proxyAddress);
 
@@ -65,18 +71,25 @@ contract("~Token vault works", function (accounts) {
     });
   });
   it("should initialize correctly", async function () {
+    
     expect(await this.tokenVault.systemAddress()).to.equal(systemAddress);
+    
     expect(await this.tokenVault.primaryOwner()).to.equal(primaryOwner);
+    
     expect(await this.tokenVault.authorityAddress()).to.equal(
       multiSigPlaceHolder
     );
+    
     expect(await this.tokenVault.contractsRegistry()).to.equal(
       this.auctionRegistry.address
     );
+    
     expect(await this.tokenVault.auctionProtectionAddress()).to.equal(
       auctionProtectionPlaceHolder
     );
+
   });
+
   it("should accept eth correctly", async function () {
     let receipt = await this.tokenVault.sendTransaction({
       from: other1,
@@ -99,9 +112,11 @@ contract("~Token vault works", function (accounts) {
         {from: testTokenHolder}
       )
     );
+
     await this.erc20.approve(this.tokenVault.address, transferringAmount, {
       from: testTokenHolder,
     });
+    
     let receipt = await this.tokenVault.depositeToken(
       this.erc20.address,
       testTokenHolder,
