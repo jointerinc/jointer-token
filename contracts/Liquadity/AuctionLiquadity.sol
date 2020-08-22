@@ -871,23 +871,6 @@ contract Liquadity is
     }
 
     
-
-    // Take out all the fund from liquadity when realy supply is zero
-    function drainLiquadity(
-        IERC20Token _token,
-        uint256 _value,
-        address payable _which
-    ) external onlyOwner() returns (bool) {
-        if (relayToken.totalSupply() == 0) {
-            if (address(_token) == address(0)) {
-                _which.transfer(_value);
-            } else {
-                ensureTransferFrom(_token, address(this), _which, _value);
-            }
-        }
-        return true;
-    }
-    
     function returnFundToTagAlong(
         IERC20Token _token,
         uint256 _value

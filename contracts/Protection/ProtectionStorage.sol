@@ -7,10 +7,11 @@ contract ProtectionStorage {
 
     address payable public vaultAddress;
     address payable public auctionAddress;
-    address payable public tagAlongAddress;
+    address payable public liquadityAddress;
     address payable public mainTokenAddress;
     address payable public companyFundWalletAddress;
     address payable public whiteListAddress;
+
     
     // timestamp for address where first lock happen
     mapping(address => uint256) public lockedOn;
