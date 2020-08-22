@@ -593,7 +593,9 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         );
     }
 
-    function auctionEnd() external onlySystem() returns (bool) {
+    // any one can call this method
+    
+    function auctionEnd() external returns (bool) {
         require(
             now >= safeAdd(LAST_AUCTION_START, MIN_AUCTION_END_TIME),
             "ERR_MIN_TIME_IS_NOT_OVER"
@@ -836,10 +838,9 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         );
         return true;
     }
-
+    // anyone can call this method 
     function disturbuteTokens(uint256 dayId, address[] calldata _which)
         external
-        onlySystem()
         returns (bool)
     {
         require(dayId < auctionDay, "ERR_AUCTION_DAY");

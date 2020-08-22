@@ -49,7 +49,7 @@ contract RegisteryProtection is ProxyOwnable,ProtectionStorage, AuctionRegistery
         vaultAddress = getAddressOf(VAULT);
         mainTokenAddress = getAddressOf(MAIN_TOKEN);
         companyFundWalletAddress = getAddressOf(COMPANY_FUND_WALLET);
-        tagAlongAddress = getAddressOf(TAG_ALONG);
+        liquadityAddress = getAddressOf(LIQUADITY);
         auctionAddress = getAddressOf(AUCTION);
         whiteListAddress = getAddressOf(WHITE_LIST);
     }
@@ -320,11 +320,11 @@ contract AuctionProtection is Upgradeable, Stacking {
                 safeMul(_tokenBalance, vaultRatio),
                 100
             );
-            uint256 tagAlongAmount = safeSub(_tokenBalance, walletAmount);
+            uint256 liquadityAmount = safeSub(_tokenBalance, walletAmount);
 
-            tagAlongAddress.transfer(tagAlongAmount);
+            liquadityAddress.transfer(liquadityAmount);
             companyFundWalletAddress.transfer(walletAmount);
-            emit FundTransfer(tagAlongAddress, address(0), tagAlongAmount);
+            emit FundTransfer(liquadityAddress, address(0), liquadityAmount);
             emit FundTransfer(
                 companyFundWalletAddress,
                 address(0),
