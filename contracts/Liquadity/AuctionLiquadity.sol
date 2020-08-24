@@ -270,6 +270,14 @@ contract LiquadityUtils is RegisteryLiquadity {
     {
         reductionStartDay = _reductionStartDay;
     }
+
+    function setRelayPercent(uint256 _relayPercent)
+        public
+        onlyOwner()
+        returns (bool)
+    {
+        relayPercent = _relayPercent;
+    }
 }
 
 contract LiquadityFormula is LiquadityUtils {
@@ -349,6 +357,7 @@ contract Liquadity is
         tagAlongRatio = 100;
         reductionStartDay = 21;
         maxIteration = 35;
+        relayPercent = 10;
         appreciationLimitWithDecimal = safeMul(120, DECIMAL_NOMINATOR);
         baseTokenVolatiltyRatio = 5 * PRICE_NOMINATOR;
         baseToken = IERC20Token(_baseToken);
@@ -471,7 +480,7 @@ contract Liquadity is
     {
         if (address(this).balance < previousMainReserveContribution) {
             while (previousMainReserveContribution >= address(this).balance) {
-                _liquadate(safeMul(10, PRICE_NOMINATOR));
+                _liquadate(safeMul(relayPercent, PRICE_NOMINATOR));
                 _convertBaseTokenToEth();
                 if (address(this).balance >=previousMainReserveContribution){
                     break;
@@ -634,21 +643,17 @@ contract Liquadity is
             );
             return _convertWithToken(_reverseBalance, mainTokenTobaseToken);
         } else {
-            uint256 converterBalance = mainToken.balanceOf(converter);
-            
-            uint256 relayPercent = 10;
-            
-            if (converterBalance > _reverseBalance)
-                
-                relayPercent = safeDiv(
+            uint256 converterBalance = mainToken.balanceOf(converter); 
+            uint _tempRelayPercent  = relayPercent;            
+            if (converterBalance > _reverseBalance)      
+                _tempRelayPercent = safeDiv(
                     safeMul(
                         safeSub(converterBalance, _reverseBalance),
                         safeMul(100, PRICE_NOMINATOR)
                     ),
                     _reverseBalance
-                );
-                
-            _liquadate(safeMul(relayPercent, PRICE_NOMINATOR));
+                );         
+            _liquadate(safeMul(_tempRelayPercent, PRICE_NOMINATOR));
             return _priceRecoveryWithConvertMainToken(_percent);
         }
     }
@@ -688,17 +693,17 @@ contract Liquadity is
             }else{
                 // redemption amount always less then what converter have
                 uint256 converterBalance = baseToken.balanceOf(converter);
-                uint256 relayPercent = 10;
+                uint256 _tempRelayPercent = relayPercent;
                 if (converterBalance > _amount) {
-                    relayPercent = safeDiv(
+                    _tempRelayPercent = safeDiv(
                         safeMul(safeSub(converterBalance, _amount), 100),
                         _amount
                     );
-                    if (relayPercent > 99) relayPercent = 99;
+                    if (_tempRelayPercent > 99) _tempRelayPercent = 99;
                 }
                 
-                _liquadate(safeMul(relayPercent, PRICE_NOMINATOR));
-                _amount = safeSub(_amount, safeDiv(_amount, relayPercent));
+                _liquadate(safeMul(_tempRelayPercent, PRICE_NOMINATOR));
+                _amount = safeSub(_amount, safeDiv(_amount, _tempRelayPercent));
                 return _convertWithToken(_amount, baseTokenToMainToken);
             }
         }

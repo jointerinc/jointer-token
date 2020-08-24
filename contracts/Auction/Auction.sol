@@ -94,6 +94,7 @@ contract AuctionUtils is RegisteryAuction {
         fundWalletRatio = 90;
         groupBonusRatio = 2;
         mainTokenRatio = 100;
+        averageDay = 10;
     }
 
     function setGroupBonusRatio(uint256 _groupBonusRatio)
@@ -149,6 +150,24 @@ contract AuctionUtils is RegisteryAuction {
         returns (bool)
     {
         maxContributionAllowed = _maxContributionAllowed;
+        return true;
+    }
+
+    function setStackingPercent(uint256 _stacking)
+        external
+        onlyAuthorized()
+        returns (bool)
+    {
+        stacking = _stacking;
+        return true;
+    }
+    
+    function setAverageDays(uint256 _averageDay)
+        external
+        onlyAuthorized()
+        returns (bool)
+    {
+        averageDay = _averageDay;
         return true;
     }
 }
@@ -359,7 +378,7 @@ contract AuctionFundCollector is IndividualBonus {
         require(
             _tokenAmount >=
                 safeAdd(
-                    walletDayWiseContribution[auctionDay][_from],
+                    mainTokenCheckDayWise[auctionDay][_from],
                     _contributedAmount
                 ),
             "ERR_USER_DONT_HAVE_EQUAL_BALANCE"
@@ -367,7 +386,7 @@ contract AuctionFundCollector is IndividualBonus {
 
         uint256 lockToken = safeDiv(
             safeAdd(
-                walletDayWiseContribution[auctionDay][_from],
+                mainTokenCheckDayWise[auctionDay][_from],
                 _contributedAmount
             ),
             _mainTokenPrice
@@ -433,7 +452,12 @@ contract AuctionFundCollector is IndividualBonus {
         }
 
         todayContribution = safeAdd(todayContribution, _contributedAmount);
-
+        
+        mainTokenCheckDayWise[auctionDay][_caller] = safeAdd(
+            walletDayWiseContribution[auctionDay][_caller],
+            _contributedAmount
+        );
+        
         walletDayWiseContribution[auctionDay][_recipient] = safeAdd(
             walletDayWiseContribution[auctionDay][_recipient],
             _contributedAmount
@@ -664,7 +688,7 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
             );
         }
 
-        uint256 _avgDays = 10;
+        uint256 _avgDays = averageDay;
         uint256 _avgInvestment = 0;
 
         if (auctionDay < 11 && auctionDay > 1) {

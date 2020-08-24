@@ -9,7 +9,7 @@ const { ZERO_ADDRESS } = constants;
 const { expect } = require("chai");
 
 const TagAlong = artifacts.require("AuctionTagAlong");
-const TagAlongRegistry = artifacts.require("AuctionTagAlongRegistry");
+const TagAlongRegistry = artifacts.require("TagAlongRegistry");
 const AuctionRegisty = artifacts.require("TestAuctionRegistery");
 const ERC20 = artifacts.require("TestERC20");
 
@@ -71,10 +71,10 @@ contract("~auction tag Along works", function (accounts) {
     expect(await this.tagAlong.liquadityAddress()).to.equal(
       liquidityPlaceHolder
     );
-    expect(await this.tagAlong.liquadityRatio()).to.be.bignumber.equal("100");
-    expect(await this.tagAlong.contributionRatio()).to.be.bignumber.equal(
-      "100"
-    );
+    // expect(await this.tagAlong.liquadityRatio()).to.be.bignumber.equal("100");
+    // expect(await this.tagAlong.contributionRatio()).to.be.bignumber.equal(
+    //   "100"
+    // );
   });
   describe("All the functions", async function () {
     //maybe first test the depositToken and then other functions

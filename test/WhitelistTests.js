@@ -8,8 +8,11 @@ const { ZERO_ADDRESS } = constants;
 
 const { expect } = require("chai");
 
+const AuctionRegisty = artifacts.require("TestAuctionRegistery");
 const whiteListContract = artifacts.require("WhiteList");
 const WhiteListRegistry = artifacts.require("WhiteListRegistery");
+
+
 const advanceTime = (time) => {
   return new Promise((resolve, reject) => {
     web3.currentProvider.send(
@@ -102,6 +105,13 @@ contract("~WhiteList works", function (accounts) {
   };
 
   beforeEach(async function () {
+
+    this.auctionRegistry = await AuctionRegisty.new(
+      systemAddress,
+      authorityAddress,
+      {from: primaryOwner}
+    );
+
     var whiteListRegistry = await WhiteListRegistry.new(
       systemAddress,
       multiSigPlaceHolder
@@ -120,7 +130,8 @@ contract("~WhiteList works", function (accounts) {
       tokenHoldBackDays,
       tokenMaturityDays,
       tokenMaturityDays,
-      stockTokenMaturityDays
+      stockTokenMaturityDays,
+      this.auctionRegistry.address
     );
 
     let proxyAddress = await whiteListRegistry.proxyAddress();
@@ -210,15 +221,18 @@ contract("~WhiteList works", function (accounts) {
   it("should add more wallets correctly", async function () {
     let flags = KYC | AML;
     let maxWallets = 1;
+    
     await this.whiteList.addNewWallet(toBeWhiteListed, flags, maxWallets, {
       from: systemAddress,
     });
+
     await expectRevert(
       this.whiteList.addMoreWallets(ZERO_ADDRESS, {
         from: toBeWhiteListed,
       }),
       "ERR_ZERO_ADDRESS"
     );
+
     await expectRevert(
       this.whiteList.addMoreWallets(extraAddedWallet, {
         from: other1,
@@ -301,7 +315,7 @@ contract("~WhiteList works", function (accounts) {
       "ERR_AUTHORIZED_ADDRESS_ONLY"
     );
     await this.whiteList.addMainRecivingRule(mask, condition, {
-      from: systemAddress,
+      from: primaryOwner,
     });
 
     let reciveingRule = await this.whiteList.tokenToReceivingRule(0);
@@ -314,7 +328,7 @@ contract("~WhiteList works", function (accounts) {
     [mask, condition] = calculateMaskAndCondition(flagsString, bools);
 
     await this.whiteList.addMainRecivingRule(mask, condition, {
-      from: systemAddress,
+      from: primaryOwner,
     });
 
     reciveingRule = await this.whiteList.tokenToReceivingRule(0);
@@ -336,7 +350,7 @@ contract("~WhiteList works", function (accounts) {
     let bools = [true, true, false];
     let [mask, condition] = calculateMaskAndCondition(flagsString, bools);
     await this.whiteList.addMainRecivingRule(mask, condition, {
-      from: systemAddress,
+      from: primaryOwner,
     });
 
     expect(await this.whiteList.main_isReceiveAllowed(fromChina)).to.equal(
@@ -354,6 +368,7 @@ contract("~WhiteList works", function (accounts) {
     flagsString = ["FROM_CHINA"];
     bools = [true];
     [to_mask, to_condition] = calculateMaskAndCondition(flagsString, bools);
+
     await expectRevert(
       this.whiteList.addMainTransferringRule(
         from_mask,
@@ -366,13 +381,14 @@ contract("~WhiteList works", function (accounts) {
       ),
       "ERR_AUTHORIZED_ADDRESS_ONLY"
     );
+
     await this.whiteList.addMainTransferringRule(
       from_mask,
       from_condition,
       to_mask,
       to_condition,
       {
-        from: systemAddress,
+        from: primaryOwner,
       }
     );
     let transferringRule = await this.whiteList.tokenToTransferringRuleArray(
@@ -397,7 +413,7 @@ contract("~WhiteList works", function (accounts) {
       to_mask,
       to_condition,
       {
-        from: systemAddress,
+        from: primaryOwner,
       }
     );
     transferringRule = await this.whiteList.tokenToTransferringRuleArray(0, 1);
@@ -410,7 +426,9 @@ contract("~WhiteList works", function (accounts) {
       this.whiteList.removeMainTransferingRules(1, { from: other1 }),
       "ERR_AUTHORIZED_ADDRESS_ONLY"
     );
-    this.whiteList.removeMainTransferingRules(1, { from: systemAddress });
+    
+    this.whiteList.removeMainTransferingRules(1, { from: primaryOwner });
+
     await expectRevert.unspecified(
       this.whiteList.tokenToTransferringRuleArray(0, 1)
     );
@@ -422,7 +440,7 @@ contract("~WhiteList works", function (accounts) {
     let [mask, condition] = calculateMaskAndCondition(flagsString, bools);
 
     await this.whiteList.addMainRecivingRule(mask, condition, {
-      from: systemAddress,
+      from: primaryOwner,
     });
     //add transferring Rules
     flagsStrings = ["FROM_EU"];
@@ -441,7 +459,7 @@ contract("~WhiteList works", function (accounts) {
       to_mask,
       to_condition,
       {
-        from: systemAddress,
+        from: primaryOwner,
       }
     );
     //a bypassed address

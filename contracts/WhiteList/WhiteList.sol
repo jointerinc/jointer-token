@@ -253,14 +253,7 @@ contract WhiteList is
         return _addMoreWallets(msg.sender,_which);
     }
     
-    function addMoreWallets(address _mainWallet,address _subWallet)
-        public
-        onlySystem()
-        notZeroAddress(_subWallet)
-        returns (bool)
-    {
-        return _addMoreWallets(_mainWallet,_subWallet);
-    }
+    
     
     function addWalletBehalfExchange(address _mainWallet,address _subWallet)
         public
