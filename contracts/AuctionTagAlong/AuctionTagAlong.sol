@@ -95,7 +95,7 @@ contract AuctionTagAlong is
         external
         returns (uint256)
     {
-        require(msg.sender == liquadityAddress, "ERR_ONLY_LIQUADITY_ALLWOED");
+        require(msg.sender == liquadityAddress, "ERR_ONLY_LIQUADITY_ALLOWED");
 
         if (_amount > address(this).balance) {
             uint256 _newamount = address(this).balance;
@@ -112,7 +112,7 @@ contract AuctionTagAlong is
         address _reciver,
         uint256 _amount
     ) external returns (bool) {
-        require(msg.sender == liquadityAddress, "ERR_ONLY_LIQUADITY_ALLWOED");
+        require(msg.sender == liquadityAddress, "ERR_ONLY_LIQUADITY_ALLOWED");
         ensureTransferFrom(_token, address(this), _reciver, _amount);
         return true;
     }
