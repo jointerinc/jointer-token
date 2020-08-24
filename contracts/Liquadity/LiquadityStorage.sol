@@ -85,6 +85,8 @@ contract LiquadityStorage {
     
     // check if today token price reach certain level
     bool public isAppreciationLimitReached;  
+
+    uint256 public relayPercent; 
     
      // mapping for where user last reddeem 
     mapping(address => uint256) public lastReedeemDay;

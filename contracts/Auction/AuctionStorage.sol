@@ -51,6 +51,8 @@ contract AuctionStorage {
     // today token supply
     uint256 public todaySupply;
 
+    uint256 public averageDay;
+
     // address how much invested by them in auciton till date
     mapping(address => uint256) public userTotalFund;
 
@@ -78,6 +80,10 @@ contract AuctionStorage {
     // address wise contribution each day
     mapping(uint256 => mapping(address => uint256))
         public walletDayWiseContribution;
+
+    // daywise contribution
+    mapping(uint256 => mapping(address => uint256))
+        public mainTokenCheckDayWise;
 
     // return index of user for bonus
     mapping(uint256 => uint256) public indexReturn;

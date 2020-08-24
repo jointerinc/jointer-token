@@ -20,7 +20,7 @@ const ProtectionRegistry = artifacts.require("ProtectionRegistry");
 const TokenVault = artifacts.require("TokenVault");
 const TokenVaultRegistry = artifacts.require("TokenVaultRegistery");
 const TagAlong = artifacts.require("AuctionTagAlong");
-const TagAlongRegistry = artifacts.require("AuctionTagAlongRegistry");
+const TagAlongRegistry = artifacts.require("TagAlongRegistry");
 const AuctionRegisty = artifacts.require("TestAuctionRegistery");
 const TestAuction = artifacts.require("TestAuction");
 
@@ -152,8 +152,9 @@ contract("~Protection works", function (accounts) {
         from: primaryOwner,
       }
     );
+    // tagalong treat as liquadity because we only have to check token balance 
     await this.auctionRegistry.registerContractAddress(
-      web3.utils.fromAscii("TAG_ALONG"),
+      web3.utils.fromAscii("LIQUADITY"),
       this.tagAlong.address,
       {
         from: primaryOwner,
@@ -223,7 +224,8 @@ contract("~Protection works", function (accounts) {
     expect(await this.protection.companyFundWalletAddress()).to.equal(
       companyFundWallet
     );
-    expect(await this.protection.tagAlongAddress()).to.equal(
+   
+    expect(await this.protection.liquadityAddress()).to.equal(
       this.tagAlong.address
     );
     expect(await this.protection.auctionAddress()).to.equal(
@@ -673,7 +675,7 @@ contract("~Protection works", function (accounts) {
       );
       //if nobody has stacked then it should go to the stakingCompanyWallet
       expect(
-        await this.mockMainToken.balanceOf(stakingCompanyWallet)
+        await this.mockMainToken.balanceOf(this.tokenVault.address)
       ).to.be.bignumber.equal(contributeAmount);
       //if somebody stacks it then...
       await this.auctionStub.lockEther(accountA, {

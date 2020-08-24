@@ -1,8 +1,10 @@
 const TruffleContract = require("@truffle/contract");
 
 const AuctionRegisty = artifacts.require("AuctionRegistery");
+
 const MultiSigGovernance = artifacts.require("MultiSigGovernance");
 const WhiteListRegistery = artifacts.require("WhiteListRegistery");
+
 const WhiteList = artifacts.require("WhiteList");
 const MainToken = artifacts.require("MainToken");
 const TokenVaultRegistery = artifacts.require("TokenVaultRegistery");
@@ -28,15 +30,15 @@ const Auction = artifacts.require("Auction");
 
 /* This all setting for ropsten */
 
-const ownerWallet = "0xEcF2659415FD22A46a83a1592558c63c00968C89";
-const WhiteListSecondary = "0xF30b7e1BB257F9D4C83f5fB18e47c6dcD60C54da";
-const auctionSecondary = "0x7F803ca9cD6721b7687767E1B6f1533e966BD524";
-const otherSecondary = "0x38e07d1C3b3e78F065dEC790a9d3b5553F602E14";
+// const ownerWallet = "0xEcF2659415FD22A46a83a1592558c63c00968C89";
+// const WhiteListSecondary = "0xF30b7e1BB257F9D4C83f5fB18e47c6dcD60C54da";
+// const auctionSecondary = "0x7F803ca9cD6721b7687767E1B6f1533e966BD524";
+// const otherSecondary = "0x38e07d1C3b3e78F065dEC790a9d3b5553F602E14";
 
-// const ownerWallet = "0x153d9909f3131e6a09390b33f7a67d40418c0318";
-// const WhiteListSecondary = "0xf4c402bf860877183e46a19382a7847ca22b51d4";
-// const auctionSecondary = "0xef7f7c4b5205a91a358de8bd8beb4345c3038922";
-// const otherSecondary = "0x98452666814c73ebff150f3d55ba4230a6c73f77";
+const ownerWallet = "0x153d9909f3131e6a09390b33f7a67d40418c0318";
+const WhiteListSecondary = "0xf4c402bf860877183e46a19382a7847ca22b51d4";
+const auctionSecondary = "0xef7f7c4b5205a91a358de8bd8beb4345c3038922";
+const otherSecondary = "0x98452666814c73ebff150f3d55ba4230a6c73f77";
 
 /* currency contarct */
 const curenncyContract = "0xf79bCD438Bb58A4C0A8B6fA1fAB79795BED545AD"; // change according
@@ -102,380 +104,371 @@ module.exports = async function (deployer) {
   //   from: ownerWallet
   // });
 
-  await deployer.deploy(
-    MultiSigGovernance,
-    [ownerWallet,WhiteListSecondary, otherSecondary, auctionSecondary],
-    2,{
-      from: ownerWallet,
-    }
-  );
+  // await deployer.deploy(
+  //   MultiSigGovernance,
+  //   [ownerWallet,WhiteListSecondary, otherSecondary, auctionSecondary],
+  //   2,{
+  //     from: ownerWallet,
+  //   }
+  // );
 
-  multiSigGovernanceInstance = await MultiSigGovernance.deployed();
-  console.log("MultiSigGovernance",MultiSigGovernance.address);
+  // multiSigGovernanceInstance = await MultiSigGovernance.deployed();
+  // console.log("MultiSigGovernance",MultiSigGovernance.address);
 
-  await deployer.deploy(
-    AuctionRegisty,
-    otherSecondary,
-    MultiSigGovernance.address, {
-      from: ownerWallet
-    }
-  );
-
-  
-  console.log("AuctionRegisty",AuctionRegisty.address);
-  auctionRegistyInstance = await AuctionRegisty.deployed();
-
-  await deployer.deploy(
-    WhiteListRegistery,
-    WhiteListSecondary,
-    MultiSigGovernance.address, {
-      from: ownerWallet,
-    }
-  );
-
-  whiteListRegisteryInstance = await WhiteListRegistery.deployed();
-
-  await deployer.deploy(WhiteList, {
-    from: ownerWallet,
-  });
-
-  await whiteListRegisteryInstance.addVersion(1, WhiteList.address, {
-    from: ownerWallet,
-  });
-
-  await whiteListRegisteryInstance.createProxy(
-    1,
-    ownerWallet,
-    WhiteListSecondary,
-    MultiSigGovernance.address,
-    MainTokenHoldBack,
-    EtnTokenHoldBack,
-    StockTokenHoldBack,
-    MainMaturityDays,
-    EtnMaturityDays,
-    StockMaturityDays,
-    AuctionRegisty.address, {
-      from: ownerWallet,
-    }
-  );
-
-  whiteListProxyAdress = await whiteListRegisteryInstance.proxyAddress();
-  whiteListInstance = await WhiteList.at(whiteListProxyAdress);
+  // await deployer.deploy(
+  //   AuctionRegisty,
+  //   otherSecondary,
+  //   MultiSigGovernance.address, {
+  //     from: ownerWallet
+  //   }
+  // );
 
   
-  console.log("WhiteList",whiteListProxyAdress);
+  // console.log("AuctionRegisty",AuctionRegisty.address);
+  // auctionRegistyInstance = await AuctionRegisty.deployed();
+
+  // await deployer.deploy(
+  //   WhiteListRegistery,
+  //   WhiteListSecondary,
+  //   MultiSigGovernance.address, {
+  //     from: ownerWallet,
+  //   }
+  // );
+
+  // whiteListRegisteryInstance = await WhiteListRegistery.deployed();
+
+  // await deployer.deploy(WhiteList, {
+  //   from: ownerWallet,
+  // });
+
+  // await whiteListRegisteryInstance.addVersion(1, WhiteList.address, {
+  //   from: ownerWallet,
+  // });
+
+  // await whiteListRegisteryInstance.createProxy(
+  //   1,
+  //   ownerWallet,
+  //   WhiteListSecondary,
+  //   MultiSigGovernance.address,
+  //   MainTokenHoldBack,
+  //   EtnTokenHoldBack,
+  //   StockTokenHoldBack,
+  //   MainMaturityDays,
+  //   EtnMaturityDays,
+  //   StockMaturityDays,
+  //   AuctionRegisty.address, {
+  //     from: ownerWallet,
+  //   }
+  // );
+
+  // whiteListProxyAdress = await whiteListRegisteryInstance.proxyAddress();
+  // whiteListInstance = await WhiteList.at(whiteListProxyAdress);
+
+  
+  // console.log("WhiteList",whiteListProxyAdress);
     
   
-  txHash = await whiteListInstance.addNewWallet(ownerWallet, ByPassCode, 10, {
-    from: WhiteListSecondary,
-  });
+  // txHash = await whiteListInstance.addNewWallet(ownerWallet, ByPassCode, 10, {
+  //   from: WhiteListSecondary,
+  // });
 
-  await whiteListInstance.addNewWallet(bancorNetwork, bancorCode, 0, {
-    from: WhiteListSecondary,
-  });
-  await whiteListInstance.addNewWallet(bancorConverter, bancorCode, 0, {
-    from: WhiteListSecondary,
-  });
+  // await whiteListInstance.addNewWallet(bancorNetwork, bancorCode, 0, {
+  //   from: WhiteListSecondary,
+  // });
+  // await whiteListInstance.addNewWallet(bancorConverter, bancorCode, 0, {
+  //   from: WhiteListSecondary,
+  // });
 
-  await auctionRegistyInstance.registerContractAddress(
-    whiteListCode,
-    whiteListProxyAdress, {
-      from: otherSecondary
-    }
-  );
+  // await auctionRegistyInstance.registerContractAddress(
+  //   whiteListCode,
+  //   whiteListProxyAdress, {
+  //     from: otherSecondary
+  //   }
+  // );
 
-  await deployer.deploy(
-    MainToken,
-    mainTokenName,
-    mainTokenSymbol,
-    otherSecondary,
-    MultiSigGovernance.address,
-    AuctionRegisty.address,
-    mainPreMintAddress,
-    mainPreMintAmount, {
-      from: ownerWallet,
-    }
-  );
+  // await deployer.deploy(
+  //   MainToken,
+  //   mainTokenName,
+  //   mainTokenSymbol,
+  //   otherSecondary,
+  //   MultiSigGovernance.address,
+  //   AuctionRegisty.address,
+  //   mainPreMintAddress,
+  //   mainPreMintAmount, {
+  //     from: ownerWallet,
+  //   }
+  // );
 
-  mainTokenInstance = await MainToken.deployed();
-  await auctionRegistyInstance.registerContractAddress(
-    mainTokenCode,
-    MainToken.address, {
-      from: otherSecondary
-    }
-  );
-  await auctionRegistyInstance.registerContractAddress(
-    currencyCode,
-    curenncyContract, {
-      from: otherSecondary
-    }
-  );
+  // mainTokenInstance = await MainToken.deployed();
+  // await auctionRegistyInstance.registerContractAddress(
+  //   mainTokenCode,
+  //   MainToken.address, {
+  //     from: otherSecondary
+  //   }
+  // );
+  // await auctionRegistyInstance.registerContractAddress(
+  //   currencyCode,
+  //   curenncyContract, {
+  //     from: otherSecondary
+  //   }
+  // );
 
-  console.log("MainToken",MainToken.address);
+  // console.log("MainToken",MainToken.address);
   
 
-  await deployer.deploy(
-    TokenVaultRegistery,
-    otherSecondary,
-    MultiSigGovernance.address, {
-      from: ownerWallet,
-    }
-  );
+  // await deployer.deploy(
+  //   TokenVaultRegistery,
+  //   otherSecondary,
+  //   MultiSigGovernance.address, {
+  //     from: ownerWallet,
+  //   }
+  // );
 
-  tokenVaultRegisteryInstance = await TokenVaultRegistery.deployed();
+  // tokenVaultRegisteryInstance = await TokenVaultRegistery.deployed();
 
-  await deployer.deploy(TokenVault, {
-    from: ownerWallet,
-  });
-  await tokenVaultRegisteryInstance.addVersion(1, TokenVault.address, {
-    from: ownerWallet,
-  });
-  await tokenVaultRegisteryInstance.createProxy(
-    1,
-    ownerWallet,
-    otherSecondary,
-    MultiSigGovernance.address,
-    AuctionRegisty.address, {
-      from: ownerWallet,
-    }
-  );
+  // await deployer.deploy(TokenVault, {
+  //   from: ownerWallet,
+  // });
+  // await tokenVaultRegisteryInstance.addVersion(1, TokenVault.address, {
+  //   from: ownerWallet,
+  // });
+  // await tokenVaultRegisteryInstance.createProxy(
+  //   1,
+  //   ownerWallet,
+  //   otherSecondary,
+  //   MultiSigGovernance.address,
+  //   AuctionRegisty.address, {
+  //     from: ownerWallet,
+  //   }
+  // );
 
-  tokenVaultProxyAdress = await tokenVaultRegisteryInstance.proxyAddress();
-  tokenVaultInstance = await TokenVault.at(tokenVaultProxyAdress);
+  // tokenVaultProxyAdress = await tokenVaultRegisteryInstance.proxyAddress();
+  // tokenVaultInstance = await TokenVault.at(tokenVaultProxyAdress);
 
-  await whiteListInstance.addNewWallet(tokenVaultProxyAdress, ByPassCode, 0, {
-    from: WhiteListSecondary,
-  });
-  console.log("tokenVaultProxyAdress",tokenVaultProxyAdress);
+  // await whiteListInstance.addNewWallet(tokenVaultProxyAdress, ByPassCode, 0, {
+  //   from: WhiteListSecondary,
+  // });
+  // console.log("tokenVaultProxyAdress",tokenVaultProxyAdress);
   
-  await auctionRegistyInstance.registerContractAddress(
-    vaultCode,
-    tokenVaultProxyAdress, {
-      from: otherSecondary
-    }
-  );
+  // await auctionRegistyInstance.registerContractAddress(
+  //   vaultCode,
+  //   tokenVaultProxyAdress, {
+  //     from: otherSecondary
+  //   }
+  // );
 
-  await deployer.deploy(
-    TagAlongRegistry,
-    otherSecondary,
-    MultiSigGovernance.address, {
-      from: ownerWallet,
-    }
-  );
+  // await deployer.deploy(
+  //   TagAlongRegistry,
+  //   otherSecondary,
+  //   MultiSigGovernance.address, {
+  //     from: ownerWallet,
+  //   }
+  // );
 
-  tagAlongRegistryInstance = await TagAlongRegistry.deployed();
+  // tagAlongRegistryInstance = await TagAlongRegistry.deployed();
 
-  await deployer.deploy(TagAlong, {
-    from: ownerWallet,
-  });
+  // await deployer.deploy(TagAlong, {
+  //   from: ownerWallet,
+  // });
 
-  await tagAlongRegistryInstance.addVersion(1, TagAlong.address);
+  // await tagAlongRegistryInstance.addVersion(1, TagAlong.address);
 
-  await tagAlongRegistryInstance.createProxy(
-    1,
-    ownerWallet,
-    otherSecondary,
-    MultiSigGovernance.address,
-    AuctionRegisty.address, {
-      from: ownerWallet,
-    }
-  );
+  // await tagAlongRegistryInstance.createProxy(
+  //   1,
+  //   ownerWallet,
+  //   otherSecondary,
+  //   MultiSigGovernance.address,
+  //   AuctionRegisty.address, {
+  //     from: ownerWallet,
+  //   }
+  // );
 
-  tagAlongProxyAddress = await tagAlongRegistryInstance.proxyAddress();
+  // tagAlongProxyAddress = await tagAlongRegistryInstance.proxyAddress();
 
-  tagAlongInstance = await TagAlong.at(tagAlongProxyAddress);
+  // tagAlongInstance = await TagAlong.at(tagAlongProxyAddress);
 
-  await whiteListInstance.addNewWallet(tagAlongProxyAddress, ByPassCode, 0, {
-    from: WhiteListSecondary,
-  });
+  // await whiteListInstance.addNewWallet(tagAlongProxyAddress, ByPassCode, 0, {
+  //   from: WhiteListSecondary,
+  // });
 
-  await auctionRegistyInstance.registerContractAddress(
-    tagAlongCode,
-    tagAlongProxyAddress, {
-      from: otherSecondary
-    }
-  );
-  console.log("tagAlongProxyAddress",tagAlongProxyAddress);
+  // await auctionRegistyInstance.registerContractAddress(
+  //   tagAlongCode,
+  //   tagAlongProxyAddress, {
+  //     from: otherSecondary
+  //   }
+  // );
+  // console.log("tagAlongProxyAddress",tagAlongProxyAddress);
 
-  await deployer.deploy(
-    ProtectionRegistry,
-    otherSecondary,
-    MultiSigGovernance.address, {
-      from: ownerWallet,
-    }
-  );
+  // await deployer.deploy(
+  //   ProtectionRegistry,
+  //   otherSecondary,
+  //   MultiSigGovernance.address, {
+  //     from: ownerWallet,
+  //   }
+  // );
 
-  protectionRegisteryInstance = await ProtectionRegistry.deployed();
+  // protectionRegisteryInstance = await ProtectionRegistry.deployed();
 
-  await deployer.deploy(AuctionProtection, {
-    from: ownerWallet,
-  });
+  // await deployer.deploy(AuctionProtection, {
+  //   from: ownerWallet,
+  // });
 
-  await protectionRegisteryInstance.addVersion(1, AuctionProtection.address);
+  // await protectionRegisteryInstance.addVersion(1, AuctionProtection.address);
 
-  await protectionRegisteryInstance.createProxy(
-    1,
-    ownerWallet,
-    otherSecondary,
-    MultiSigGovernance.address,
-    AuctionRegisty.address, {
-      from: ownerWallet,
-    }
-  );
+  // await protectionRegisteryInstance.createProxy(
+  //   1,
+  //   ownerWallet,
+  //   otherSecondary,
+  //   MultiSigGovernance.address,
+  //   AuctionRegisty.address, {
+  //     from: ownerWallet,
+  //   }
+  // );
 
-  protectionProxyAddress = await protectionRegisteryInstance.proxyAddress();
+  // protectionProxyAddress = await protectionRegisteryInstance.proxyAddress();
 
-  protectionInstance = await AuctionProtection.at(protectionProxyAddress);
+  // protectionInstance = await AuctionProtection.at(protectionProxyAddress);
 
-  await whiteListInstance.addNewWallet(protectionProxyAddress, ByPassCode, 0, {
-    from: WhiteListSecondary,
-  });
+  // await whiteListInstance.addNewWallet(protectionProxyAddress, ByPassCode, 0, {
+  //   from: WhiteListSecondary,
+  // });
 
-  await auctionRegistyInstance.registerContractAddress(
-    protectionCode,
-    protectionProxyAddress, {
-      from: otherSecondary
-    }
-  );
+  // await auctionRegistyInstance.registerContractAddress(
+  //   protectionCode,
+  //   protectionProxyAddress, {
+  //     from: otherSecondary
+  //   }
+  // );
 
-  console.log("protectionProxyAddress",protectionProxyAddress);
-  await SmartToken.setProvider(web3.currentProvider);
-  relayTokenInstance = await SmartToken.at(smartToken);
-  baseTokenInstance = await SmartToken.at(baseToken);
+  // console.log("protectionProxyAddress",protectionProxyAddress);
+  // await SmartToken.setProvider(web3.currentProvider);
+  // relayTokenInstance = await SmartToken.at(smartToken);
+  // baseTokenInstance = await SmartToken.at(baseToken);
 
-  await baseTokenInstance.transfer(bancorConverter,baseTokenAmout, {
-    from: ownerWallet
-  });
+  // await baseTokenInstance.transfer(bancorConverter,baseTokenAmout, {
+  //   from: ownerWallet
+  // });
 
-  await relayTokenInstance.issue(tagAlongProxyAddress,relayTokenAmount, {
-    from: ownerWallet
-  });
-
-  
+  // await relayTokenInstance.issue(tagAlongProxyAddress,relayTokenAmount, {
+  //   from: ownerWallet
+  // });
 
   
-  await BancorConverter.setProvider(web3.currentProvider);
-  converterInstance = await BancorConverter.at(bancorConverter);
-  await converterInstance.addConnector(MainToken.address, "500000", false, {
-    from: ownerWallet
-  });
 
-  await relayTokenInstance.transferOwnership(bancorConverter ,{
-    from: ownerWallet
-  });
   
-  await converterInstance.acceptTokenOwnership({
-    from: ownerWallet
-  })
+  // await BancorConverter.setProvider(web3.currentProvider);
+  // converterInstance = await BancorConverter.at(bancorConverter);
+  // await converterInstance.addConnector(MainToken.address, "500000", false, {
+  //   from: ownerWallet
+  // });
 
-  await deployer.deploy(
-    LiquadityRegistery,
-    otherSecondary,
-    MultiSigGovernance.address, {
-      from: ownerWallet,
-    }
-  );
+  // await relayTokenInstance.transferOwnership(bancorConverter ,{
+  //   from: ownerWallet
+  // });
+  
+  // await converterInstance.acceptTokenOwnership({
+  //   from: ownerWallet
+  // })
 
-  liquadityRegisteryInstance = await LiquadityRegistery.deployed();
+  // await deployer.deploy(
+  //   LiquadityRegistery,
+  //   otherSecondary,
+  //   MultiSigGovernance.address, {
+  //     from: ownerWallet,
+  //   }
+  // );
 
-  await deployer.deploy(Liquadity, {
-    from: ownerWallet,
-  });
+  // liquadityRegisteryInstance = await LiquadityRegistery.deployed();
 
-  await liquadityRegisteryInstance.addVersion(1, Liquadity.address, {
-    from: ownerWallet,
-  });
+  // await deployer.deploy(Liquadity, {
+  //   from: ownerWallet,
+  // });
 
-  await liquadityRegisteryInstance.createProxy(
-    1,
-    bancorConverter,
-    baseToken,
-    MainToken.address,
-    smartToken,
-    ownerWallet,
-    otherSecondary,
-    MultiSigGovernance.address,
-    AuctionRegisty.address,
-    baseLinePrice,
-    {
-      from: ownerWallet,
-    }
-  );
+  // await liquadityRegisteryInstance.addVersion(1, Liquadity.address, {
+  //   from: ownerWallet,
+  // });
 
-  liquadityProxyAddress = await liquadityRegisteryInstance.proxyAddress();
+  // await liquadityRegisteryInstance.createProxy(
+  //   1,
+  //   bancorConverter,
+  //   baseToken,
+  //   MainToken.address,
+  //   smartToken,
+  //   ownerWallet,
+  //   otherSecondary,
+  //   MultiSigGovernance.address,
+  //   AuctionRegisty.address,
+  //   baseLinePrice,
+  //   {
+  //     from: ownerWallet,
+  //   }
+  // );
 
-  liquadityInstance = Liquadity.at(liquadityProxyAddress);
+  // liquadityProxyAddress = await liquadityRegisteryInstance.proxyAddress();
 
-  await whiteListInstance.addNewWallet(liquadityProxyAddress, ByPassCode, 0, {
-    from: WhiteListSecondary,
-  });
+  // liquadityInstance = Liquadity.at(liquadityProxyAddress);
 
-  await auctionRegistyInstance.registerContractAddress(
-    liquadityCode,
-    liquadityProxyAddress, {
-      from: otherSecondary
-    }
-  );
+  // await whiteListInstance.addNewWallet(liquadityProxyAddress, ByPassCode, 0, {
+  //   from: WhiteListSecondary,
+  // });
 
-  console.log("liquadity",liquadityProxyAddress);
-  await deployer.deploy(
-    AuctionProxyRegistry,
-    auctionSecondary,
-    MultiSigGovernance.address, {
-      from: ownerWallet,
-    }
-  );
+  // await auctionRegistyInstance.registerContractAddress(
+  //   liquadityCode,
+  //   liquadityProxyAddress, {
+  //     from: otherSecondary
+  //   }
+  // );
 
-  AuctionProxyRegistryInstance = await AuctionProxyRegistry.deployed();
+  // console.log("liquadity",liquadityProxyAddress);
+  // await deployer.deploy(
+  //   AuctionProxyRegistry,
+  //   auctionSecondary,
+  //   MultiSigGovernance.address, {
+  //     from: ownerWallet,
+  //   }
+  // );
 
-  await deployer.deploy(Auction, {
-    from: ownerWallet,
-  });
+  // AuctionProxyRegistryInstance = await AuctionProxyRegistry.deployed();
 
-  await AuctionProxyRegistryInstance.addVersion(1, Auction.address, {
-    from: ownerWallet,
-  });
+  // await deployer.deploy(Auction, {
+  //   from: ownerWallet,
+  // });
 
-  await AuctionProxyRegistryInstance.createProxy(
-    1,
-    1598032158,
-    40,
-    60,
-    21,
-    ownerWallet,
-    auctionSecondary,
-    MultiSigGovernance.address,
-    AuctionRegisty.address,
+  // await AuctionProxyRegistryInstance.addVersion(1, Auction.address, {
+  //   from: ownerWallet,
+  // });
 
-    {
-      from: ownerWallet,
-    }
-  );
+  // await AuctionProxyRegistryInstance.createProxy(
+  //   1,
+  //   1598032158,
+  //   40,
+  //   60,
+  //   21,
+  //   ownerWallet,
+  //   auctionSecondary,
+  //   MultiSigGovernance.address,
+  //   AuctionRegisty.address,
 
-  auctionProxyAddress = await AuctionProxyRegistryInstance.proxyAddress();
+  //   {
+  //     from: ownerWallet,
+  //   }
+  // );
 
-  auctionInstance = Auction.at(auctionProxyAddress);
+  // auctionProxyAddress = await AuctionProxyRegistryInstance.proxyAddress();
 
-  await whiteListInstance.addNewWallet(auctionProxyAddress, ByPassCode, 0, {
-    from: WhiteListSecondary,
-  });
+  // auctionInstance = Auction.at(auctionProxyAddress);
 
-  await auctionRegistyInstance.registerContractAddress(
-    auctionCode,
-    auctionProxyAddress, {
-      from: otherSecondary
-    }
-  );
+  // await whiteListInstance.addNewWallet(auctionProxyAddress, ByPassCode, 0, {
+  //   from: WhiteListSecondary,
+  // });
 
-    
-    
-    
-   
-    console.log("auction",auctionProxyAddress);
-    
-    
+  // await auctionRegistyInstance.registerContractAddress(
+  //   auctionCode,
+  //   auctionProxyAddress, {
+  //     from: otherSecondary
+  //   }
+  // );
 
-
-
+  
   //console.log(register_white);
 };

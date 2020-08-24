@@ -20,7 +20,7 @@ const { web3 } = require("@openzeppelin/test-helpers/src/setup");
 const Liquidity = artifacts.require("Liquadity");
 const LiquidityRegistry = artifacts.require("LiquadityRegistery");
 const TagAlong = artifacts.require("AuctionTagAlong");
-const TagAlongRegistry = artifacts.require("AuctionTagAlongRegistry");
+const TagAlongRegistry = artifacts.require("TagAlongRegistry");
 const AuctionRegisty = artifacts.require("TestAuctionRegistery");
 const CurrencyPrices = artifacts.require("TestCurrencyPrices");
 const TokenVault = artifacts.require("TokenVault");
@@ -189,6 +189,7 @@ contract("~liquidity works", function (accounts) {
       tokenMaturityDays,
       tokenMaturityDays,
       stockTokenMaturityDays,
+      this.auctionRegistry.address,
       { from: primaryOwner }
     );
 
@@ -258,15 +259,15 @@ contract("~liquidity works", function (accounts) {
     this.liquidity = await Liquidity.at(proxyAddress);
 
     //set the paths
-    this.liquidity.setTokenPath(0, ethToMainToken, { from: systemAddress });
+    this.liquidity.setTokenPath(0, ethToMainToken, { from: primaryOwner });
     this.liquidity.setTokenPath(1, baseTokenToMainToken, {
-      from: systemAddress,
+      from: primaryOwner,
     });
     this.liquidity.setTokenPath(2, mainTokenTobaseToken, {
-      from: systemAddress,
+      from: primaryOwner,
     });
-    this.liquidity.setTokenPath(3, ethToBaseToken, { from: systemAddress });
-    this.liquidity.setTokenPath(4, baseTokenToEth, { from: systemAddress });
+    this.liquidity.setTokenPath(3, ethToBaseToken, { from: primaryOwner });
+    this.liquidity.setTokenPath(4, baseTokenToEth, { from: primaryOwner });
 
     // this.liquidity = await Liquidity.new(
     //   this.converter.address,
@@ -323,11 +324,11 @@ contract("~liquidity works", function (accounts) {
     let mainReserveAmount = contributeAmount.sub(sideReserveAmount);
 
     //Here we are taking and extra mainReserveAmount out of the tokenVault
-    let tagAlongEthBalance = await balance.current(this.tagAlong.address);
+    //let tagAlongEthBalance = await balance.current(this.tagAlong.address);
 
-    if (mainReserveAmount <= tagAlongEthBalance)
-      mainReserveAmount = mainReserveAmount.add(mainReserveAmount);
-    else mainReserveAmount = mainReserveAmount.add(tagAlongEthBalance);
+    // if (mainReserveAmount <= tagAlongEthBalance)
+    //   mainReserveAmount = mainReserveAmount.add(mainReserveAmount);
+    mainReserveAmount = mainReserveAmount.add(mainReserveAmount);
 
     //mainReserveAmount + whatever tagAlong gave us gets converted into JNTR through bancor
     let tempAmounts = await bancorNetwork.getReturnByPath(
@@ -339,7 +340,9 @@ contract("~liquidity works", function (accounts) {
     let vaultBalanceJntr = await this.jntrToken.balanceOf(
       this.tokenVault.address
     );
+    
     expect(tempAmounts[0]).to.be.bignumber.equal(vaultBalanceJntr);
+
     expectEvent(receipt, "Contribution", {
       _token: ZERO_ADDRESS,
       _amount: mainReserveAmount,
@@ -764,52 +767,7 @@ contract("~liquidity works", function (accounts) {
       // let tagAlongBalanceJntr = await this.jntrToken.balanceOf(this.tokenVault.address)
       // console.log(tagAlongBalanceJntr.toString())
     });
-    it("when side reserve does not have enough eth (we take them from tagAlong)", async function () {
-      // console.log((await balance.current(this.tagAlong.address)).toString());
 
-      await this.tagAlong.sendTransaction({
-        from: other1,
-        value: contributeAmount,
-      });
-      let receipt = await this.liquidity.redemption(
-        mainTokenTobaseToken,
-        contributeAmount,
-        { from: accountA }
-      );
-      // expectEvent(receipt, "Redemption", { _token: BNTToken.address, _amount: contributeAmount, returnAmount: balanceBNTAccountA })
-    });
-    //case-III when tagAlong does not enough eth either but has bnt we require
-    it("when tagAlong does not have enough eth either", async function () {
-      await BNTToken.transfer(this.tagAlong.address, contributeAmount, {
-        from: accounts[0],
-      });
-
-      let receipt = await this.liquidity.redemption(
-        mainTokenTobaseToken,
-        contributeAmount,
-        { from: accountA }
-      );
-    });
-    // case-IV when tagAlogn does not have ether or bnt we sell 10% relay
-    it("when tagAlong does not have ether or bnt(we sell 10% relay)", async function () {
-      //Lets give the tagAlong all the relay tokens(all two of them)
-      await this.smartToken.approve(this.tagAlong.address, one.mul(new BN(2)), {
-        from: accounts[0],
-      });
-      await this.tagAlong.depositeToken(
-        this.smartToken.address,
-        accounts[0],
-        one.mul(new BN(2)),
-        {
-          from: accounts[0],
-        }
-      );
-      // console.log(await web3.eth.getBalance(this.tagAlong.address));
-      let receipt = await this.liquidity.redemption(
-        mainTokenTobaseToken,
-        contributeAmount,
-        { from: accountA }
-      );
-    });
+   
   });
 });
