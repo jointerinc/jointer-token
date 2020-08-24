@@ -66,7 +66,6 @@ contract RegisteryAuction is ProxyOwnable, AuctionRegisteryContracts,AuctionStor
         auctionProtectionAddress = getAddressOf(AUCTION_PROTECTION);
         liquadityAddress = getAddressOf(LIQUADITY);
         companyFundWalletAddress = getAddressOf(COMPANY_FUND_WALLET);
-        companyTokenWalletAddress = getAddressOf(COMPANY_MAIN_TOKEN_WALLET);
         escrowAddress = getAddressOf(ESCROW);
     }
 
@@ -827,12 +826,13 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         // here we check with last auction bcz user can invest after auction start
         IToken(mainTokenAddress).lockToken(_which, 0, LAST_AUCTION_START);
 
-        ensureTransferFrom(
+        approveTransferFrom(
             IERC20Token(mainTokenAddress),
-            address(this),
-            companyTokenWalletAddress,
+            escrowAddress,
             fee
         );
+        
+        IEscrow(escrowAddress).depositFee(fee);
         ensureTransferFrom(
             IERC20Token(mainTokenAddress),
             address(this),

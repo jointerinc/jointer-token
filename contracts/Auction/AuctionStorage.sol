@@ -12,7 +12,6 @@ contract AuctionStorage {
     address payable public auctionProtectionAddress;
     address payable public liquadityAddress;
     address payable public companyFundWalletAddress;
-    address payable public companyTokenWalletAddress;
     address payable public escrowAddress;
 
     uint256 public constant PRICE_NOMINATOR = 10**9;
