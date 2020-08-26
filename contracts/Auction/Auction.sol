@@ -878,7 +878,7 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
 
     function disturbuteTokens(uint256 dayId) external returns (bool) {
         require(dayId < auctionDay, "ERR_AUCTION_DAY");
-        disturbuteTokenInternal(dayId, msg.sender);
+        return disturbuteTokenInternal(dayId, msg.sender);
     }
 
     //In case if there is other tokens into contract
