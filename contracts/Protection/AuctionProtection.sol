@@ -222,6 +222,7 @@ contract Stacking is
         stackBalance[_whom] = 0;
         lastRound[_whom] = 0;
         emit StackRemoved(stackRoundId, _whom, actulToken);
+        return true;
     }
     
     function unlockTokenFromStack() external returns (bool) {
