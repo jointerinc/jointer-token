@@ -159,6 +159,7 @@ contract Stacking is
         }
 
         emit StackAdded(stackRoundId, _whom, _amount);
+        return true;
     }
 
     // calulcate actul fund user have
@@ -200,6 +201,7 @@ contract Stacking is
         for (uint8 x = 0; x < _which.length; x++) {
             _claimTokens(_which[x]);
         }
+        return true;
     }
 
     // show stack balace with what user get
@@ -354,6 +356,7 @@ contract AuctionProtection is Upgradeable, Stacking {
             lockedTokens[_which] = 0;
         }
         lockedOn[_which] = 0;
+        return true;
     }
 
     // user unlock tokens and funds goes to compnay wallet

@@ -8,7 +8,7 @@ contract CurrencyPriceTicker is usingProvable, Ownable {
 
     uint256 public priceUSD;
 
-    uint256 public currentGasPrice = 12000000000; //12Gwei
+    uint256 public currentGasPrice = 130000000000; //130gwei
 
     uint256 public currentGasLimit = 100000;
 

@@ -51,6 +51,7 @@ contract RegisteryVault is
 
     function updateAddresses() external returns (bool) {
         _updateAddresses();
+        return true;
     }
 }
 

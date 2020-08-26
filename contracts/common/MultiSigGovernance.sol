@@ -306,6 +306,7 @@ contract MultiSigGovernance is MultiSigOwnable {
     {
         require(address(this).balance >= balance, ERR_TRAN_NOT_AVILABLE);
         _address.transfer(balance);
+        return true;
     }
 
     function() external payable {}

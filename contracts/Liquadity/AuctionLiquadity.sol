@@ -269,6 +269,7 @@ contract LiquadityUtils is RegisteryLiquadity {
         returns (bool)
     {
         reductionStartDay = _reductionStartDay;
+        return true;
     }
 
     function setRelayPercent(uint256 _relayPercent)
@@ -277,6 +278,7 @@ contract LiquadityUtils is RegisteryLiquadity {
         returns (bool)
     {
         relayPercent = _relayPercent;
+        return true;
     }
 }
 
