@@ -392,6 +392,7 @@ contract AuctionFundCollector is IndividualBonus {
         );
 
         IToken(mainTokenAddress).lockToken(_from, lockToken, now);
+        return true;
     }
 
     // check weather user send more fund if yes
