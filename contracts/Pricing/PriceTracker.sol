@@ -29,6 +29,7 @@ contract CurrencyPriceTicker is usingProvable, Ownable {
         string memory _parameter
     ) public payable Ownable(_systemAddress, _multisigAddress) {
         currency = _currency;
+        provable_setCustomGasPrice(currentGasPrice);
         provable_setProof(proofType_Android | proofStorage_IPFS);
         parameters.push(_parameter);
     }

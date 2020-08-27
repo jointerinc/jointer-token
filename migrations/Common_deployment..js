@@ -88,6 +88,13 @@ const auctionCode = "0x41554354494f4e0000000000000000000000000000000000000000000
 const ByPassCode = 8195;
 const bancorCode = 16384;
 
+
+// ["0xD368b98d03855835E2923Dc000b3f9c2EBF1b27b","0x71cec6E58f12c28a9f1Fb96Ee64DA8328dD9F23C","0xC6e100530C7344631F22eEd05ef66f8AE9ddD68D"]
+
+// ["0xC6e100530C7344631F22eEd05ef66f8AE9ddD68D","0x71cec6E58f12c28a9f1Fb96Ee64DA8328dD9F23C","0xD368b98d03855835E2923Dc000b3f9c2EBF1b27b"]
+
+// ["0xD368b98d03855835E2923Dc000b3f9c2EBF1b27b","0x71cec6E58f12c28a9f1Fb96Ee64DA8328dD9F23C","0xC6e100530C7344631F22eEd05ef66f8AE9ddD68D","0x71cec6E58f12c28a9f1Fb96Ee64DA8328dD9F23C","0xD368b98d03855835E2923Dc000b3f9c2EBF1b27b"]
+
 module.exports = async function (deployer) {
 
   // await BancorConverter.setProvider(web3.currentProvider);
@@ -163,11 +170,8 @@ module.exports = async function (deployer) {
 
   // whiteListProxyAdress = await whiteListRegisteryInstance.proxyAddress();
   // whiteListInstance = await WhiteList.at(whiteListProxyAdress);
-
-  
   // console.log("WhiteList",whiteListProxyAdress);
     
-  
   // txHash = await whiteListInstance.addNewWallet(ownerWallet, ByPassCode, 10, {
   //   from: WhiteListSecondary,
   // });
