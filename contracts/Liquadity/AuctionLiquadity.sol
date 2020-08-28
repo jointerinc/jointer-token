@@ -276,7 +276,8 @@ contract LiquadityUtils is RegisteryLiquadity {
         public
         onlyOwner()
         returns (bool)
-    {
+    {   
+        require(_relayPercent < 99);
         relayPercent = _relayPercent;
         return true;
     }
