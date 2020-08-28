@@ -2,7 +2,9 @@ pragma solidity ^0.5.9;
 
 import "./Constant.sol";
 
+
 contract ProxyOwnable is Constant {
+    
     address public primaryOwner;
 
     address public authorityAddress;
@@ -10,7 +12,7 @@ contract ProxyOwnable is Constant {
     address public newAuthorityAddress;
 
     address public systemAddress;
-
+    
     bool public isOwnerInitialize = false;
 
     event OwnershipTransferred(
@@ -18,7 +20,7 @@ contract ProxyOwnable is Constant {
         address indexed previousOwner,
         address indexed newOwner
     );
-
+    
     event AuthorityAddressChnageCall(
         address indexed previousOwner,
         address indexed newOwner
@@ -33,20 +35,16 @@ contract ProxyOwnable is Constant {
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress
-    )
-        internal
-        notZeroAddress(_primaryOwner)
-        notZeroAddress(_systemAddress)
-        notZeroAddress(_authorityAddress)
-    {
-        require(!isOwnerInitialize, "ERR_OWNER_INTIALIZED_ALREADY");
-
+    ) internal notZeroAddress(_primaryOwner) notZeroAddress(_systemAddress) notZeroAddress(_authorityAddress) {
+        
+        require(!isOwnerInitialize,"ERR_OWNER_INTIALIZED_ALREADY");
+        
         require(_primaryOwner != _systemAddress, ERR_SAME_ADDRESS);
-
+        
         require(_systemAddress != _authorityAddress, ERR_SAME_ADDRESS);
-
+        
         require(_primaryOwner != _authorityAddress, ERR_SAME_ADDRESS);
-
+        
         primaryOwner = _primaryOwner;
         systemAddress = _systemAddress;
         authorityAddress = _authorityAddress;
@@ -77,26 +75,15 @@ contract ProxyOwnable is Constant {
     }
 
     /**
-     * @dev change primary ownership
-     * @param _which The address to which is new owner address
+     * @dev change primary ownership governance 
      */
-    function changePrimaryOwner(address _which)
+    function changePrimaryOwner()
         public
-        onlyAuthorized()
-        notZeroAddress(_which)
+        onlyOwner()
         returns (bool)
     {
-        require(
-            _which != systemAddress &&
-                _which != authorityAddress &&
-                _which != primaryOwner,
-            ERR_SAME_ADDRESS
-        );
-
-        emit OwnershipTransferred("PRIMARY_OWNER", primaryOwner, _which);
-
-        primaryOwner = _which;
-
+        emit OwnershipTransferred("PRIMARY_OWNER", primaryOwner, authorityAddress);
+        primaryOwner = authorityAddress;
         return true;
     }
 
@@ -134,8 +121,7 @@ contract ProxyOwnable is Constant {
     {
         require(
             _which != systemAddress &&
-                _which != authorityAddress &&
-                _which != primaryOwner,
+                _which != authorityAddress
             ERR_SAME_ADDRESS
         );
         newAuthorityAddress = _which;
