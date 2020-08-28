@@ -23,59 +23,60 @@ const vaultCode =
 
 module.exports = async function (deployer) {
 
-    // currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
-    // currentdata = JSON.parse(currentdata);
+    currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
+    currentdata = JSON.parse(currentdata);
     
-    // auctionRegistery  = currentdata.AuctionRegistery;
-    // whiteList  = currentdata.WhiteList;
+    auctionRegistery  = currentdata.AuctionRegistery;
+    whiteList  = currentdata.WhiteList;
 
-    // whiteListInstance = await WhiteList.at(whiteList);
-    // auctionRegistyInstance = await AuctionRegistery.at(auctionRegistery);
+    whiteListInstance = await WhiteList.at(whiteList);
+    auctionRegistyInstance = await AuctionRegistery.at(auctionRegistery);
    
-    // await deployer.deploy(
-    //     TokenVaultRegistery,
-    //     otherSecondary,
-    //     governance, {
-    //     from: ownerWallet,
-    //     }
-    // );
+    await deployer.deploy(
+        TokenVaultRegistery,
+        otherSecondary,
+        governance, {
+        from: ownerWallet,
+        }
+    );
 
-    // tokenVaultRegisteryInstance = await TokenVaultRegistery.deployed();
-    // await deployer.deploy(TokenVault, {
-    //     from: ownerWallet,
-    // });
+    tokenVaultRegisteryInstance = await TokenVaultRegistery.deployed();
+    await deployer.deploy(TokenVault, {
+        from: ownerWallet,
+    });
 
-    // txHash1 = await tokenVaultRegisteryInstance.addVersion(1, TokenVault.address, {
-    //     from: ownerWallet,
-    // });
+    txHash1 = await tokenVaultRegisteryInstance.addVersion(1, TokenVault.address, {
+        from: ownerWallet,
+    });
 
-    // txHash2 = await tokenVaultRegisteryInstance.createProxy(
-    //     1,
-    //     ownerWallet,
-    //     otherSecondary,
-    //     governance,
-    //     auctionRegistery, {
-    //     from: ownerWallet,
-    //     }
-    // );
+    txHash2 = await tokenVaultRegisteryInstance.createProxy(
+        1,
+        ownerWallet,
+        otherSecondary,
+        governance,
+        auctionRegistery, {
+        from: ownerWallet,
+        }
+    );
 
-    // tokenVaultProxyAdress = await tokenVaultRegisteryInstance.proxyAddress();
-    // tokenVaultInstance = await TokenVault.at(tokenVaultProxyAdress);
+    tokenVaultProxyAdress = await tokenVaultRegisteryInstance.proxyAddress();
+    tokenVaultInstance = await TokenVault.at(tokenVaultProxyAdress);
 
-    // txHash3 = await whiteListInstance.addNewWallet(tokenVaultProxyAdress, byPassCode, 0, {
-    //     from: whiteListSecondary,
-    // });
+    txHash3 = await whiteListInstance.addNewWallet(tokenVaultProxyAdress, byPassCode, 0, {
+        from: whiteListSecondary,
+    });
     
-    // txHash4 =  await auctionRegistyInstance.registerContractAddress(
-    //     vaultCode,
-    //     tokenVaultProxyAdress, {
-    //     from: otherSecondary
-    //     }
-    // );
+    txHash4 =  await auctionRegistyInstance.registerContractAddress(
+        vaultCode,
+        tokenVaultProxyAdress, {
+        from: otherSecondary
+        }
+    );
 
 
-    // currentdata["TokenVaultRegistery"] = TokenVaultRegistery.address;
-    // currentdata["TokenVault"] = tokenVaultProxyAdress;
-    // await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata,undefined,2));
+    currentdata["TokenVaultRegistery"] = TokenVaultRegistery.address;
+    currentdata["TokenVault"] = tokenVaultProxyAdress;
+    await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata,undefined,2));
+
 }   
 

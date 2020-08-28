@@ -24,59 +24,59 @@ const protectionCode =
 
 module.exports = async function (deployer) {
 
-    // currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
-    // currentdata = JSON.parse(currentdata);
+    currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
+    currentdata = JSON.parse(currentdata);
     
-    // auctionRegistery  = currentdata.AuctionRegistery;
-    // whiteList  = currentdata.WhiteList;
+    auctionRegistery  = currentdata.AuctionRegistery;
+    whiteList  = currentdata.WhiteList;
 
-    // whiteListInstance = await WhiteList.at(whiteList);
-    // auctionRegistyInstance = await AuctionRegistery.at(auctionRegistery);
+    whiteListInstance = await WhiteList.at(whiteList);
+    auctionRegistyInstance = await AuctionRegistery.at(auctionRegistery);
 
-    // await deployer.deploy(
-    //     ProtectionRegistry,
-    //     otherSecondary,
-    //     governance,{
-    //        from: ownerWallet,
-    //     }
-    // );
+    await deployer.deploy(
+        ProtectionRegistry,
+        otherSecondary,
+        governance,{
+           from: ownerWallet,
+        }
+    );
 
-    // protectionRegistryInstance = await ProtectionRegistry.deployed();
+    protectionRegistryInstance = await ProtectionRegistry.deployed();
 
-    // await deployer.deploy(AuctionProtection, {
-    //     from: ownerWallet,
-    // });
+    await deployer.deploy(AuctionProtection, {
+        from: ownerWallet,
+    });
 
-    // txHash1 = await protectionRegistryInstance.addVersion(1, AuctionProtection.address);
+    txHash1 = await protectionRegistryInstance.addVersion(1, AuctionProtection.address);
 
-    // txHash2 = await protectionRegistryInstance.createProxy(
-    //     1,
-    //     ownerWallet,
-    //     otherSecondary,
-    //     governance,
-    //     auctionRegistery, {
-    //     from: ownerWallet,
-    //     }
-    // );
+    txHash2 = await protectionRegistryInstance.createProxy(
+        1,
+        ownerWallet,
+        otherSecondary,
+        governance,
+        auctionRegistery, {
+        from: ownerWallet,
+        }
+    );
     
-    // protectionProxyAddress = await protectionRegistryInstance.proxyAddress();
+    protectionProxyAddress = await protectionRegistryInstance.proxyAddress();
 
-    // protectionInstance = await AuctionProtection.at(protectionProxyAddress);
+    protectionInstance = await AuctionProtection.at(protectionProxyAddress);
 
-    // txHash3 = await whiteListInstance.addNewWallet(protectionProxyAddress, byPassCode, 0, {
-    //     from: whiteListSecondary,
-    // });
+    txHash3 = await whiteListInstance.addNewWallet(protectionProxyAddress, byPassCode, 0, {
+        from: whiteListSecondary,
+    });
     
-    // txHash4 =  await auctionRegistyInstance.registerContractAddress(
-    //     protectionCode,
-    //     protectionProxyAddress, {
-    //     from: otherSecondary
-    //     }
-    // );
+    txHash4 =  await auctionRegistyInstance.registerContractAddress(
+        protectionCode,
+        protectionProxyAddress, {
+        from: otherSecondary
+        }
+    );
 
-    // currentdata["ProtectionRegistry"] = ProtectionRegistry.address;
-    // currentdata["AuctionProtection"] = protectionProxyAddress;
-    // await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata,undefined,2));
+    currentdata["ProtectionRegistry"] = ProtectionRegistry.address;
+    currentdata["AuctionProtection"] = protectionProxyAddress;
+    await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata,undefined,2));
   
    
 
