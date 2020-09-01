@@ -121,7 +121,7 @@ contract ProxyOwnable is Constant {
     {
         require(
             _which != systemAddress &&
-                _which != authorityAddress
+                _which != authorityAddress,
             ERR_SAME_ADDRESS
         );
         newAuthorityAddress = _which;
