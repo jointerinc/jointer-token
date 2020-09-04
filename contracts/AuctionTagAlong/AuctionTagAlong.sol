@@ -5,7 +5,6 @@ import "../common/ProxyOwnable.sol";
 import "../Proxy/Upgradeable.sol";
 import "../common/TokenTransfer.sol";
 import "../InterFaces/IAuctionRegistery.sol";
-import "../InterFaces/IAuctionProtection.sol";
 import "../InterFaces/ICurrencyPrices.sol";
 import "../InterFaces/IERC20Token.sol";
 import "../InterFaces/IAuctionLiquadity.sol";
