@@ -9,7 +9,6 @@ contract AuctionStorage {
     address payable public currencyPricesAddress;
     address payable public vaultAddress;
     address payable public mainTokenAddress;
-    address payable public auctionProtectionAddress;
     address payable public liquadityAddress;
     address payable public companyFundWalletAddress;
     address payable public escrowAddress;
@@ -17,6 +16,8 @@ contract AuctionStorage {
     uint256 public constant PRICE_NOMINATOR = 10**9;
 
     uint256 public constant DECIMAL_NOMINATOR = 10**18;
+    
+    uint256 public constant PERCENT_NOMINATOR = 10**6;
 
     // allowed contarct limit the contribution
     uint256 public maxContributionAllowed;
@@ -101,7 +102,9 @@ contract AuctionStorage {
     uint256 public LAST_AUCTION_START;
 
     uint256 public INTERVAL;
-
+    
+    uint256 public currentMarketPrice;
+    
     event FundAdded(
         uint256 indexed _auctionDayId,
         uint256 _todayContribution,
@@ -135,5 +138,53 @@ contract AuctionStorage {
         uint256 _totalToken,
         uint256 lockedToken,
         uint256 _userToken
+    );
+    
+    // downside protection storage goes from here 
+    // timestamp for address where first lock happen
+    mapping(address => uint256) public lockedOn;
+
+    mapping(address => mapping(address => uint256)) public lockedFunds;
+
+    mapping(address => mapping(uint256 => mapping(address => uint256))) public currentLockedFunds;
+
+    mapping(address => uint256) public lockedTokens;
+    
+    event TokenUnLocked(address indexed _from, uint256 _tokenAmount);
+
+    event InvestMentCancelled(address indexed _from, uint256 _tokenAmount);
+
+    event FundLocked(address _token, address indexed _which, uint256 _amount);
+
+    event FundTransfer(address indexed _to, address _token, uint256 _amount);
+    
+    uint256 public totalTokenAmount;
+
+    mapping(uint256 => uint256) dayWiseRatio;
+
+    mapping(address => uint256) lastRound;
+
+    mapping(address => mapping(uint256 => uint256)) roundWiseToken;
+
+    mapping(address => uint256) stackBalance;
+    
+    uint256 public tokenLockDuration;
+
+    mapping(address => bool) public unLockBlock;
+    
+    mapping (address => uint256) totalLocked;
+
+    uint256 public vaultRatio;
+    
+    event StackAdded(
+        uint256 indexed _roundId,
+        address indexed _whom,
+        uint256 _amount
+    );
+
+    event StackRemoved(
+        uint256 indexed _roundId,
+        address indexed _whom,
+        uint256 _amount
     );
 }
