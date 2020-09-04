@@ -668,7 +668,7 @@ contract AuctionFundCollector is IndividualBonus {
         );
         
         require(
-            mainToken.balanceOf(_from) >= lockToken,
+            mainToken.balanceOf(_from) >= safeDiv(safeMul(lockToken,mainTokenRatio),100),
             "ERR_USER_DOES_NOT_HAVE_EQUAL_BALANCE"
         );
         
@@ -1155,6 +1155,7 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
     }
     
     
+
     //In case if there is other tokens into contract
     function returnFund(
         IERC20Token _token,
