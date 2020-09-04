@@ -753,7 +753,7 @@ contract AuctionFundCollector is IndividualBonus {
             _contributedAmount
         );
 
-        //_comprareForGroupBonus(_recipient);
+        _comprareForGroupBonus(_recipient);
 
         emit FundAdded(
             auctionDay,
@@ -1155,7 +1155,6 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
     }
     
     
-
     //In case if there is other tokens into contract
     function returnFund(
         IERC20Token _token,
