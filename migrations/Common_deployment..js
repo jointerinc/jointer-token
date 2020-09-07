@@ -14,7 +14,7 @@ const TagAlongRegistry = artifacts.require("TagAlongRegistry");
 const TagAlong = artifacts.require("AuctionTagAlong");
 
 const ProtectionRegistry = artifacts.require("ProtectionRegistry");
-const AuctionProtection = artifacts.require("AuctionProtection");
+// const AuctionProtection = artifacts.require("AuctionProtection");
 
 
 const SmartToken = TruffleContract(require("../test/bancorArtifacts/SmartToken.json"));

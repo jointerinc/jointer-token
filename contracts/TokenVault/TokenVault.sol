@@ -63,8 +63,8 @@ contract TokenSpenders is AuctionRegistery,SafeMath {
         _;
     }
     
-    function addSpender(address _which) external onlyAuthorized() returns(bool){
-        
+    // once all spender from copany set we give authority to govenranacne 
+    function addSpender(address _which) external onlyOwner() returns(bool){
         require(isSpender[_which] == false,ERR_AUTHORIZED_ADDRESS_ONLY);
         isSpender[_which] = true;
         spenderIndex[_which] = spenders.length;

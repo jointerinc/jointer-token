@@ -9,7 +9,7 @@ const whiteListSecondary = "0xF30b7e1BB257F9D4C83f5fB18e47c6dcD60C54da";
 const auctionSecondary = "0x7F803ca9cD6721b7687767E1B6f1533e966BD524";
 const otherSecondary = "0x38e07d1C3b3e78F065dEC790a9d3b5553F602E14";
 
-const governance = "0x56C0D40a90B084c079778a25c56982E22A1aF5e3";
+const governance = "0xd3411ca38F5256154d25E949a3F0E7E9646D4Eac";
 const escrow = "0x0Cdb8BA7e9D0A6039d9FD8556957F979A35FFB11";
 
 
@@ -42,9 +42,9 @@ const byPassCode = 8195;
 const bancorCode = 16384;
 
 const starTime = 1598032158;
-const minAuctionTime = 82800;
-const intervalTime = 86400;
-const mainTokenCheckDay = 21;
+const minAuctionTime = 60;
+const intervalTime = 60;
+const mainTokenCheckDay = 300;
 
 module.exports = {
     governance:governance,
