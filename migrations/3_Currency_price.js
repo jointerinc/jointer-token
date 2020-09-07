@@ -102,10 +102,11 @@ module.exports = async function (deployer) {
       to: bntPriceTracker,
       value: "15000000000000000",
     });
+    await bntPriceTrackerInstance.update({from:otherSecondary});
     await CurrencyPricesInstnace.setCurrencyPriceContract(baseTokenAddress,bntPriceTracker,{
         from: otherSecondary
     });
-    await bntPriceTracker.update({from:otherSecondary});
+    
 
     await AuctionRegistyInstance.registerContractAddress(
         currencyCode,
