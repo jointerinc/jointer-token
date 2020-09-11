@@ -7,7 +7,7 @@ import "../common/TokenTransfer.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/ICurrencyPrices.sol";
 import "../InterFaces/IERC20Token.sol";
-import "../InterFaces/IAuctionLiquadity.sol";
+import "../InterFaces/IAuctionLiquidity.sol";
 import "../InterFaces/IAuction.sol";
 import "../InterFaces/ITokenVault.sol";
 
@@ -22,7 +22,7 @@ interface TagAlongInitializeInterface {
 
 contract RegisteryTagAlong is ProxyOwnable, AuctionRegisteryContracts {
     IAuctionRegistery public contractsRegistry;
-    address payable public liquadityAddress;
+    address payable public LiquidityAddress;
 
     event FundDeposited(address _token, address _from, uint256 _amount);
 
@@ -60,7 +60,7 @@ contract RegisteryTagAlong is ProxyOwnable, AuctionRegisteryContracts {
     this decision was made to save gas that occurs from calling an external view function */
 
     function _updateAddresses() internal {
-        liquadityAddress = getAddressOf(LIQUADITY);
+        LiquidityAddress = getAddressOf(Liquidity);
     }
 
     function updateAddresses() external returns (bool) {
@@ -69,7 +69,7 @@ contract RegisteryTagAlong is ProxyOwnable, AuctionRegisteryContracts {
     }
 }
 
-contract AuctionTagAlong is
+contract ContributionTrigger is
     Upgradeable,
     RegisteryTagAlong,
     TokenTransfer,
@@ -90,11 +90,11 @@ contract AuctionTagAlong is
         );
     }
 
-    function contributeTowardLiquadity(uint256 _amount)
+    function contributeTowardLiquidity(uint256 _amount)
         external
         returns (uint256)
     {
-        require(msg.sender == liquadityAddress, "ERR_ONLY_LIQUADITY_ALLOWED");
+        require(msg.sender == LiquidityAddress, "ERR_ONLY_Liquidity_ALLOWED");
 
         if (_amount > address(this).balance) {
             uint256 _newamount = address(this).balance;
@@ -106,12 +106,12 @@ contract AuctionTagAlong is
     }
 
     // relay token and bnt token
-    function transferTokenLiquadity(
+    function transferTokenLiquidity(
         IERC20Token _token,
         address _reciver,
         uint256 _amount
     ) external returns (bool) {
-        require(msg.sender == liquadityAddress, "ERR_ONLY_LIQUADITY_ALLOWED");
+        require(msg.sender == LiquidityAddress, "ERR_ONLY_Liquidity_ALLOWED");
         ensureTransferFrom(_token, address(this), _reciver, _amount);
         return true;
     }
