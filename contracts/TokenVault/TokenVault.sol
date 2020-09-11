@@ -15,7 +15,7 @@ interface InitializeInterface {
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress,
-        address _registeryAddress
+        address _registryaddress
     ) external;
 }
 
@@ -101,10 +101,10 @@ contract TokenVault is
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress,
-        address _registeryAddress
+        address _registryaddress
     ) public {
         super.initialize();
-        contractsRegistry = IAuctionRegistery(_registeryAddress);
+        contractsRegistry = IAuctionRegistery(_registryaddress);
         _updateAddresses();
         initializeOwner(
             _primaryOwner,

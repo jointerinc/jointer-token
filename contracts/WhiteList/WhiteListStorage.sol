@@ -53,17 +53,16 @@ contract WhiteListStorage {
     uint256 public constant ACCREDIATED_INVESTOR = 1 << 2;
     uint256 public constant QUALIFIED_INVESTOR = 1 << 3;
     uint256 public constant RETAIL_INVESTOR = 1 << 4;
-    uint256 public constant IS_ALLOWED_BUYBACK = 1 << 5;
-    uint256 public constant DECENTRALIZE_EXCHANGE = 1 << 6; // wallet of decentralize exchanges
-    uint256 public constant CENTRALIZE_EXCHANGE = 1 << 7; // wallet of centralize exchanges
-    uint256 public constant IS_ALLOWED_ETN = 1 << 8;
-    uint256 public constant IS_ALLOWED_STOCK = 1 << 9;
-    uint256 public constant FROM_USA = 1 << 10;
-    uint256 public constant FROM_CHINA = 1 << 11;
-    uint256 public constant FROM_EU = 1 << 12;
-    uint256 public constant IS_BYPASSED = 1 << 13;
-    uint256 public constant BANCOR_ADDRESS = 1 << 14;
-    uint256 public constant IS_ALLOWED_AUCTION = 1 << 15;
+    uint256 public constant DECENTRALIZE_EXCHANGE = 1 << 5; // wallet of decentralize exchanges
+    uint256 public constant CENTRALIZE_EXCHANGE = 1 << 6; // wallet of centralize exchanges
+    uint256 public constant IS_ALLOWED_ETN = 1 << 7;
+    uint256 public constant IS_ALLOWED_STOCK = 1 << 8;
+    uint256 public constant FROM_USA = 1 << 9;
+    uint256 public constant FROM_CHINA = 1 << 10;
+    uint256 public constant FROM_EU = 1 << 11;
+    uint256 public constant IS_BYPASSED = 1 << 12;
+    uint256 public constant BANCOR_ADDRESS = 1 << 13;
+    uint256 public constant IS_ALLOWED_AUCTION = 1 << 14;
     
     event AccountWhiteListed(address indexed which, uint256 flags);
     event WalletAdded(address indexed from, address indexed which);

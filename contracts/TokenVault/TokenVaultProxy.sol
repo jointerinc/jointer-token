@@ -10,7 +10,7 @@ interface VaultProxyInitializeInterface {
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress,
-        address _registeryAddress
+        address _registryaddress
     ) external;
 }
 
@@ -71,7 +71,7 @@ contract TokenVaultRegistery is Ownable, IRegistry {
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress,
-        address _registeryAddress
+        address _registryaddress
     ) public onlyOneOfOnwer() returns (address) {
         require(proxyAddress == address(0), "ERR_PROXY_ALREADY_CREATED");
 
@@ -81,7 +81,7 @@ contract TokenVaultRegistery is Ownable, IRegistry {
             _primaryOwner,
             _systemAddress,
             _authorityAddress,
-            _registeryAddress
+            _registryaddress
         );
 
         currentVersion = version;

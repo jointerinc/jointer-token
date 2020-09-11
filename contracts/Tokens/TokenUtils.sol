@@ -17,11 +17,11 @@ contract RegisteryToken is AuctionRegisteryContracts, Ownable {
     address public auctionAddress;
 
     /**@dev sets the initial registry address */
-    constructor(address _registeryAddress)
+    constructor(address _registryaddress)
         public
-        notZeroAddress(_registeryAddress)
+        notZeroAddress(_registryaddress)
     {
-        contractsRegistry = IAuctionRegistery(_registeryAddress);
+        contractsRegistry = IAuctionRegistery(_registryaddress);
         _updateAddresses();
     }
 
@@ -72,17 +72,17 @@ contract TokenUtils is StandardToken, RegisteryToken {
      *@param _symbol symbol of the token
      *@param _systemAddress address that acts as an admin of the system
      *@param _authorityAddress address that can change the systemAddress
-     *@param _registeryAddress address of the registry contract the keeps track of all the contract Addresses
+     *@param _registryaddress address of the registry contract the keeps track of all the contract Addresses
      **/
     constructor(
         string memory _name,
         string memory _symbol,
         address _systemAddress,
         address _authorityAddress,
-        address _registeryAddress
+        address _registryaddress
     )
         public
         StandardToken(_name, _symbol, _systemAddress, _authorityAddress)
-        RegisteryToken(_registeryAddress)
+        RegisteryToken(_registryaddress)
     {}
 }

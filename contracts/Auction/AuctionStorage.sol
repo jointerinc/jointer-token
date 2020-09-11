@@ -22,9 +22,9 @@ contract AuctionStorage {
     // allowed contarct limit the contribution
     uint256 public maxContributionAllowed;
     // managment fee to run auction cut from basesupply
-    uint256 public mangmentFee;
-    // stacking percentage
-    uint256 public stacking;
+    uint256 public managementFee;
+    // staking percentage
+    uint256 public staking;
     // fund that will be locked in contacrt
     uint256 public downSideProtectionRatio;
     // Fund goes to companyWallet
@@ -45,7 +45,7 @@ contract AuctionStorage {
     // yesterday's contribution
     uint256 public yesterdayContribution;
     // allowed max contribution in a day
-    uint256 public allowedMaxContribution;
+    uint256 public allowMaxContribution;
     // yesterday token Supply
     uint256 public yesterdaySupply;
     // today token supply
@@ -89,10 +89,10 @@ contract AuctionStorage {
     mapping(uint256 => uint256) public indexReturn;
 
     // day wiser five top contributor
-    mapping(uint256 => mapping(uint256 => address)) public topFiveContributior;
+    mapping(uint256 => mapping(uint256 => address)) public topFiveContributor;
 
     //contributor Index
-    mapping(uint256 => mapping(address => uint256)) public topContributiorIndex;
+    mapping(uint256 => mapping(address => uint256)) public topContributorIndex;
 
     // check if daywise token disturbuted
     mapping(uint256 => mapping(address => bool)) public returnToken;

@@ -23,7 +23,7 @@ interface LiquidityInitializeInterface {
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress,
-        address _registeryAddress,
+        address _registryaddress,
         uint256 _baseLinePrice
     ) external;
 }
@@ -327,7 +327,7 @@ contract Liquidity is
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress,
-        address _registeryAddress,
+        address _registryaddress,
         uint256 _baseLinePrice
     ) public {
         super.initialize();
@@ -350,7 +350,7 @@ contract Liquidity is
         etherToken = _etherToken;
         ethRelayToken = _ethRelayToken;
 
-        contractsRegistry = IAuctionRegistery(_registeryAddress);
+        contractsRegistry = IAuctionRegistery(_registryaddress);
         lastReserveBalance = IERC20Token(baseToken).balanceOf(converter);
         tokenAuctionEndPrice = _getCurrentMarketPrice();
         _updateAddresses();
@@ -720,11 +720,7 @@ contract Liquidity is
         address primaryWallet = IWhiteList(whiteListAddress).address_belongs(
             _reciver
         );
-        require(
-            IWhiteList(whiteListAddress).isAllowedBuyBack(primaryWallet),
-            "ERR_NOT_ALLOWED_BUYBACK"
-        );
-
+       
         uint256 auctionDay = IAuction(auctionAddress).auctionDay();
 
         require(primaryWallet != address(0), "ERR_WHITELIST");

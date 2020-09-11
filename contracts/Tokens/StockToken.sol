@@ -11,7 +11,7 @@ contract StockToken is Exchangeable {
      *@param _symbol symbol of the token
      *@param _systemAddress address that acts as an admin of the system
      *@param _authorityAddress address that can change the systemAddress
-     *@param _registeryAddress address of the registry contract the keeps track of all the contract Addresses
+     *@param _registryaddress address of the registry contract the keeps track of all the contract Addresses
      *@param _returnToken address of the token user gets back when system forces them to convert(maintoken)
      *@param _which array of address to mint tokens to
      *@param _amount array of corresponding amount getting minted
@@ -21,7 +21,7 @@ contract StockToken is Exchangeable {
         string memory _symbol,
         address _systemAddress,
         address _authorityAddress,
-        address _registeryAddress,
+        address _registryaddress,
         address _returnToken,
         address[] memory _which,
         uint256[] memory _amount
@@ -32,7 +32,7 @@ contract StockToken is Exchangeable {
             _symbol,
             _systemAddress,
             _authorityAddress,
-            _registeryAddress
+            _registryaddress
         )
         ForceSwap(_returnToken)
     {
