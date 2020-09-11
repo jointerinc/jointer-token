@@ -29,7 +29,9 @@ const {
     bancorCode,
     bancorConverterAddress,
     ethBaseTokenRelayAddress,
+    etherTokenAddress,
     bancorNetworkAddress,
+    ethRelayTokenAddress,
     ethTokenAddress,
     baseLinePrice
 } = require("../constant");
@@ -101,6 +103,8 @@ module.exports = async function (deployer) {
         baseTokenAddress,
         mainToken,
         relayTokenAddress,
+        etherTokenAddress,
+        ethRelayTokenAddress
         ownerWallet,
         otherSecondary,
         governance,
