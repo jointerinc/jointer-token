@@ -11,7 +11,7 @@ import "../InterFaces/IAuctionLiquidity.sol";
 import "../InterFaces/IAuction.sol";
 import "../InterFaces/ITokenVault.sol";
 
-interface TagAlongInitializeInterface {
+interface ContributionTriggerInitializeInterface {
     function initialize(
         address _primaryOwner,
         address _systemAddress,
@@ -20,7 +20,7 @@ interface TagAlongInitializeInterface {
     ) external;
 }
 
-contract RegisteryTagAlong is ProxyOwnable, AuctionRegisteryContracts {
+contract RegisteryContributionTrigger is ProxyOwnable, AuctionRegisteryContracts {
     IAuctionRegistery public contractsRegistry;
     address payable public LiquidityAddress;
 
@@ -71,9 +71,9 @@ contract RegisteryTagAlong is ProxyOwnable, AuctionRegisteryContracts {
 
 contract ContributionTrigger is
     Upgradeable,
-    RegisteryTagAlong,
+    RegisteryContributionTrigger,
     TokenTransfer,
-    TagAlongInitializeInterface
+    ContributionTriggerInitializeInterface
 {
     function initialize(
         address _primaryOwner,
