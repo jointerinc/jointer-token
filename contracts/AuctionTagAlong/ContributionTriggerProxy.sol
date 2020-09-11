@@ -5,7 +5,7 @@ import "../common/Ownable.sol";
 import "../Proxy/UpgradeabilityProxy.sol";
 import "../InterFaces/IERC20Token.sol";
 
-interface TagAlongProxyInitializeInterface {
+interface ContributionTriggerProxyInitializeInterface {
     function initialize(
         address _primaryOwner,
         address _systemAddress,
@@ -76,7 +76,7 @@ contract TagAlongRegistry is Ownable, IRegistry {
 
         UpgradeabilityProxy proxy = new UpgradeabilityProxy(version);
 
-        TagAlongProxyInitializeInterface(address(proxy)).initialize(
+        ContributionTriggerProxyInitializeInterface(address(proxy)).initialize(
             _primaryOwner,
             _systemAddress,
             _multisigAdress,
