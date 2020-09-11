@@ -2,7 +2,7 @@ pragma solidity ^0.5.9;
 import "../InterFaces/IERC20Token.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 
-contract LiquadityStorage {
+contract LiquidityStorage {
     bytes32 internal constant BANCOR_FORMULA = "BancorFormula";
     bytes32 internal constant BANCOR_NETWORK = "BancorNetwork";
     uint256 public constant BIG_NOMINATOR = 10**24;

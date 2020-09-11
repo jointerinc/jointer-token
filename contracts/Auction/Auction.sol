@@ -6,10 +6,10 @@ import "../common/SafeMath.sol";
 import "../common/TokenTransfer.sol";
 import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
-import "../InterFaces/IAuctionTagAlong.sol";
+import "../InterFaces/IContributionTrigger.sol";
 import "../InterFaces/IERC20Token.sol";
 import "../InterFaces/ICurrencyPrices.sol";
-import "../InterFaces/IAuctionLiquadity.sol";
+import "../InterFaces/IAuctionLiquidity.sol";
 import "../InterFaces/ITokenVault.sol";
 import "../InterFaces/IToken.sol";
 import "../InterFaces/IWhiteList.sol";
@@ -62,7 +62,7 @@ contract RegisteryAuction is ProxyOwnable, AuctionRegisteryContracts,AuctionStor
         currencyPricesAddress = getAddressOf(CURRENCY);
         vaultAddress = getAddressOf(VAULT);
         mainTokenAddress = getAddressOf(MAIN_TOKEN);
-        liquadityAddress = getAddressOf(LIQUADITY);
+        LiquidityAddress = getAddressOf(Liquidity);
         companyFundWalletAddress = getAddressOf(COMPANY_FUND_WALLET);
         escrowAddress = getAddressOf(ESCROW);
 
@@ -307,13 +307,13 @@ contract DownsideProtection is Upgradeable, Stacking {
                 100
             );
             
-            uint256 liquadityAmount = safeSub(_tokenBalance, walletAmount);
+            uint256 LiquidityAmount = safeSub(_tokenBalance, walletAmount);
 
-            liquadityAddress.transfer(liquadityAmount);
+            LiquidityAddress.transfer(LiquidityAmount);
             
             companyFundWalletAddress.transfer(walletAmount);
             
-            emit FundTransfer(liquadityAddress, address(0), liquadityAmount);
+            emit FundTransfer(LiquidityAddress, address(0), LiquidityAmount);
             emit FundTransfer(
                 companyFundWalletAddress,
                 address(0),
@@ -814,20 +814,20 @@ contract AuctionFundCollector is IndividualBonus {
         return true;
     }
     
-    function pushEthToLiquadity() external returns(bool){
+    function pushEthToLiquidity() external returns(bool){
         
         uint256 downSideEther = totalLocked[address(0)];
         
         uint256 currentBalance = address(this).balance;
         
-        uint256 pushToLiquadity = safeSub(currentBalance,downSideEther);
+        uint256 pushToLiquidity = safeSub(currentBalance,downSideEther);
         
-        if(pushToLiquadity > 0){
+        if(pushToLiquidity > 0){
             
-            uint256 realEstateAmount = safeDiv(safeMul(pushToLiquadity,fundWalletRatio),100);                
+            uint256 realEstateAmount = safeDiv(safeMul(pushToLiquidity,fundWalletRatio),100);                
             companyFundWalletAddress.transfer(realEstateAmount); 
-            uint256 reserveAmount = safeSub(pushToLiquadity,realEstateAmount);
-            currentMarketPrice = IAuctionLiquadity(liquadityAddress)
+            uint256 reserveAmount = safeSub(pushToLiquidity,realEstateAmount);
+            currentMarketPrice = IAuctionLiquidity(LiquidityAddress)
              .contributeWithEther
              .value(reserveAmount)();
              
@@ -922,7 +922,7 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
             uint256 _ethPrice = ICurrencyPrices(currencyPricesAddress)
                 .getCurrencyPrice(address(0));
 
-            uint256 mainReserveAmount = IAuctionLiquadity(liquadityAddress)
+            uint256 mainReserveAmount = IAuctionLiquidity(LiquidityAddress)
                 .contributeTowardMainReserve();
 
             uint256 mainReserveAmountUsd = safeDiv(
@@ -1047,7 +1047,7 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         yesterdaySupply = dayWiseSupply[auctionDay];
         yesterdayContribution = todayContribution;
         auctionDay = safeAdd(auctionDay, 1);
-        IAuctionLiquadity(liquadityAddress).auctionEnded();
+        IAuctionLiquidity(LiquidityAddress).auctionEnded();
         dayWiseDownSideProtectionRatio[auctionDay] = downSideProtectionRatio;
         LAST_AUCTION_START = safeAdd(LAST_AUCTION_START, INTERVAL);
         todayContribution = 0;

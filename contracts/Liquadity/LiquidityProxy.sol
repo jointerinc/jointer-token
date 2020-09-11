@@ -25,7 +25,7 @@ interface InitializeInterface {
  * @title Registry
  * @dev This contract works as a registry of versions, it holds the implementations for the registered versions.
  */
-contract LiquadityRegistery is Ownable, IRegistry {
+contract LiquidityRegistery is Ownable, IRegistry {
     // Mapping of versions to implementations of different functions
     mapping(uint256 => address) internal versions;
 

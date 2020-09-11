@@ -1,18 +1,18 @@
 pragma solidity ^0.5.9;
 
-import "./LiquadityStorage.sol";
+import "./LiquidityStorage.sol";
 import "../common/SafeMath.sol";
 import "../common/ProxyOwnable.sol";
 import "../common/TokenTransfer.sol";
 import "../Proxy/Upgradeable.sol";
-import "../InterFaces/IAuctionTagAlong.sol";
+import "../InterFaces/IContributionTrigger.sol";
 import "../InterFaces/ICurrencyPrices.sol";
 import "../InterFaces/IERC20Token.sol";
 import "../InterFaces/IAuction.sol";
 import "../InterFaces/ITokenVault.sol";
 import "../InterFaces/IWhiteList.sol";
 
-interface LiquadityInitializeInterface {
+interface LiquidityInitializeInterface {
     function initialize(
         address _converter,
         address _baseToken,
@@ -82,7 +82,7 @@ interface IBancorConverter {
     ) external;
 }
 
-contract BancorConverterLiquadity is ProxyOwnable, SafeMath, LiquadityStorage {
+contract BancorConverterLiquidity is ProxyOwnable, SafeMath, LiquidityStorage {
     function updateConverter(address _converter)
         public
         onlyOwner()
@@ -131,8 +131,8 @@ contract BancorConverterLiquadity is ProxyOwnable, SafeMath, LiquadityStorage {
     }
 }
 
-contract RegisteryLiquadity is
-    BancorConverterLiquadity,
+contract RegisteryLiquidity is
+    BancorConverterLiquidity,
     AuctionRegisteryContracts
 {
     function updateRegistery(address _address)
@@ -174,7 +174,7 @@ contract RegisteryLiquadity is
     }
 }
 
-contract LiquadityUtils is RegisteryLiquadity {
+contract LiquidityUtils is RegisteryLiquidity {
     modifier allowedAddressOnly(address _which) {
         require(_which == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
         _;
@@ -261,7 +261,7 @@ contract LiquadityUtils is RegisteryLiquadity {
     }
 }
 
-contract LiquadityFormula is LiquadityUtils {
+contract LiquidityFormula is LiquidityUtils {
     // current market price calculate according to baseLinePrice
     // if baseToken Price differ from
     function _getCurrentMarketPrice() internal view returns (uint256) {
@@ -283,7 +283,7 @@ contract LiquadityFormula is LiquadityUtils {
         return safeDiv(safeMul(ratio, baseLinePrice), BIG_NOMINATOR);
     }
 
-    function calculateLiquadityMainReserve(
+    function calculateLiquidityMainReserve(
         uint256 yesterdayPrice,
         uint256 dayBeforyesterdayPrice,
         uint256 yesterDaycontibution,
@@ -311,11 +311,11 @@ contract LiquadityFormula is LiquadityUtils {
     }
 }
 
-contract Liquadity is
+contract Liquidity is
     Upgradeable,
-    LiquadityFormula,
+    LiquidityFormula,
     TokenTransfer,
-    LiquadityInitializeInterface
+    LiquidityInitializeInterface
 {
     function initialize(
         address _converter,
@@ -664,7 +664,7 @@ contract Liquadity is
         }
 
         // this change because we convert all base token to ether
-        if (totalEthAmount > address(this).balance) {
+        if (address(this).balance >= totalEthAmount ) {
             IBancorNetwork(bancorNetwork).convertByPath.value(totalEthAmount)(
                 ethToMainToken,
                 totalEthAmount,
@@ -797,7 +797,7 @@ contract Liquadity is
                 safeSub(auctionDay, 1)
             );
 
-            virtualReserverDivisor = calculateLiquadityMainReserve(
+            virtualReserverDivisor = calculateLiquidityMainReserve(
                 _yesterdayPrice,
                 _dayBeforePrice,
                 _yesterdayContribution,
@@ -830,7 +830,7 @@ contract Liquadity is
             safeMul(100, PRICE_NOMINATOR)
         );
 
-        IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
+        IContributionTrigger(tagAlongAddress).transferTokenLiquidity(
             IERC20Token(relayToken),
             address(this),
             sellRelay
@@ -887,9 +887,9 @@ contract Liquadity is
         returns (bool)
     {
         if (address(_token) == address(0))
-            IAuctionTagAlong(tagAlongAddress).contributeTowardLiquadity(_value);
+            IContributionTrigger(tagAlongAddress).contributeTowardLiquidity(_value);
         else
-            IAuctionTagAlong(tagAlongAddress).transferTokenLiquadity(
+            IContributionTrigger(tagAlongAddress).transferTokenLiquidity(
                 _token,
                 address(this),
                 _value

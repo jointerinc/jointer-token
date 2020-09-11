@@ -9,7 +9,7 @@ contract AuctionStorage {
     address payable public currencyPricesAddress;
     address payable public vaultAddress;
     address payable public mainTokenAddress;
-    address payable public liquadityAddress;
+    address payable public LiquidityAddress;
     address payable public companyFundWalletAddress;
     address payable public escrowAddress;
 
