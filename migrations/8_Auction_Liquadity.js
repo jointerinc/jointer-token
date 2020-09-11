@@ -104,7 +104,7 @@ module.exports = async function (deployer) {
         mainToken,
         relayTokenAddress,
         etherTokenAddress,
-        ethRelayTokenAddress
+        ethRelayTokenAddress,
         ownerWallet,
         otherSecondary,
         governance,
