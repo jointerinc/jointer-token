@@ -202,15 +202,7 @@ contract LiquadityUtils is RegisteryLiquadity {
         return _updateTokenPath();
     }
 
-    function setMaxIteration(uint256 _maxIteration)
-        public
-        onlyOwner()
-        returns (bool)
-    {
-        maxIteration = _maxIteration;
-        return true;
-    }
-
+    
     function setSideReseverRatio(uint256 _sideReseverRatio)
         public
         onlyOwner()
