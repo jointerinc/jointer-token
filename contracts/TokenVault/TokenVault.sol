@@ -57,13 +57,12 @@ contract AuctionRegistery is ProxyOwnable,TokenVaultStorage, AuctionRegisteryCon
 contract TokenSpenders is AuctionRegistery,SafeMath {
     
     
-   
     modifier onlySpender() {
         require(isSpender[msg.sender],ERR_AUTHORIZED_ADDRESS_ONLY);
         _;
     }
     
-    // once all spender from copany set we give authority to govenranacne 
+    // once all spender from set give authority to govenranacne 
     function addSpender(address _which) external onlyOwner() returns(bool){
         require(isSpender[_which] == false,ERR_AUTHORIZED_ADDRESS_ONLY);
         isSpender[_which] = true;
