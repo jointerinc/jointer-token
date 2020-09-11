@@ -15,7 +15,7 @@ interface InitializeInterface {
         uint256 _mainMaturityDays,
         uint256 _etnMaturityDays,
         uint256 _stockMaturityDays,
-        address _registeryAddress
+        address _registryaddress
     ) external;
 }
 
@@ -81,7 +81,7 @@ contract WhiteListRegistery is Ownable, IRegistry {
         uint256 _mainMaturityDays,
         uint256 _etnMaturityDays,
         uint256 _stockMaturityDays,
-        address _registeryAddress
+        address _registryaddress
     ) public onlyOneOfOnwer() returns (address) {
         require(proxyAddress == address(0), "ERR_PROXY_ALREADY_CREATED");
 
@@ -97,7 +97,7 @@ contract WhiteListRegistery is Ownable, IRegistry {
             _mainMaturityDays,
             _etnMaturityDays,
             _stockMaturityDays,
-            _registeryAddress
+            _registryaddress
         );
 
         currentVersion = version;

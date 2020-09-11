@@ -14,7 +14,7 @@ interface AuctionProxyInitializeInterface {
         address _primaryOwner,
         address _systemAddress,
         address _multisigAddress,
-        address _registeryAddress
+        address _registryaddress
     ) external;
 }
 
@@ -78,7 +78,7 @@ contract AuctionProxyRegistry is Ownable, IRegistry {
         address _primaryOwner,
         address _systemAddress,
         address _multisigAddress,
-        address _registeryAddress
+        address _registryaddress
     ) external onlyOneOfOnwer() returns (address) {
         require(proxyAddress == address(0), "ERR_PROXY_ALREADY_CREATED");
 
@@ -92,7 +92,7 @@ contract AuctionProxyRegistry is Ownable, IRegistry {
             _primaryOwner,
             _systemAddress,
             _multisigAddress,
-            _registeryAddress
+            _registryaddress
         );
 
         currentVersion = version;

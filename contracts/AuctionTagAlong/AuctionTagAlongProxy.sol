@@ -10,7 +10,7 @@ interface TagAlongProxyInitializeInterface {
         address _primaryOwner,
         address _systemAddress,
         address _multisigAdress,
-        address _registeryAddress
+        address _registryaddress
     ) external;
 }
 
@@ -70,7 +70,7 @@ contract TagAlongRegistry is Ownable, IRegistry {
         address _primaryOwner,
         address _systemAddress,
         address _multisigAdress,
-        address _registeryAddress
+        address _registryaddress
     ) external onlyOneOfOnwer() returns (address) {
         require(proxyAddress == address(0), "ERR_PROXY_ALREADY_CREATED");
 
@@ -80,7 +80,7 @@ contract TagAlongRegistry is Ownable, IRegistry {
             _primaryOwner,
             _systemAddress,
             _multisigAdress,
-            _registeryAddress
+            _registryaddress
         );
 
         currentVersion = version;

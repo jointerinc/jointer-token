@@ -9,8 +9,6 @@ interface IWhiteList {
 
     function isAddressByPassed(address _which) external view returns (bool);
 
-    function isAllowedBuyBack(address _which) external view returns (bool);
-
     function isExchangeAddress(address _which) external view returns (bool);
 
     function main_isTransferAllowed(

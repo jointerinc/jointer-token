@@ -16,7 +16,7 @@ interface InitializeInterface {
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress,
-        address _registeryAddress,
+        address _registryaddress,
         uint256 _baseLinePrice
     ) external;
 }
@@ -83,7 +83,7 @@ contract LiquidityRegistery is Ownable, IRegistry {
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress,
-        address _registeryAddress,
+        address _registryaddress,
         uint256 _baseLinePrice
     ) external onlyOneOfOnwer() returns (address) {
         require(proxyAddress == address(0), "ERR_PROXY_ALREADY_CREATED");
@@ -100,7 +100,7 @@ contract LiquidityRegistery is Ownable, IRegistry {
             _primaryOwner,
             _systemAddress,
             _authorityAddress,
-            _registeryAddress,
+            _registryaddress,
             _baseLinePrice
         );
 

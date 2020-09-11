@@ -17,7 +17,7 @@ interface WhiteListInitializeInterface {
         uint256 _mainMaturityDays,
         uint256 _etnMaturityDays,
         uint256 _stockMaturityDays,
-        address _registeryAddress
+        address _registryaddress
     ) external;
 }
 
@@ -88,12 +88,12 @@ contract WhiteList is
         uint256 _mainMaturityDays,
         uint256 _etnMaturityDays,
         uint256 _stockMaturityDays,
-        address _registeryAddress
+        address _registryaddress
     ) public {
         super.initialize();
 
         initializeOwner(_primaryOwner, _systemAddress, _authorityAddress);
-        contractsRegistry = IAuctionRegistery(_registeryAddress);
+        contractsRegistry = IAuctionRegistery(_registryaddress);
         
         tokenToMaturityDaysTimeStamp[0] = convertDaysToTimeStamp(
             _mainMaturityDays
@@ -168,12 +168,7 @@ contract WhiteList is
         return _checkRule(flags, IS_ALLOWED_AUCTION, IS_ALLOWED_AUCTION);
     }
 
-    /**@dev checks if _which is allowed with buyback or not */
-    function isAllowedBuyBack(address _which) external view returns (bool) {
-        address primaryAddress = address_belongs[_which];
-        uint256 flags = user_details[primaryAddress].flags;
-        return _checkRule(flags, IS_ALLOWED_BUYBACK, IS_ALLOWED_BUYBACK);
-    }
+    
 
     /**@dev checks if address is allowed in auction or not */
     function checkRule(address _which, uint256 _condition)

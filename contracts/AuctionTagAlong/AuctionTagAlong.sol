@@ -16,7 +16,7 @@ interface TagAlongInitializeInterface {
         address _primaryOwner,
         address _systemAddress,
         address _multisigAdress,
-        address _registeryAddress
+        address _registryaddress
     ) external;
 }
 
@@ -30,10 +30,10 @@ contract RegisteryTagAlong is ProxyOwnable, AuctionRegisteryContracts {
         address _primaryOwner,
         address _systemAddress,
         address _multisigAdress,
-        address _registeryAddress
+        address _registryaddress
     ) internal {
         initializeOwner(_primaryOwner, _systemAddress, _multisigAdress);
-        contractsRegistry = IAuctionRegistery(_registeryAddress);
+        contractsRegistry = IAuctionRegistery(_registryaddress);
         _updateAddresses();
     }
 
@@ -79,14 +79,14 @@ contract ContributionTrigger is
         address _primaryOwner,
         address _systemAddress,
         address _multisigAdress,
-        address _registeryAddress
+        address _registryaddress
     ) external {
         super.initialize();
         initilizeRegistry(
             _primaryOwner,
             _systemAddress,
             _multisigAdress,
-            _registeryAddress
+            _registryaddress
         );
     }
 
