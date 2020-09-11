@@ -5,12 +5,14 @@ import "../common/Ownable.sol";
 import "../Proxy/UpgradeabilityProxy.sol";
 import "../InterFaces/IERC20Token.sol";
 
-interface LiquadityProxyInitializeInterface {
+interface InitializeInterface {
     function initialize(
         address _converter,
         address _baseToken,
         address _mainToken,
         address _relayToken,
+        address _etherToken,
+        address _ethRelayToken,
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress,
@@ -19,17 +21,16 @@ interface LiquadityProxyInitializeInterface {
     ) external;
 }
 
-
 /**
  * @title Registry
  * @dev This contract works as a registry of versions, it holds the implementations for the registered versions.
  */
 contract LiquadityRegistery is Ownable, IRegistry {
     // Mapping of versions to implementations of different functions
-    mapping(uint256 => address) internal versions;   
-     
+    mapping(uint256 => address) internal versions;
+
     uint256 public currentVersion;
-    
+
     address payable public proxyAddress;
 
     //@dev constructor
@@ -72,51 +73,51 @@ contract LiquadityRegistery is Ownable, IRegistry {
      * @return address of the new proxy created
      */
     function createProxy(
-        uint256  version,
+        uint256 version,
         address _converter,
         address _baseToken,
         address _mainToken,
         address _relayToken,
+        address _etherToken,
+        address _ethRelayToken,
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress,
         address _registeryAddress,
         uint256 _baseLinePrice
-        
     ) external onlyOneOfOnwer() returns (address) {
-        
-        require(proxyAddress == address(0),"ERR_PROXY_ALREADY_CREATED");
-        
+        require(proxyAddress == address(0), "ERR_PROXY_ALREADY_CREATED");
+
         UpgradeabilityProxy proxy = new UpgradeabilityProxy(version);
-        
-        LiquadityProxyInitializeInterface(address(proxy)).initialize(
+
+        InitializeInterface(address(proxy)).initialize(
             _converter,
             _baseToken,
             _mainToken,
             _relayToken,
+            _etherToken,
+            _ethRelayToken,
             _primaryOwner,
             _systemAddress,
             _authorityAddress,
             _registeryAddress,
             _baseLinePrice
         );
-        
+
         currentVersion = version;
         proxyAddress = address(proxy);
         emit ProxyCreated(address(proxy));
         return address(proxy);
     }
-    
 
     /**
      * @dev Upgrades the implementation to the requested version
      * @param version representing the version name of the new implementation to be set
      */
-    
-    function upgradeTo(uint256 version) public onlyAuthorized() returns(bool) {
+
+    function upgradeTo(uint256 version) public onlyAuthorized() returns (bool) {
         currentVersion = version;
         UpgradeabilityProxy(proxyAddress).upgradeTo(version);
         return true;
     }
-    
 }
