@@ -62,7 +62,7 @@ contract RegisteryAuction is ProxyOwnable, AuctionRegisteryContracts,AuctionStor
         currencyPricesAddress = getAddressOf(CURRENCY);
         vaultAddress = getAddressOf(VAULT);
         mainTokenAddress = getAddressOf(MAIN_TOKEN);
-        LiquidityAddress = getAddressOf(Liquidity);
+        liquidityAddress = getAddressOf(LIQUIDITY);
         companyFundWalletAddress = getAddressOf(COMPANY_FUND_WALLET);
         escrowAddress = getAddressOf(ESCROW);
 
@@ -309,11 +309,11 @@ contract DownsideProtection is Upgradeable, staking {
             
             uint256 LiquidityAmount = safeSub(_tokenBalance, walletAmount);
 
-            LiquidityAddress.transfer(LiquidityAmount);
+            liquidityAddress.transfer(LiquidityAmount);
             
             companyFundWalletAddress.transfer(walletAmount);
             
-            emit FundTransfer(LiquidityAddress, address(0), LiquidityAmount);
+            emit FundTransfer(liquidityAddress, address(0), LiquidityAmount);
             emit FundTransfer(
                 companyFundWalletAddress,
                 address(0),
@@ -827,7 +827,7 @@ contract AuctionFundCollector is IndividualBonus {
             uint256 realEstateAmount = safeDiv(safeMul(pushToLiquidity,fundWalletRatio),100);                
             companyFundWalletAddress.transfer(realEstateAmount); 
             uint256 reserveAmount = safeSub(pushToLiquidity,realEstateAmount);
-            currentMarketPrice = IAuctionLiquidity(LiquidityAddress)
+            currentMarketPrice = IAuctionLiquidity(liquidityAddress)
              .contributeWithEther
              .value(reserveAmount)();
              
@@ -922,7 +922,7 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
             uint256 _ethPrice = ICurrencyPrices(currencyPricesAddress)
                 .getCurrencyPrice(address(0));
 
-            uint256 mainReserveAmount = IAuctionLiquidity(LiquidityAddress)
+            uint256 mainReserveAmount = IAuctionLiquidity(liquidityAddress)
                 .contributeTowardMainReserve();
 
             uint256 mainReserveAmountUsd = safeDiv(
@@ -1047,7 +1047,7 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         yesterdaySupply = dayWiseSupply[auctionDay];
         yesterdayContribution = todayContribution;
         auctionDay = safeAdd(auctionDay, 1);
-        IAuctionLiquidity(LiquidityAddress).auctionEnded();
+        IAuctionLiquidity(liquidityAddress).auctionEnded();
         dayWiseDownSideProtectionRatio[auctionDay] = downSideProtectionRatio;
         LAST_AUCTION_START = safeAdd(LAST_AUCTION_START, INTERVAL);
         todayContribution = 0;

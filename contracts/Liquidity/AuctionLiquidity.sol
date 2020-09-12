@@ -161,7 +161,7 @@ contract RegisteryLiquidity is
         whiteListAddress = getAddressOf(WHITE_LIST);
         currencyPricesAddress = getAddressOf(CURRENCY);
         vaultAddress = getAddressOf(VAULT);
-        tagAlongAddress = getAddressOf(CONTRIBUTION_TRIGGER);
+        triggerAddress = getAddressOf(CONTRIBUTION_TRIGGER);
         auctionAddress = getAddressOf(AUCTION);
 
         // bancor network
@@ -820,13 +820,13 @@ contract Liquidity is
 
         uint256 sellRelay = safeDiv(
             safeMul(
-                IERC20Token(relayToken).balanceOf(address(tagAlongAddress)),
+                IERC20Token(relayToken).balanceOf(address(triggerAddress)),
                 _relayPercent
             ),
             safeMul(100, PRICE_NOMINATOR)
         );
 
-        IContributionTrigger(tagAlongAddress).transferTokenLiquidity(
+        IContributionTrigger(triggerAddress).transferTokenLiquidity(
             IERC20Token(relayToken),
             address(this),
             sellRelay
@@ -869,9 +869,9 @@ contract Liquidity is
         returns (bool)
     {
         if (address(_token) == address(0)) {
-            tagAlongAddress.transfer(_value);
+            triggerAddress.transfer(_value);
         } else {
-            ensureTransferFrom(_token, address(this), tagAlongAddress, _value);
+            ensureTransferFrom(_token, address(this), triggerAddress, _value);
         }
         return true;
     }
@@ -883,9 +883,9 @@ contract Liquidity is
         returns (bool)
     {
         if (address(_token) == address(0))
-            IContributionTrigger(tagAlongAddress).contributeTowardLiquidity(_value);
+            IContributionTrigger(triggerAddress).contributeTowardLiquidity(_value);
         else
-            IContributionTrigger(tagAlongAddress).transferTokenLiquidity(
+            IContributionTrigger(triggerAddress).transferTokenLiquidity(
                 _token,
                 address(this),
                 _value
