@@ -6,10 +6,10 @@ contract AuctionRegisteryContracts {
     bytes32 internal constant STOCK_TOKEN = "STOCK_TOKEN";
     bytes32 internal constant WHITE_LIST = "WHITE_LIST";
     bytes32 internal constant AUCTION = "AUCTION";
-    bytes32 internal constant Liquidity = "Liquidity";
+    bytes32 internal constant LIQUIDITY = "LIQUIDITY";
     bytes32 internal constant CURRENCY = "CURRENCY";
     bytes32 internal constant VAULT = "VAULT";
-    bytes32 internal constant TAG_ALONG = "TAG_ALONG";
+    bytes32 internal constant CONTRIBUTION_TRIGGER = "CONTRIBUTION_TRIGGER";
     bytes32 internal constant COMPANY_FUND_WALLET = "COMPANY_FUND_WALLET";
     bytes32
         internal constant COMPANY_MAIN_TOKEN_WALLET = "COMPANY_MAIN_TOKEN_WALLET";
