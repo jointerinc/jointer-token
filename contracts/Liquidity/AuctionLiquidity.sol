@@ -163,7 +163,8 @@ contract RegisteryLiquidity is
         vaultAddress = getAddressOf(VAULT);
         triggerAddress = getAddressOf(CONTRIBUTION_TRIGGER);
         auctionAddress = getAddressOf(AUCTION);
-
+        escrowAddress = getAddressOf(ESCROW);
+        
         // bancor network
         bancorNetwork = addressOf(BANCOR_NETWORK);
     }
@@ -735,13 +736,14 @@ contract Liquidity is
         if (_beforeBalance != lastReserveBalance) {
             _recoverPriceDueToManipulation();
         }
+        
         ensureTransferFrom(
             IERC20Token(_path[0]),
             _caller,
             address(this),
             _amount
         );
-        approveTransferFrom(IERC20Token(_path[0]), converter, _amount);
+        approveTransferFrom(IERC20Token(_path[0]), bancorNetwork, _amount);
 
         uint256 returnAmount = IBancorNetwork(bancorNetwork)
             .convertByPath
