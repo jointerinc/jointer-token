@@ -6,7 +6,7 @@ contract TokenVaultStorage {
     
     IAuctionRegistery public contractsRegistry;
     
-    address payable public auctionAddress;
+    address payable public auctionProtectionAddress;
     
     mapping(address=>bool) public isSpender;
     

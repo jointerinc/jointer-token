@@ -6,6 +6,7 @@ contract AuctionRegisteryContracts {
     bytes32 internal constant STOCK_TOKEN = "STOCK_TOKEN";
     bytes32 internal constant WHITE_LIST = "WHITE_LIST";
     bytes32 internal constant AUCTION = "AUCTION";
+    bytes32 internal constant AUCTION_PROTECTION = "AUCTION_PROTECTION";
     bytes32 internal constant LIQUIDITY = "LIQUIDITY";
     bytes32 internal constant CURRENCY = "CURRENCY";
     bytes32 internal constant VAULT = "VAULT";

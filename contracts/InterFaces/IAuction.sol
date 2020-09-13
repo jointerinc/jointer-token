@@ -7,7 +7,5 @@ interface IAuction {
     function dayWiseContribution(uint256 dayId) external view returns(uint256);
     
     function auctionDay() external returns(uint256);
-    
-    function unLockTokens() external returns (bool);
-    
+        
 }
