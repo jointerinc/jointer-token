@@ -7,7 +7,7 @@ import "../common/TokenTransfer.sol";
 import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IERC20Token.sol";
-import "../InterFaces/IAuction.sol";
+import "../InterFaces/IAuctionProtection.sol";
 
 
 interface InitializeInterface {
@@ -46,7 +46,7 @@ contract AuctionRegistery is ProxyOwnable,TokenVaultStorage, AuctionRegisteryCon
     this decision was made to save gas that occurs from calling an external view function */
     
     function _updateAddresses() internal {
-        auctionAddress = getAddressOf(AUCTION);
+        auctionProtectionAddress = getAddressOf(AUCTION_PROTECTION);
     }
     
     function updateAddresses() external returns (bool) {
@@ -145,7 +145,7 @@ contract TokenVault is
     // This method is auction protection methods called from here 
     // vault address set when contribution is 0
     function unLockTokens() external onlySystem() returns (bool){
-        return IAuction(auctionAddress).unLockTokens();
+        return IAuctionProtection(auctionProtectionAddress).unLockTokens();
     }
     
 }

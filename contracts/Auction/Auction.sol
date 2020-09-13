@@ -14,6 +14,7 @@ import "../InterFaces/ITokenVault.sol";
 import "../InterFaces/IToken.sol";
 import "../InterFaces/IWhiteList.sol";
 import "../InterFaces/IEscrow.sol";
+import "../InterFaces/IAuctionProtection.sol";
 
 interface AuctionInitializeInterface {
     function initialize(
@@ -65,6 +66,7 @@ contract RegisteryAuction is ProxyOwnable, AuctionRegisteryContracts,AuctionStor
         liquidityAddress = getAddressOf(LIQUIDITY);
         companyFundWalletAddress = getAddressOf(COMPANY_FUND_WALLET);
         escrowAddress = getAddressOf(ESCROW);
+        auctionProtectionAddress = getAddressOf(AUCTION_PROTECTION);
 
     }
 
@@ -76,329 +78,10 @@ contract RegisteryAuction is ProxyOwnable, AuctionRegisteryContracts,AuctionStor
 
 
 
-contract DownsideUtils is RegisteryAuction,SafeMath{
+contract Utils is RegisteryAuction,SafeMath{
     
-    function setVaultRatio(uint256 _vaultRatio)
-        external
-        onlyOwner()
-        returns (bool)
-    {
-        require(_vaultRatio < 100);
-        vaultRatio = _vaultRatio;
-        return true;
-    }
     
-    function setTokenLockDuration(uint256 _tokenLockDuration)
-        external
-        onlyOwner()
-        returns (bool)
-    {
-        tokenLockDuration = _tokenLockDuration;
-        return true;
-    }
-
-    function isTokenLockEndDay(uint256 _LockDay) internal view returns (bool) {
-        if (auctionDay > safeAdd(_LockDay, tokenLockDuration)) {
-            return true;
-        }
-        return false;
-    }
-    
-}
-contract staking is
-    DownsideUtils,
-    TokenTransfer
-{
-    
-    function addStackReward(uint256 _amount) internal returns (bool){
-        
-        if (totalTokenAmount > PERCENT_NOMINATOR){
-            uint256 ratio = safeDiv(
-                safeMul(_amount, safeMul(DECIMAL_NOMINATOR, PERCENT_NOMINATOR)),
-                totalTokenAmount
-            );
-            totalTokenAmount = safeAdd(totalTokenAmount, _amount);
-            dayWiseRatio[auctionDay] = ratio;
-        }else{
-            
-            ensureTransferFrom(
-                IERC20Token(mainTokenAddress),
-                address(this),
-                vaultAddress,
-                _amount
-            );
-            
-        }
-        return true;
-        
-    }
-    
-    function addFundTostaking(address _whom, uint256 _amount)
-        internal
-        returns (bool)
-    {
-        totalTokenAmount = safeAdd(totalTokenAmount, _amount);
-
-        roundWiseToken[_whom][auctionDay] = safeAdd(
-            roundWiseToken[_whom][auctionDay],
-            _amount
-        );
-
-        stackBalance[_whom] = safeAdd(stackBalance[_whom], _amount);
-        if (lastRound[_whom] == 0) {
-            lastRound[_whom] = auctionDay;
-        }
-
-        emit StackAdded(auctionDay, _whom, _amount);
-        return true;
-    }
-    
-    // calulcate token user have
-    function calulcateStackFund(address _whom) internal view returns (uint256) {
-        uint256 _lastRound = lastRound[_whom];
-        uint256 _token;
-        uint256 _stackToken = 0;
-        if (_lastRound > 0) {
-            for (uint256 x = _lastRound; x < auctionDay; x++) {
-                _token = safeAdd(_token, roundWiseToken[_whom][x]);
-                uint256 _tempStack = safeDiv(
-                    safeMul(dayWiseRatio[x], _token),
-                    safeMul(DECIMAL_NOMINATOR, PERCENT_NOMINATOR)
-                );
-                _stackToken = safeAdd(_stackToken, _tempStack);
-                _token = safeAdd(_token, _tempStack);
-            }
-        }
-        return _stackToken;
-    }
-    
-    // this method disturbute Tokens
-    function _claimTokens(address _which) internal returns (bool) {
-        uint256 _stackToken = calulcateStackFund(_which);
-        lastRound[_which] = auctionDay;
-        stackBalance[_which] = safeAdd(stackBalance[_which], _stackToken);
-        return true;
-    }
-    
-    // every 5th Round system call this so token distributed
-    // user also can call this
-    function distributionStackInBatch(address[] calldata _which)
-        external
-        returns (bool)
-    {
-        for (uint8 x = 0; x < _which.length; x++) {
-            _claimTokens(_which[x]);
-        }
-        return true;
-    }
-    
-    // show stack balace with what user get
-    function getStackBalance(address _whom) external view returns (uint256) {
-        uint256 _stackToken = calulcateStackFund(_whom);
-        return safeAdd(stackBalance[_whom], _stackToken);
-    }
-
-    // unlocking stack token
-    function _unlockTokenFromStack(address _whom) internal returns (bool) {
-        uint256 _stackToken = calulcateStackFund(_whom);
-        uint256 actulToken = safeAdd(stackBalance[_whom], _stackToken);
-        ensureTransferFrom(
-            IERC20Token(mainTokenAddress),
-            address(this),
-            _whom,
-            actulToken
-        );
-        totalTokenAmount = safeSub(totalTokenAmount, actulToken);
-        stackBalance[_whom] = 0;
-        lastRound[_whom] = 0;
-        emit StackRemoved(auctionDay,_whom, actulToken);
-        return true;
-    }
-    
-    function unlockTokenFromStack() external returns (bool) {
-        return _unlockTokenFromStack(msg.sender);
-    }
-    
-    function unlockTokenFromStackBehalf(address _whom) external returns (bool) {
-        require(IWhiteList(whiteListAddress).address_belongs(_whom) == msg.sender,ERR_AUTHORIZED_ADDRESS_ONLY);
-        return _unlockTokenFromStack(_whom);
-    }
-}
-
-contract DownsideProtection is Upgradeable, staking {
-    
-     function lockBalance(
-        address _token,
-        address _which,
-        uint256 _amount
-    ) internal returns (bool) {
-        if (lockedOn[_which] == 0) {
-            lockedOn[_which] = auctionDay;
-        }
-        uint256 currentBalance = currentLockedFunds[_which][auctionDay][_token];
-        currentLockedFunds[_which][auctionDay][_token] = safeAdd(currentBalance, _amount);
-        totalLocked[_token] = safeAdd(totalLocked[_token],_amount);
-        emit FundLocked(_token, _which, _amount);
-        return true;
-    }
-    
-    function lockEtherInProtection(address _which,uint256 _amount)
-        internal
-        returns (bool)
-    {
-        return lockBalance(address(0), _which, _amount);
-    }
-    
-    function _cancelInvestment(address payable _whom) internal returns (bool) {
-        require(
-            !isTokenLockEndDay(lockedOn[_whom]),
-            "ERR_INVESTMENT_CANCEL_PERIOD_OVER"
-        );
-        
-        uint256 _tokenBalance = lockedFunds[_whom][address(0)];
-        
-        if (_tokenBalance > 0) {
-            _whom.transfer(_tokenBalance);
-            totalLocked[address(0)] = safeSub(totalLocked[address(0)],_tokenBalance);
-            emit FundTransfer(_whom, address(0), _tokenBalance);
-            lockedFunds[_whom][address(0)] = 0;
-        }
-
-        _tokenBalance = lockedTokens[_whom];
-        
-        if (_tokenBalance > 0) {
-            
-            ensureTransferFrom(
-                IERC20Token(mainTokenAddress),
-                address(this),
-                vaultAddress,
-                _tokenBalance
-            );
-            
-            emit FundTransfer(vaultAddress,mainTokenAddress, _tokenBalance);
-            
-            lockedTokens[_whom] = 0;
-        }
-        lockedOn[_whom] = 0;
-        emit InvestMentCancelled(_whom, _tokenBalance);
-        return true;
-    }
-    
-    function cancelInvestment() external returns (bool) {
-        return _cancelInvestment(msg.sender);
-    }
-    
-    function cancelInvestmentBehalf(address payable _whom) external returns (bool) {
-        require(IWhiteList(whiteListAddress).address_belongs(_whom) == msg.sender,ERR_AUTHORIZED_ADDRESS_ONLY);
-        return _cancelInvestment(_whom);
-    }
-    
-   function _unLockTokens(address _which, bool isstaking)
-        internal
-        returns (bool)
-    {
-        
-        uint256 _tokenBalance = lockedFunds[_which][address(0)];
-        
-        if (_tokenBalance > 0) {
-            
-            uint256 walletAmount = safeDiv(
-                safeMul(_tokenBalance, vaultRatio),
-                100
-            );
-            
-            uint256 LiquidityAmount = safeSub(_tokenBalance, walletAmount);
-
-            liquidityAddress.transfer(LiquidityAmount);
-            
-            companyFundWalletAddress.transfer(walletAmount);
-            
-            emit FundTransfer(liquidityAddress, address(0), LiquidityAmount);
-            emit FundTransfer(
-                companyFundWalletAddress,
-                address(0),
-                walletAmount
-            );
-            totalLocked[address(0)] = safeSub(totalLocked[address(0)],_tokenBalance);
-            lockedFunds[_which][address(0)] = 0;
-        }
-
-        _tokenBalance = lockedTokens[_which];
-
-        if (_tokenBalance > 0) {
-            
-            IERC20Token _token = IERC20Token(mainTokenAddress);
-
-            if (isstaking) {
-                addFundTostaking(_which, _tokenBalance);
-            } else {
-                ensureTransferFrom(
-                    _token,
-                    address(this),
-                    _which,
-                    _tokenBalance
-                );
-                emit TokenUnLocked(_which, _tokenBalance);
-            }
-            emit FundTransfer(_which, address(_token), _tokenBalance);
-            lockedTokens[_which] = 0;
-        }
-        lockedOn[_which] = 0;
-        return true;
-    }
-    
-    // user unlock tokens and funds goes to compnay wallet
-    function unLockTokens() external returns (bool) {
-        return _unLockTokens(msg.sender, false);
-    }
-
-    function stackToken() external returns (bool) {
-        return _unLockTokens(msg.sender, true);
-    }
-    
-    function unLockTokensBehalf(address _whom) external returns (bool) {
-        require(IWhiteList(whiteListAddress).address_belongs(_whom) == msg.sender,ERR_AUTHORIZED_ADDRESS_ONLY);
-        return _unLockTokens(_whom, false);
-    }
-
-    function stackTokenBehalf(address _whom) external returns (bool) {
-        require(IWhiteList(whiteListAddress).address_belongs(_whom) == msg.sender,ERR_AUTHORIZED_ADDRESS_ONLY);
-        return _unLockTokens(_whom, true);
-    }
-    
-    function unLockFundByAdmin(address _which)
-        external
-        onlySystem()
-        returns (bool)
-    {
-        require(
-            isTokenLockEndDay(lockedOn[_which]),
-            "ERR_ADMIN_CANT_UNLOCK_FUND"
-        );
-        return _unLockTokens(_which, false);
-    }
-    
-    function depositToken(address _which, uint256 auctionDay,uint256 _amount) internal returns (bool) {
-        lockedTokens[_which] = safeAdd(lockedTokens[_which], _amount);
-        
-        if (currentLockedFunds[_which][auctionDay][address(0)] > 0) {
-            
-            uint256 _currentTokenBalance = currentLockedFunds[_which][auctionDay][address(0)];
-            
-            lockedFunds[_which][address(0)] = safeAdd(
-                lockedFunds[_which][address(0)],
-                _currentTokenBalance
-            );
-        }
-        emit FundLocked(mainTokenAddress, _which, _amount);
-        return true;
-    }
-}
-
-contract AuctionUtils is DownsideProtection {
-    
-
-    function initializeStorage() internal {
+     function initializeStorage() internal {
         auctionDay = 1;
         totalContribution = 2500000 * PRICE_NOMINATOR;
         yesterdayContribution = 500 * PRICE_NOMINATOR;
@@ -412,8 +95,6 @@ contract AuctionUtils is DownsideProtection {
         groupBonusRatio = 2;
         mainTokenRatio = 100;
         averageDay = 10;
-        tokenLockDuration = 365;
-        vaultRatio = 90;
     }
 
     function setGroupBonusRatio(uint256 _groupBonusRatio)
@@ -489,9 +170,12 @@ contract AuctionUtils is DownsideProtection {
         averageDay = _averageDay;
         return true;
     }
+    
 }
 
-contract AuctionFormula is SafeMath, TokenTransfer {
+
+
+contract AuctionFormula is TokenTransfer,Utils {
     
     // calculate Funds On each day to see how much the user receives
     // split between  _returnAmount totalAmount which the user receives
@@ -556,7 +240,7 @@ contract AuctionFormula is SafeMath, TokenTransfer {
 }
 
 
-contract IndividualBonus is AuctionFormula,AuctionUtils {
+contract IndividualBonus is AuctionFormula {
     
     function updateIndividualBonusRatio(
         uint256 X1,
@@ -785,7 +469,9 @@ contract AuctionFundCollector is IndividualBonus {
             _value = safeSub(_value, returnAmount);
         }
         uint256 downSideAmount = safeDiv(safeMul(_value,dayWiseDownSideProtectionRatio[auctionDay]),100);
-        lockEtherInProtection(_recipient,downSideAmount);
+        
+        IAuctionProtection(auctionProtectionAddress).lockEther.value(downSideAmount)(auctionDay,_recipient);
+        
         return fundAdded(address(0), _value, 18, _caller , _recipient,_currencyPrice);
     }
 
@@ -800,10 +486,13 @@ contract AuctionFundCollector is IndividualBonus {
     // so we check caller maintoken balance 
     function contributeWithEtherBehalf(address payable _whom) external payable returns (bool) {
         require(IWhiteList(whiteListAddress).isExchangeAddress(msg.sender),ERR_AUTHORIZED_ADDRESS_ONLY);
+        
         if(IWhiteList(whiteListAddress).address_belongs(_whom) == address(0)){
             IWhiteList(whiteListAddress).addWalletBehalfExchange(msg.sender,_whom);
         }
+        
         require(IWhiteList(whiteListAddress).address_belongs(_whom) == msg.sender);
+        
         return _contributeWithEther(msg.value,msg.sender,_whom);
     }
     
@@ -816,11 +505,7 @@ contract AuctionFundCollector is IndividualBonus {
     
     function pushEthToLiquidity() external returns(bool){
         
-        uint256 downSideEther = totalLocked[address(0)];
-        
-        uint256 currentBalance = address(this).balance;
-        
-        uint256 pushToLiquidity = safeSub(currentBalance,downSideEther);
+        uint256 pushToLiquidity = address(this).balance;
         
         if(pushToLiquidity > 0){
             
@@ -864,9 +549,8 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         super.initialize();
         initializeOwner(_primaryOwner, _systemAddress, _multisigAddress);
         initializeStorage();
-        contractsRegistry = IAuctionRegistery(_registryaddress);
         _updateAddresses();
-
+        contractsRegistry = IAuctionRegistery(_registryaddress);
         dayWiseDownSideProtectionRatio[auctionDay] = downSideProtectionRatio;
         LAST_AUCTION_START = _startTime;
         MIN_AUCTION_END_TIME = _minAuctionTime;
@@ -1029,8 +713,14 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         
         IEscrow(escrowAddress).depositFee(fee);
         
-        addStackReward(stakingAmount);
-
+        approveTransferFrom(
+            IERC20Token(mainTokenAddress),
+            auctionProtectionAddress,
+            stakingAmount
+        );
+        
+        IAuctionProtection(auctionProtectionAddress).stackFund(stakingAmount);
+    
         uint256 _tokenPrice = safeDiv(
             safeMul(todayContribution, DECIMAL_NOMINATOR),
             dayWiseSupply[auctionDay]
@@ -1100,7 +790,6 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
 
         if (_percent > 0) {
             newReturnAmount = safeDiv(safeMul(returnAmount, _percent), 100);
-
             fee = calculateSupplyPercent(newReturnAmount, managementFee);
         }
 
@@ -1123,9 +812,17 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
             _which,
             _userAmount
         );
-
-        depositToken(_which,dayId,safeSub(newReturnAmount, _userAmount));
+        
+        approveTransferFrom(
+            IERC20Token(mainTokenAddress),
+            escrowAddress,
+            safeSub(newReturnAmount, _userAmount)
+        );
+    
+        IAuctionProtection(auctionProtectionAddress).depositToken(dayId,_which,safeSub(newReturnAmount, _userAmount));
+        
         returnToken[dayId][_which] = true;
+        
         emit TokenDistrubuted(
             _which,
             dayId,
@@ -1154,8 +851,6 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         return disturbuteTokenInternal(dayId, msg.sender);
     }
     
-    
-
     //In case if there is other tokens into contract
     function returnFund(
         IERC20Token _token,
