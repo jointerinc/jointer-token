@@ -78,7 +78,7 @@ contract RegisteryAuction is ProxyOwnable, AuctionRegisteryContracts,AuctionStor
 
 
 
-contract Utils is RegisteryAuction,SafeMath{
+contract AuctionUtils is RegisteryAuction{
     
     
      function initializeStorage() internal {
@@ -175,7 +175,7 @@ contract Utils is RegisteryAuction,SafeMath{
 
 
 
-contract AuctionFormula is TokenTransfer,Utils {
+contract AuctionFormula is SafeMath, TokenTransfer {
     
     // calculate Funds On each day to see how much the user receives
     // split between  _returnAmount totalAmount which the user receives
@@ -240,7 +240,7 @@ contract AuctionFormula is TokenTransfer,Utils {
 }
 
 
-contract IndividualBonus is AuctionFormula {
+contract IndividualBonus is AuctionFormula,AuctionUtils {
     
     function updateIndividualBonusRatio(
         uint256 X1,
@@ -468,6 +468,7 @@ contract AuctionFundCollector is IndividualBonus {
             _recipient.transfer(returnAmount);
             _value = safeSub(_value, returnAmount);
         }
+        
         uint256 downSideAmount = safeDiv(safeMul(_value,dayWiseDownSideProtectionRatio[auctionDay]),100);
         
         IAuctionProtection(auctionProtectionAddress).lockEther.value(downSideAmount)(auctionDay,_recipient);
@@ -477,7 +478,9 @@ contract AuctionFundCollector is IndividualBonus {
 
     // we only start with ether we dont need any token right now
     function contributeWithEther() external payable returns (bool) {
+        
         require(_checkContribution(msg.sender));
+        
         return _contributeWithEther(msg.value,msg.sender,msg.sender);
     }
     
@@ -485,6 +488,7 @@ contract AuctionFundCollector is IndividualBonus {
     // Exchange invests on behalf of their users
     // so we check caller maintoken balance 
     function contributeWithEtherBehalf(address payable _whom) external payable returns (bool) {
+        
         require(IWhiteList(whiteListAddress).isExchangeAddress(msg.sender),ERR_AUTHORIZED_ADDRESS_ONLY);
         
         if(IWhiteList(whiteListAddress).address_belongs(_whom) == address(0)){
@@ -496,14 +500,19 @@ contract AuctionFundCollector is IndividualBonus {
         return _contributeWithEther(msg.value,msg.sender,_whom);
     }
     
-    function updateCurrentMarketPrice() external returns(bool){
+    function updateCurrentMarketPrice() external returns (bool){
         currentMarketPrice = ICurrencyPrices(currencyPricesAddress)
             .getCurrencyPrice(mainTokenAddress);
         
         return true;
     }
     
+    
     function pushEthToLiquidity() external returns(bool){
+        return _pushEthToLiquidity();
+    }
+    
+    function _pushEthToLiquidity() internal returns(bool){
         
         uint256 pushToLiquidity = address(this).balance;
         
@@ -548,9 +557,9 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
     ) public {
         super.initialize();
         initializeOwner(_primaryOwner, _systemAddress, _multisigAddress);
+        contractsRegistry = IAuctionRegistery(_registryaddress);
         initializeStorage();
         _updateAddresses();
-        contractsRegistry = IAuctionRegistery(_registryaddress);
         dayWiseDownSideProtectionRatio[auctionDay] = downSideProtectionRatio;
         LAST_AUCTION_START = _startTime;
         MIN_AUCTION_END_TIME = _minAuctionTime;
@@ -601,8 +610,11 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
 
         uint256 _mainTokenPrice = ICurrencyPrices(currencyPricesAddress)
             .getCurrencyPrice(mainTokenAddress);
-
+        
+        _pushEthToLiquidity();
+        
         if (todayContribution == 0) {
+            
             uint256 _ethPrice = ICurrencyPrices(currencyPricesAddress)
                 .getCurrencyPrice(address(0));
 
@@ -815,7 +827,7 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         
         approveTransferFrom(
             IERC20Token(mainTokenAddress),
-            escrowAddress,
+            auctionProtectionAddress,
             safeSub(newReturnAmount, _userAmount)
         );
     
@@ -851,6 +863,8 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         return disturbuteTokenInternal(dayId, msg.sender);
     }
     
+    
+
     //In case if there is other tokens into contract
     function returnFund(
         IERC20Token _token,
@@ -864,7 +878,6 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         
     }
 
-    function() external payable {
-        revert("NOT_ACCEPT_ETHER_DIRECT");
-    }
+    function() external payable {}
+    
 }
