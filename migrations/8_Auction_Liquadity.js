@@ -87,7 +87,7 @@ module.exports = async function (deployer) {
 
     LiquadityInstance = await Liquadity.at(LiquadityProxyAddress);
 
-    txHash10 = await whiteListInstance.addNewWallet(LiquadityProxyAddress, byPassCode, 0, {
+    await whiteListInstance.addNewWallet(LiquadityProxyAddress, byPassCode, 0, {
         from: whiteListSecondary,
     });
 

@@ -7,20 +7,22 @@ const whiteListSecondary = "0x82c2935d9b3F800fb80A167070C38aA835041B98"; // whit
 
 const realEstate =  "0xA41A44e6084833f82E73a5edda6Caaf4C206AcC9";
 
-const governance = "0xAb7594A440e3354AFe1f0B9792EFb76Dd90fF71d"; // GovernanceProxy address is here dynamic
+const governance = "0x2071195F2071c066853a904F9459A8668f0B3e46"; // GovernanceProxy address is here dynamic
 const escrow = "0x352e2708aC8f671a2FE46e244D8255dcd17D7d35"; // dynamic 
-
+const gateWay = "0x7f1eAAE18E0CCdb9ECBA86e0bBe3ef76718245C7"; // dynamic 
 
 // bancor address
-const baseTokenAddress = "0x98474564a00d15989f16bfb7c162c782b0e2b336";// dynamic
-const relayTokenAddress = "0x32d9a18826e76afcdc6c9df1ab79bd888ab40d2e";// dynamic
+
+const baseTokenAddress = "0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c";// dynamic
 const ethTokenAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"; // dynamic
-const ethBaseTokenRelayAddress = "0x884058297ec1FfD6C8FA4F9F2d4f066057255a03";// dynamic
+
+const ethBaseTokenRelayAddress = "0xb1CD6e4153B2a390Cf00A6556b0fC1458C4A5533";// dynamic
+const bancorNetworkAddress = "0x2F9EC37d6CcFFf1caB21733BdaDEdE11c823cCB0";// dynamic
+
+// now this two varibale need to chnage after maintoken Deployed we deploy bancor reserve 
+// and then we get this parameter  
+const relayTokenAddress = "0x32d9a18826e76afcdc6c9df1ab79bd888ab40d2e";// dynamic
 const bancorConverterAddress = "0x4eb0845ca823205D16135E64c184bd2B2D591169"; // dynamic
-const bancorNetworkAddress = "0xE3042915EeaE7974bFe5a2653911d7fa05003eea";// dynamic
-
-
-
 
 const baseLinePrice = "1162999999"; // dynamic
 const mainTokenHoldBack = 0; // threre is no holdback days
@@ -75,5 +77,7 @@ module.exports = {
     minAuctionTime:minAuctionTime,
     intervalTime:intervalTime,
     baseLinePrice:baseLinePrice,
-    realEstate:realEstate
+    realEstate:realEstate,
+    gateWay:gateWay,
+    bancorNetworkAddress:bancorNetworkAddress
 }

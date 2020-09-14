@@ -20,7 +20,10 @@ const {
   stockMaturityDays,
   byPassCode,
   escrow,
-  realEstate
+  gateWay,
+  realEstate,
+  bancorCode,
+  bancorNetworkAddress
 } = require("../constant");
 
 
@@ -76,18 +79,25 @@ module.exports = async function (deployer) {
     
     AuctionRegistyInstance = await AuctionRegistery.at(auctionRegistery);
     
-    txHash3 = await whiteListInstance.addNewWallet(ownerWallet,byPassCode, 10, {
+    await whiteListInstance.addNewWallet(ownerWallet,byPassCode, 10, {
       from: whiteListSecondary,
     });
 
-    txHash3 = await whiteListInstance.addNewWallet(escrow,byPassCode, 10, {
+    await whiteListInstance.addNewWallet(escrow,byPassCode, 10, {
       from: whiteListSecondary,
     });
 
-    txHash3 = await whiteListInstance.addNewWallet(realEstate,byPassCode, 10, {
+    await whiteListInstance.addNewWallet(realEstate,byPassCode, 10, {
       from: whiteListSecondary,
     });
-    
+
+    await whiteListInstance.addNewWallet(gateWay,byPassCode, 10, {
+      from: whiteListSecondary,
+    });
+
+    await whiteListInstance.addNewWallet(bancorNetworkAddress,bancorCode, 10, {
+      from: whiteListSecondary,
+    });
 
     await AuctionRegistyInstance.registerContractAddress(
       WhiteListCode,
