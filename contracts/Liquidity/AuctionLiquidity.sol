@@ -593,8 +593,8 @@ contract Liquidity is
             );
 
             isMainToken = true;
+            _recoverReserve(isMainToken, volatilty);
         }
-        _recoverReserve(isMainToken, volatilty);
         return true;
     }
 
