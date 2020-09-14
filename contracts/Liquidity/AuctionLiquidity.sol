@@ -684,14 +684,17 @@ contract Liquidity is
                     converterBalance
                 );
             } else {
-                _tempRelayPercent = safeMul(relayPercent, PRICE_NOMINATOR);
+                 _tempRelayPercent = safeDiv(
+                    safeMul(safeMul(_amount, PRICE_NOMINATOR), 100),
+                    safeAdd(converterBalance,_amount)
+                );
             }
 
             _liquadate(_tempRelayPercent);
 
             _amount = safeSub(
                 _amount,
-                safeDiv(safeMul(_amount, PRICE_NOMINATOR), _tempRelayPercent)
+                safeDiv(safeMul(_amount, _tempRelayPercent),safeMul(100,PRICE_NOMINATOR))
             );
 
             return _convertWithToken(_amount, baseTokenToMainToken);
