@@ -69,12 +69,19 @@ module.exports = async function (deployer) {
         from: whiteListSecondary,
     });
     
+    await whiteListInstance.changeFlags(ownerWallet,0,{
+        from: whiteListSecondary,
+    });
+
     txHash4 =  await auctionRegistyInstance.registerContractAddress(
         protectionCode,
         protectionProxyAddress, {
         from: otherSecondary
         }
     );
+
+
+    
 
     currentdata["ProtectionRegistry"] = ProtectionRegistry.address;
     currentdata["AuctionProtection"] = protectionProxyAddress;
