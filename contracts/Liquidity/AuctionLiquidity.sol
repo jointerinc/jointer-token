@@ -164,7 +164,7 @@ contract RegisteryLiquidity is
         triggerAddress = getAddressOf(CONTRIBUTION_TRIGGER);
         auctionAddress = getAddressOf(AUCTION);
         escrowAddress = getAddressOf(ESCROW);
-        
+
         // bancor network
         bancorNetwork = addressOf(BANCOR_NETWORK);
     }
@@ -203,7 +203,6 @@ contract LiquidityUtils is RegisteryLiquidity {
         return _updateTokenPath();
     }
 
-    
     function setSideReseverRatio(uint256 _sideReseverRatio)
         public
         onlyOwner()
@@ -541,7 +540,9 @@ contract Liquidity is
         lastReserveBalance = IERC20Token(baseToken).balanceOf(converter);
     }
 
-    function recoverPriceVolatility() external onlySystem() returns (bool) {
+    function recoverPriceVolatility() external returns (bool) {
+        _recoverPriceDueToManipulation();
+
         uint256 baseTokenPrice = ICurrencyPrices(currencyPricesAddress)
             .getCurrencyPrice(address(baseToken));
 
@@ -580,7 +581,6 @@ contract Liquidity is
         uint256 volatilty;
 
         uint256 _baseTokenBalance = IERC20Token(baseToken).balanceOf(converter);
-
         bool isMainToken;
 
         if (_baseTokenBalance > lastReserveBalance) {
@@ -598,11 +598,7 @@ contract Liquidity is
         return true;
     }
 
-    function recoverPriceDueToManipulation()
-        external
-        onlySystem()
-        returns (bool)
-    {
+    function recoverPriceDueToManipulation() external returns (bool) {
         return _recoverPriceDueToManipulation();
     }
 
@@ -653,43 +649,51 @@ contract Liquidity is
             return _priceRecoveryWithConvertMainToken(_percent);
         }
     }
+    
 
+    // if not have enough ether we sell relay 
+    // exmple reserve have 100 token and we need 25 token to recover 
+    // we need to sell 25% relay 
+    // _amount*100/reserveBalance
+    // (25*100)/100 so we get 25%
+    // we multiply it with price PRICE_NOMINATOR so we can get excat amount 
     function _recoverAfterRedemption(uint256 _amount) internal returns (bool) {
-        bool isEtherToken = false;
-
         uint256 totalEthAmount = getReturnByPath(ethToBaseToken, _amount);
 
-        if (etherTokens(baseToken)) {
-            isEtherToken = true;
-            totalEthAmount = _amount;
-        }
-
-        // this change because we convert all base token to ether
-        if (address(this).balance >= totalEthAmount ) {
+        if (address(this).balance >= totalEthAmount) {
             IBancorNetwork(bancorNetwork).convertByPath.value(totalEthAmount)(
-                ethToMainToken,
+                ethToBaseToken,
                 totalEthAmount,
                 1,
-                vaultAddress,
+                address(0),
                 address(0),
                 0
             );
-            return true;
+
+            return _convertWithToken(_amount, baseTokenToMainToken);
         } else {
             uint256 converterBalance = IERC20Token(baseToken).balanceOf(
                 converter
             );
 
-            uint256 _tempRelayPercent = relayPercent;
+            uint256 _tempRelayPercent;
+            
             if (converterBalance > _amount) {
                 _tempRelayPercent = safeDiv(
-                    safeMul(safeSub(converterBalance, _amount), 100),
-                    _amount
+                    safeMul(safeMul(_amount, PRICE_NOMINATOR), 100),
+                    converterBalance
                 );
-                if (_tempRelayPercent > 99) _tempRelayPercent = 99;
+            } else {
+                _tempRelayPercent = safeMul(relayPercent, PRICE_NOMINATOR);
             }
-            _liquadate(safeMul(_tempRelayPercent, PRICE_NOMINATOR));
-            _amount = safeSub(_amount, safeDiv(_amount, _tempRelayPercent));
+
+            _liquadate(_tempRelayPercent);
+
+            _amount = safeSub(
+                _amount,
+                safeDiv(safeMul(_amount, PRICE_NOMINATOR), _tempRelayPercent)
+            );
+
             return _convertWithToken(_amount, baseTokenToMainToken);
         }
     }
@@ -716,12 +720,12 @@ contract Liquidity is
         address payable _caller,
         address payable _reciver
     ) internal returns (bool) {
-        require(address(_path[0]) == address(mainToken), "ERR_MAIN_TOKEN");
+        require(_path[0] == mainToken, "ERR_MAIN_TOKEN");
 
         address primaryWallet = IWhiteList(whiteListAddress).address_belongs(
             _reciver
         );
-       
+
         uint256 auctionDay = IAuction(auctionAddress).auctionDay();
 
         require(primaryWallet != address(0), "ERR_WHITELIST");
@@ -736,14 +740,15 @@ contract Liquidity is
         if (_beforeBalance != lastReserveBalance) {
             _recoverPriceDueToManipulation();
         }
-        
+
         ensureTransferFrom(
-            IERC20Token(_path[0]),
+            IERC20Token(mainToken),
             _caller,
             address(this),
             _amount
         );
-        approveTransferFrom(IERC20Token(_path[0]), bancorNetwork, _amount);
+
+        approveTransferFrom(IERC20Token(mainToken), bancorNetwork, _amount);
 
         uint256 returnAmount = IBancorNetwork(bancorNetwork)
             .convertByPath
@@ -816,17 +821,20 @@ contract Liquidity is
         uint256 _mainTokenBalance = IERC20Token(mainToken).balanceOf(
             address(this)
         );
+
         uint256 _baseTokenBalance = IERC20Token(baseToken).balanceOf(
             address(this)
         );
 
         uint256 sellRelay = safeDiv(
             safeMul(
-                IERC20Token(relayToken).balanceOf(address(triggerAddress)),
+                IERC20Token(relayToken).balanceOf(triggerAddress),
                 _relayPercent
             ),
             safeMul(100, PRICE_NOMINATOR)
         );
+
+        require(sellRelay > 0, "ERR_RELAY_ZERO");
 
         IContributionTrigger(triggerAddress).transferTokenLiquidity(
             IERC20Token(relayToken),
@@ -885,7 +893,9 @@ contract Liquidity is
         returns (bool)
     {
         if (address(_token) == address(0))
-            IContributionTrigger(triggerAddress).contributeTowardLiquidity(_value);
+            IContributionTrigger(triggerAddress).contributeTowardLiquidity(
+                _value
+            );
         else
             IContributionTrigger(triggerAddress).transferTokenLiquidity(
                 _token,
@@ -909,6 +919,7 @@ contract Liquidity is
             vaultAddress,
             mainTokenBalance
         );
+        return true;
     }
 
     function convertBaseTokenToEth() external returns (bool) {

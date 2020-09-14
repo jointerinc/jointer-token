@@ -337,8 +337,7 @@ contract AuctionFundCollector is IndividualBonus {
     {
         IERC20Token mainToken = IERC20Token(mainTokenAddress);
         
-        uint256 _mainTokenPrice = ICurrencyPrices(currencyPricesAddress)
-            .getCurrencyPrice(mainTokenAddress);
+        uint256 _mainTokenPrice = currentMarketPrice;
 
         require(_mainTokenPrice > 0, "ERR_TOKEN_PRICE_NOT_SET");
         
@@ -608,10 +607,9 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
             "ERR_MIN_TIME_IS_NOT_OVER"
         );
 
-        uint256 _mainTokenPrice = ICurrencyPrices(currencyPricesAddress)
-            .getCurrencyPrice(mainTokenAddress);
-        
         _pushEthToLiquidity();
+        
+        uint256 _mainTokenPrice = currentMarketPrice;
         
         if (todayContribution == 0) {
             
@@ -878,6 +876,8 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         
     }
 
-    function() external payable {}
+    function() external payable {
+         revert("ERR_CAN'T_FORCE_ETH");
+    }
     
 }
