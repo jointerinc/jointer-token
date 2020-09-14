@@ -20,6 +20,7 @@ const {
   stockMaturityDays,
   byPassCode,
   escrow,
+  realEstate
 } = require("../constant");
 
 
@@ -28,6 +29,8 @@ const WhiteListCode =
 
 const escrowCode =
   "0x455343524f570000000000000000000000000000000000000000000000000000";
+
+const realEstateCode = "0x434f4d50414e595f46554e445f57414c4c455400000000000000000000000000";
 
 module.exports = async function (deployer) {
   
@@ -81,16 +84,28 @@ module.exports = async function (deployer) {
       from: whiteListSecondary,
     });
 
-    txHash4 = await AuctionRegistyInstance.registerContractAddress(
+    txHash3 = await whiteListInstance.addNewWallet(realEstate,byPassCode, 10, {
+      from: whiteListSecondary,
+    });
+    
+
+    await AuctionRegistyInstance.registerContractAddress(
       WhiteListCode,
       whiteListProxyAdress, {
         from: otherSecondary
       }
     );
 
-    txHash4 = await AuctionRegistyInstance.registerContractAddress(
+     await AuctionRegistyInstance.registerContractAddress(
       escrowCode,
       escrow, {
+        from: otherSecondary
+      }
+    );
+
+    await AuctionRegistyInstance.registerContractAddress(
+      realEstateCode,
+      realEstate, {
         from: otherSecondary
       }
     );
