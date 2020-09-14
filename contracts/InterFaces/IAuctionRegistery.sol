@@ -12,8 +12,6 @@ contract AuctionRegisteryContracts {
     bytes32 internal constant VAULT = "VAULT";
     bytes32 internal constant CONTRIBUTION_TRIGGER = "CONTRIBUTION_TRIGGER";
     bytes32 internal constant COMPANY_FUND_WALLET = "COMPANY_FUND_WALLET";
-    bytes32
-        internal constant COMPANY_MAIN_TOKEN_WALLET = "COMPANY_MAIN_TOKEN_WALLET";
     bytes32 internal constant SMART_SWAP = "SMART_SWAP";
     bytes32 internal constant SMART_SWAP_P2P = "SMART_SWAP_P2P";
     bytes32 internal constant ESCROW = "ESCROW";
