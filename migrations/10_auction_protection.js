@@ -8,8 +8,8 @@ const AuctionRegistery = artifacts.require("AuctionRegistery");
 const WhiteList = artifacts.require("WhiteList");
 
 
-const TagAlongRegistry = artifacts.require("ContributionTriggerRegistry");
-const TagAlong = artifacts.require("ContributionTrigger");
+const ProtectionRegistry = artifacts.require("ProtectionRegistry");
+const AuctionProtection = artifacts.require("AuctionProtection");
 
 const {
   ownerWallet,
@@ -19,8 +19,8 @@ const {
   byPassCode,
 } = require("../constant");
 
-const tagAlongCode =
-  "0x434f4e545249425554494f4e5f54524947474552000000000000000000000000";
+const protectionCode =
+  "0x41554354494f4e5f50524f54454354494f4e0000000000000000000000000000";
 
 module.exports = async function (deployer) {
 
@@ -34,24 +34,24 @@ module.exports = async function (deployer) {
     auctionRegistyInstance = await AuctionRegistery.at(auctionRegistery);
 
     await deployer.deploy(
-        TagAlongRegistry,
+        ProtectionRegistry,
         otherSecondary,
         governance,{
            from: ownerWallet,
         }
     );
 
-    tagAlongRegistryInstance = await TagAlongRegistry.deployed();
+    protectionRegistryInstance = await ProtectionRegistry.deployed();
 
-    await deployer.deploy(TagAlong, {
+    await deployer.deploy(AuctionProtection, {
         from: ownerWallet,
     });
 
-    txHash1 = await tagAlongRegistryInstance.addVersion(1, TagAlong.address, {
+    txHash1 = await protectionRegistryInstance.addVersion(1, AuctionProtection.address, {
         from: ownerWallet,
     });
 
-    txHash2 = await tagAlongRegistryInstance.createProxy(
+    txHash2 = await protectionRegistryInstance.createProxy(
         1,
         ownerWallet,
         otherSecondary,
@@ -61,24 +61,25 @@ module.exports = async function (deployer) {
         }
     );
     
-    tagAlongProxyAddress = await tagAlongRegistryInstance.proxyAddress();
+    protectionProxyAddress = await protectionRegistryInstance.proxyAddress();
 
-    tagAlongInstance = await TagAlong.at(tagAlongProxyAddress);
+    protectionInstance = await AuctionProtection.at(protectionProxyAddress);
 
-    txHash3 = await whiteListInstance.addNewWallet(tagAlongProxyAddress, byPassCode, 0, {
+    txHash3 = await whiteListInstance.addNewWallet(protectionProxyAddress, byPassCode, 0, {
         from: whiteListSecondary,
     });
     
     txHash4 =  await auctionRegistyInstance.registerContractAddress(
-        tagAlongCode,
-        tagAlongProxyAddress, {
+        protectionCode,
+        protectionProxyAddress, {
         from: otherSecondary
         }
     );
 
-    currentdata["TagAlongRegistry"] = TagAlongRegistry.address;
-    currentdata["TagAlong"] = tagAlongProxyAddress;
+    currentdata["ProtectionRegistry"] = ProtectionRegistry.address;
+    currentdata["AuctionProtection"] = protectionProxyAddress;
     await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata,undefined,2));
+  
+   
 
 }   
-

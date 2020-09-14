@@ -33,18 +33,16 @@ const auctionCode = "0x41554354494f4e0000000000000000000000000000000000000000000
 
 module.exports = async function (deployer) {
 
-    // currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
-    // currentdata = JSON.parse(currentdata);
+    currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
+    currentdata = JSON.parse(currentdata);
 
-    // auctionRegistery = currentdata.AuctionRegistery;
-    // whiteList = currentdata.WhiteList;
-    // mainToken = currentdata.MainToken;
+    auctionRegistery = currentdata.AuctionRegistery;
+    whiteList = currentdata.WhiteList;
+    mainToken = currentdata.MainToken;
 
-    // whiteListInstance = await WhiteList.at(whiteList);
-    // auctionRegistyInstance = await AuctionRegistery.at(auctionRegistery);
-    //governance = "0xd3411ca38F5256154d25E949a3F0E7E9646D4Eac";
-    auctionRegistery = "0xc10A9d65fAe96Ae0F337cb17c38b4fc1F60E410E";
-
+    whiteListInstance = await WhiteList.at(whiteList);
+    auctionRegistyInstance = await AuctionRegistery.at(auctionRegistery);
+   
     await deployer.deploy(
         AuctionProxyRegistry,
         auctionSecondary,

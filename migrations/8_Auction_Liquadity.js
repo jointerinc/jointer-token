@@ -12,8 +12,8 @@ const WhiteList = artifacts.require("WhiteList");
 
 const MainToken = artifacts.require("MainToken");
 
-const LiquadityRegistery = artifacts.require("LiquadityRegistery");
-const Liquadity = artifacts.require("Liquadity");
+const LiquadityRegistery = artifacts.require("LiquidityRegistery");
+const Liquadity = artifacts.require("Liquidity");
 
 const SmartToken = TruffleContract(require("../test/bancorArtifacts/SmartToken.json"));
 const BancorConverter = TruffleContract(require("../test/bancorArtifacts/BancorConverter.json"));
@@ -26,17 +26,13 @@ const {
     otherSecondary,
     governance,
     byPassCode,
-    bancorCode,
     bancorConverterAddress,
     ethBaseTokenRelayAddress,
-    etherTokenAddress,
-    bancorNetworkAddress,
-    ethRelayTokenAddress,
     ethTokenAddress,
     baseLinePrice
 } = require("../constant");
 
-const liquadityCode = "0x4c49515541444954590000000000000000000000000000000000000000000000";
+const liquadityCode = "0x4c49515549444954590000000000000000000000000000000000000000000000";
 
 module.exports = async function (deployer) {
 
@@ -50,36 +46,7 @@ module.exports = async function (deployer) {
     whiteListInstance = await WhiteList.at(whiteList);
     auctionRegistyInstance = await AuctionRegistery.at(auctionRegistery);
 
-    await BancorConverter.setProvider(web3.currentProvider);
-    converterInstance = await BancorConverter.at(bancorConverterAddress);
     
-    await SmartToken.setProvider(web3.currentProvider);
-    relayTokenInstance = await SmartToken.at(relayTokenAddress);
-
-    txHash1 = await converterInstance.addConnector(mainToken, "500000", false, {
-        from: ownerWallet
-    });
-    
-    txHash6 = await whiteListInstance.addNewWallet(bancorNetworkAddress, bancorCode, 0, {
-        from: whiteListSecondary,
-    });
-
-    txHash7 = await whiteListInstance.addNewWallet(bancorConverterAddress, bancorCode, 0, {
-        from: whiteListSecondary,
-    })
-
-    MainTokenInstance = await MainToken.at(mainToken);
-
-    txHash2 = await MainTokenInstance.transfer(bancorConverterAddress,"100000000000000000000000",{from:ownerWallet})
-
-    txHash3 = await relayTokenInstance.transferOwnership(bancorConverterAddress ,{
-        from: ownerWallet
-    });
-
-    txHash4 = await converterInstance.acceptTokenOwnership({
-        from: ownerWallet
-    })
-
     await deployer.deploy(
         LiquadityRegistery,
         otherSecondary,
@@ -95,7 +62,9 @@ module.exports = async function (deployer) {
         from: ownerWallet,
     });
 
-    txHash8 = await LiquadityRegisteryInstance.addVersion(1, Liquadity.address);
+    txHash8 = await LiquadityRegisteryInstance.addVersion(1, Liquadity.address, {
+        from: ownerWallet,
+    });
 
     txHash9 = await LiquadityRegisteryInstance.createProxy(
         1,
@@ -103,8 +72,8 @@ module.exports = async function (deployer) {
         baseTokenAddress,
         mainToken,
         relayTokenAddress,
-        etherTokenAddress,
-        ethRelayTokenAddress,
+        ethTokenAddress,
+        ethBaseTokenRelayAddress,
         ownerWallet,
         otherSecondary,
         governance,
@@ -129,48 +98,8 @@ module.exports = async function (deployer) {
         }
     );
 
-    ethToMainToken = [
-        ethTokenAddress,
-        ethBaseTokenRelayAddress,
-        baseTokenAddress,
-        relayTokenAddress,
-        mainToken,
-    ];
-
-    baseTokenToMainToken = [
-        baseTokenAddress,
-        relayTokenAddress,
-        mainToken,
-    ];
-
-    mainTokenTobaseToken = [
-        mainToken,
-        relayTokenAddress,
-        baseTokenAddress,
-    ];
-
-    ethToBaseToken = [
-        ethTokenAddress,
-        ethBaseTokenRelayAddress,
-        baseTokenAddress,
-    ];
-
-    baseTokenToEth = [
-        baseTokenAddress,
-        ethBaseTokenRelayAddress,
-        ethTokenAddress,
-    ];
-
-    txHash12 = await LiquadityInstance.setAllPath(
-      ethToMainToken,
-      baseTokenToMainToken,
-      mainTokenTobaseToken,
-      ethToBaseToken,
-      baseTokenToEth,
-      {
-        from: ownerWallet,
-      }
-    );
+    
+    
 
     currentdata["LiquadityRegistery"] = LiquadityRegistery.address;
     currentdata["Liquadity"] = LiquadityProxyAddress;
