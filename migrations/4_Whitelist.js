@@ -26,6 +26,9 @@ const {
 const WhiteListCode =
   "0x57484954455f4c49535400000000000000000000000000000000000000000000";
 
+const escrowCode =
+  "0x455343524f570000000000000000000000000000000000000000000000000000";
+
 module.exports = async function (deployer) {
   
     currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
@@ -81,6 +84,13 @@ module.exports = async function (deployer) {
     txHash4 = await AuctionRegistyInstance.registerContractAddress(
       WhiteListCode,
       whiteListProxyAdress, {
+        from: otherSecondary
+      }
+    );
+
+    txHash4 = await AuctionRegistyInstance.registerContractAddress(
+      escrowCode,
+      escrow, {
         from: otherSecondary
       }
     );
