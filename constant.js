@@ -34,7 +34,7 @@ const mainTokenName = "Jointer";
 const mainTokenSymbol = "JNTR";
 
 const preMintAddress = [escrow,ownerWallet];
-const preMintAmount = ["11740788397000000000000000000","100000000000000000000000000000"];
+const preMintAmount = ["11740788397000000000000000000","100000000000000000000000"];
 
 const byPassCode = 20483;
 const bancorCode = 8195;
