@@ -21,7 +21,7 @@ interface InitializeInterface {
     ) external;
 }
 
-contract AuctionRegistery is ProxyOwnable,ProtectionStorage, AuctionRegisteryContracts {
+contract ProtectionRegistery is ProxyOwnable,ProtectionStorage, AuctionRegisteryContracts {
     
 
     function updateRegistery(address _address)
@@ -62,7 +62,7 @@ contract AuctionRegistery is ProxyOwnable,ProtectionStorage, AuctionRegisteryCon
 }
 
 
-contract Utils is SafeMath, AuctionRegistery {
+contract Utils is SafeMath, ProtectionRegistery {
     
 
     modifier allowedAddressOnly(address _which) {

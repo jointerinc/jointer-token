@@ -19,7 +19,7 @@ interface InitializeInterface {
     ) external;
 }
 
-contract AuctionRegistery is ProxyOwnable,TokenVaultStorage, AuctionRegisteryContracts {
+contract TokenRegistery is ProxyOwnable,TokenVaultStorage, AuctionRegisteryContracts {
     
     
     function updateRegistery(address _address)
@@ -54,7 +54,7 @@ contract AuctionRegistery is ProxyOwnable,TokenVaultStorage, AuctionRegisteryCon
     }
 }
 
-contract TokenSpenders is AuctionRegistery,SafeMath {
+contract TokenSpenders is TokenRegistery,SafeMath {
     
     
     modifier onlySpender() {
