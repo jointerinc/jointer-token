@@ -71,9 +71,6 @@ module.exports = async function (deployer) {
         bancorConverterAddress,
         baseTokenAddress,
         mainToken,
-        relayTokenAddress,
-        ethTokenAddress,
-        ethBaseTokenRelayAddress,
         ownerWallet,
         otherSecondary,
         governance,
@@ -98,9 +95,9 @@ module.exports = async function (deployer) {
         }
     );
 
-    await whiteListInstance.changeFlags(ownerWallet,0,{
-        from: whiteListSecondary,
-    });
+    // await whiteListInstance.changeFlags(ownerWallet,0,{
+    //     from: whiteListSecondary,
+    // });
     
 
     currentdata["LiquadityRegistery"] = LiquadityRegistery.address;

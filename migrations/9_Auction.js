@@ -92,7 +92,6 @@ module.exports = async function (deployer) {
 
     currentdata["AuctionProxyRegistry"] = AuctionProxyRegistry.address;
     currentdata["Auction"] = auctionProxyAddress;
-    
     await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata, undefined, 2));
 
 }

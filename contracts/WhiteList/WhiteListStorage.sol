@@ -61,7 +61,7 @@ contract WhiteListStorage {
     uint256 public constant FROM_CHINA = 1 << 10;
     uint256 public constant FROM_EU = 1 << 11;
     uint256 public constant IS_BYPASSED = 1 << 12;
-    uint256 public constant BANCOR_ADDRESS = 1 << 13;
+    uint256 public constant POOL_ADDRESS = 1 << 13;
     uint256 public constant IS_ALLOWED_AUCTION = 1 << 14;
     
     event AccountWhiteListed(address indexed which, uint256 flags);
@@ -69,6 +69,4 @@ contract WhiteListStorage {
     event WalletRemoved(address indexed from, address indexed which);
     event FlagsChanged(address indexed which, uint256 flags);
 
-    
-    
 }

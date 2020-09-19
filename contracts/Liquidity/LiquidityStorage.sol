@@ -10,19 +10,10 @@ contract LiquidityStorage {
     uint256 public constant PRICE_NOMINATOR = 10**9;
 
     address public converter;
-
-    address public bancorNetwork;
-
     address public baseToken; // basetoken
-
     address public mainToken; // maintoken
 
-    address public relayToken; // relayToken
-
-    address public etherToken; // etherToken
-
-    address public ethRelayToken; // ether to baseToken RelayToken
-
+  
     // registery of all contacrt
     IAuctionRegistery public contractsRegistry;
 
@@ -33,20 +24,7 @@ contract LiquidityStorage {
     address payable public currencyPricesAddress;
     address payable public escrowAddress;
 
-    // _path = 0 ether to maint token conversion path
-    address[] public ethToMainToken;
-    // _path = 1 basetoken to mainToken conversion path
-    address[] public baseTokenToMainToken;
-    // _path = 2 mainToken to basetoken conversion path
-    address[] public mainTokenTobaseToken;
-    // _path = 3 ether to baseToken conversion path
-    address[] public ethToBaseToken;
-    // _path = 4  basetoken to ether conversion path
-    address[] public baseTokenToEth;
-
-    IERC20Token[] public relayPath;
-
-    uint256[] public returnAmountRelay;
+   
 
     // side reserve ratio split between bancor and side reserve
     uint256 public sideReseverRatio;

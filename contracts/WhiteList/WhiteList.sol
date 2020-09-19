@@ -131,11 +131,11 @@ contract WhiteList is
         return true;
     }
 
-    /**@dev checks if address is bancor's*/
-    function _isBancorAddress(address _which) internal view returns (bool) {
+    /**@dev checks if address is pool or not*/
+    function _isPoolAddress(address _which) internal view returns (bool) {
         address primaryAddress = address_belongs[_which];
         uint256 flags = user_details[primaryAddress].flags;
-        return _checkRule(flags, BANCOR_ADDRESS, BANCOR_ADDRESS);
+        return _checkRule(flags, POOL_ADDRESS, POOL_ADDRESS);
     }
 
     /**@dev checks if address is bypassed*/
@@ -369,12 +369,12 @@ contract WhiteList is
         //Added to make sure that bancor addresses transfer to bypassed addresses only
         //if a bancor address calls a transfer or transferFrom function then return true only if to is Bypassed a
 
-        if (_isBancorAddress(msgSender)) {
-            if (_isBancorAddress(to))
-                return _isBancorAddress(_from) || _isAddressByPassed(_from);
+        if (_isPoolAddress(msgSender)) {
+            if (_isPoolAddress(to))
+                return _isPoolAddress(_from) || _isAddressByPassed(_from);
             else if (_isAddressByPassed(to)) return true;
             else return false;
-        } else if (_isBancorAddress(to)) return false;
+        } else if (_isPoolAddress(to)) return false;
 
         result = _isReceiveAllowed(_to, token); // Check receiver at first
         if (!result) return false; // if receiver disallowed the transfer disallowed too.
