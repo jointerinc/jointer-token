@@ -17,9 +17,6 @@ interface LiquidityInitializeInterface {
         address _converter,
         address _baseToken,
         address _mainToken,
-        address _relayToken,
-        address _etherToken,
-        address _ethRelayToken,
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress,
@@ -28,61 +25,14 @@ interface LiquidityInitializeInterface {
     ) external;
 }
 
-interface IBancorNetwork {
-    function etherTokens(address _address) external view returns (bool);
-
-    function rateByPath(address[] calldata _path, uint256 _amount)
-        external
-        view
-        returns (uint256);
-
-    function convertByPath(
-        address[] calldata _path,
-        uint256 _amount,
-        uint256 _minReturn,
-        address payable _beneficiary,
-        address _affiliateAccount,
-        uint256 _affiliateFee
-    ) external payable returns (uint256);
+interface IUniswapV2Pair {
+    function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast);
+    function burn(address payable to) external returns (uint amount0, uint amount1);
+    function swap(uint amount0Out, uint amount1Out, address payable to, bytes calldata data) external payable returns(bool);
+    function sync() external payable returns(bool);
 }
 
-interface IContractRegistry {
-    function addressOf(bytes32 _contractName) external view returns (address);
-
-    // deprecated, backward compatibility
-    function getAddress(bytes32 _contractName) external view returns (address);
-}
-
-interface IEtherToken {
-    function deposit() external payable;
-
-    function withdraw(uint256 _amount) external;
-
-    function withdrawTo(address _to, uint256 _amount) external;
-}
-
-interface IBancorConverter {
-    function registry() external view returns (address);
-
-    function reserves(address _address)
-        external
-        view
-        returns (
-            uint256,
-            uint32,
-            bool,
-            bool,
-            bool
-        );
-
-    function removeLiquidity(
-        uint256 _amount,
-        IERC20Token[] calldata _reserveTokens,
-        uint256[] calldata _reserveMinReturnAmounts
-    ) external;
-}
-
-contract BancorConverterLiquidity is ProxyOwnable, SafeMath, LiquidityStorage {
+contract UniConverterLiquidity is ProxyOwnable, SafeMath, LiquidityStorage {
     function updateConverter(address _converter)
         public
         onlyOwner()
@@ -92,47 +42,82 @@ contract BancorConverterLiquidity is ProxyOwnable, SafeMath, LiquidityStorage {
         return true;
     }
 
-    function addressOf(bytes32 _contractName) internal view returns (address) {
-        address _registry = IBancorConverter(converter).registry();
-        IContractRegistry registry = IContractRegistry(_registry);
-        return registry.addressOf(_contractName);
-    }
-
     function getTokensReserveRatio()
         internal
         view
         returns (uint256 _baseTokenRatio, uint256 _mainTokenRatio)
     {
-        uint256 a;
-        bool c;
-        bool d;
-        bool e;
-        (a, _baseTokenRatio, c, d, e) = IBancorConverter(converter).reserves(
-            address(baseToken)
-        );
-        (a, _mainTokenRatio, c, d, e) = IBancorConverter(converter).reserves(
-            address(mainToken)
-        );
+        (_baseTokenRatio, _mainTokenRatio,) = IUniswapV2Pair(converter).getReserves();
         return (_baseTokenRatio, _mainTokenRatio);
     }
 
-    function etherTokens(address _address) internal view returns (bool) {
-        IBancorNetwork network = IBancorNetwork(bancorNetwork);
-        return network.etherTokens(_address);
+    // convert base to main token. baseTokenAmount = BNB, mainTokenAmount = JNTR
+    function convertBase(uint baseTokenAmount, address payable to) internal  returns(uint256) {
+        
+        uint amountOut = getReturnAmount(baseTokenAmount, 0);
+        
+        IUniswapV2Pair(converter).swap.value(baseTokenAmount)(0, amountOut, to, new bytes(0));
+        
+        lastReserveBalance = converter.balance;
+        
+        return uint256(amountOut);
+        
+    }    
+
+    // convert main to base token. baseTokenAmount = BNB, mainTokenAmount = JNTR
+    function convertMain(uint mainTokenAmount, address payable to) internal returns(uint256) {
+        
+        uint amountOut = getReturnAmount(0, mainTokenAmount);
+        
+        IUniswapV2Pair(converter).swap(amountOut, 0, to, new bytes(0));
+        
+        lastReserveBalance = converter.balance;
+        
+        return uint256(amountOut);
     }
 
-    function getReturnByPath(address[] memory _path, uint256 _amount)
-        internal
-        view
-        returns (uint256)
-    {
-        IBancorNetwork network = IBancorNetwork(bancorNetwork);
-        return network.rateByPath(_path, _amount);
+    // return amount if we convert base or main token. baseTokenAmount = BNB, mainTokenAmount = JNTR
+    function getReturnAmount(uint baseTokenAmount, uint mainTokenAmount) internal view returns(uint amountOut) {
+        uint reserveIn;
+        uint reserveOut;
+        uint amountIn;
+        
+        if (baseTokenAmount != 0) {
+            (reserveIn, reserveOut,) = IUniswapV2Pair(converter).getReserves();
+            amountIn = baseTokenAmount;
+        }
+        else {
+            (reserveOut,reserveIn, ) = IUniswapV2Pair(converter).getReserves();
+            amountIn = mainTokenAmount;
+        }
+        
+        return getAmountOut(amountIn, reserveIn, reserveOut);
     }
+
+    // given an input amount of an asset and pair reserves, returns the maximum output amount of the other asset
+    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) internal pure returns (uint amountOut) {
+        require(amountIn > 0, 'UniswapV2Library: INSUFFICIENT_INPUT_AMOUNT');
+        require(reserveIn > 0 && reserveOut > 0, 'UniswapV2Library: INSUFFICIENT_LIQUIDITY');
+        uint amountInWithFee = safeMul(amountIn,1000);  //No fee. 997 - with fee
+        uint numerator = safeMul(amountInWithFee,reserveOut);
+        uint denominator = safeAdd(safeMul(reserveIn,1000),amountInWithFee);
+        amountOut = safeDiv(numerator,denominator);
+        return amountOut;
+    }
+
+    // given an output amount of an asset and pair reserves, returns a required input amount of the other asset
+    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut) internal pure returns (uint amountIn) {
+        require(amountOut > 0, 'UniswapV2Library: INSUFFICIENT_OUTPUT_AMOUNT');
+        require(reserveIn > 0 && reserveOut > 0, 'UniswapV2Library: INSUFFICIENT_LIQUIDITY');
+        uint numerator = safeMul(safeMul(reserveIn,amountOut),1000);
+        uint denominator = safeMul(safeSub(reserveOut,amountOut),1000);  //No fee. 997 -  with fee
+        amountIn = safeAdd(safeDiv(numerator,denominator),1);
+        return amountIn;
+    }    
 }
 
 contract RegisteryLiquidity is
-    BancorConverterLiquidity,
+    UniConverterLiquidity,
     AuctionRegisteryContracts
 {
     function updateRegistery(address _address)
@@ -164,9 +149,6 @@ contract RegisteryLiquidity is
         triggerAddress = getAddressOf(CONTRIBUTION_TRIGGER);
         auctionAddress = getAddressOf(AUCTION);
         escrowAddress = getAddressOf(ESCROW);
-
-        // bancor network
-        bancorNetwork = addressOf(BANCOR_NETWORK);
     }
 
     function updateAddresses() external returns (bool) {
@@ -180,28 +162,7 @@ contract LiquidityUtils is RegisteryLiquidity {
         require(_which == auctionAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
         _;
     }
-
-    function _updateTokenPath() internal returns (bool) {
-        ethToMainToken = [
-            etherToken,
-            ethRelayToken,
-            baseToken,
-            relayToken,
-            mainToken
-        ];
-        baseTokenToMainToken = [baseToken, relayToken, mainToken];
-        mainTokenTobaseToken = [mainToken, relayToken, baseToken];
-        ethToBaseToken = [etherToken, ethRelayToken, baseToken];
-        baseTokenToEth = [baseToken, ethRelayToken, etherToken];
-        relayPath = [IERC20Token(mainToken), IERC20Token(baseToken)];
-        returnAmountRelay = [1, 1];
-        return true;
-    }
-
-    // this is for bnt an eth token only
-    function updateTokenPath() external returns (bool) {
-        return _updateTokenPath();
-    }
+  
 
     function setSideReseverRatio(uint256 _sideReseverRatio)
         public
@@ -321,9 +282,6 @@ contract Liquidity is
         address _converter,
         address _baseToken,
         address _mainToken,
-        address _relayToken,
-        address _etherToken,
-        address _ethRelayToken,
         address _primaryOwner,
         address _systemAddress,
         address _authorityAddress,
@@ -346,34 +304,22 @@ contract Liquidity is
 
         baseToken = _baseToken;
         mainToken = _mainToken;
-        relayToken = _relayToken;
-        etherToken = _etherToken;
-        ethRelayToken = _ethRelayToken;
+       
 
         contractsRegistry = IAuctionRegistery(_registryaddress);
-        lastReserveBalance = IERC20Token(baseToken).balanceOf(converter);
+        lastReserveBalance = converter.balance;
         tokenAuctionEndPrice = _getCurrentMarketPrice();
         _updateAddresses();
-        _updateTokenPath();
     }
 
     function _contributeWithEther(uint256 value) internal returns (uint256) {
-        uint256 lastBalance = IERC20Token(baseToken).balanceOf(converter);
+        uint256 lastBalance = converter.balance;
 
         if (lastBalance != lastReserveBalance) {
             _recoverPriceDueToManipulation();
         }
 
-        uint256 returnAmount = IBancorNetwork(bancorNetwork)
-            .convertByPath
-            .value(value)(
-            ethToMainToken,
-            value,
-            1,
-            vaultAddress,
-            address(0),
-            0
-        );
+        uint256 returnAmount = convertBase(value, vaultAddress);
 
         todayMainReserveContribution = safeAdd(
             todayMainReserveContribution,
@@ -381,64 +327,11 @@ contract Liquidity is
         );
 
         emit Contribution(address(0), value, returnAmount);
-        lastReserveBalance = IERC20Token(baseToken).balanceOf(converter);
+        lastReserveBalance = converter.balance;
         checkAppeciationLimit();
         return returnAmount;
     }
 
-    //convert base token token into ether
-    function _convertBaseTokenToEth() internal {
-        uint256 _baseTokenBalance = IERC20Token(baseToken).balanceOf(
-            address(this)
-        );
-
-        if (_baseTokenBalance > 0) {
-            if (etherTokens(baseToken)) {
-                IEtherToken(baseToken).withdraw(_baseTokenBalance);
-            } else {
-                approveTransferFrom(
-                    IERC20Token(baseToken),
-                    bancorNetwork,
-                    _baseTokenBalance
-                );
-                IBancorNetwork(bancorNetwork).convertByPath.value(0)(
-                    baseTokenToEth,
-                    _baseTokenBalance,
-                    1,
-                    address(0),
-                    address(0),
-                    0
-                );
-            }
-        }
-    }
-
-    //This method return token base on wich is last address
-    //If last address is ethtoken it will return ether
-    function _convertWithToken(uint256 value, address[] memory _path)
-        internal
-        returns (bool)
-    {
-        approveTransferFrom(IERC20Token(_path[0]), bancorNetwork, value);
-
-        address payable sentBackAddress;
-
-        if (_path[safeSub(_path.length, 1)] == mainToken) {
-            sentBackAddress = vaultAddress;
-        }
-        IBancorNetwork(bancorNetwork).convertByPath.value(0)(
-            _path,
-            value,
-            1,
-            sentBackAddress,
-            address(0),
-            0
-        );
-
-        _convertBaseTokenToEth();
-        lastReserveBalance = IERC20Token(baseToken).balanceOf(converter);
-        return true;
-    }
 
     function checkAppeciationLimit() internal returns (bool) {
         uint256 tokenCurrentPrice = _getCurrentMarketPrice();
@@ -467,7 +360,6 @@ contract Liquidity is
         if (address(this).balance < previousMainReserveContribution) {
             while (previousMainReserveContribution >= address(this).balance) {
                 _liquadate(safeMul(relayPercent, PRICE_NOMINATOR));
-                _convertBaseTokenToEth();
                 if (address(this).balance >= previousMainReserveContribution) {
                     break;
                 }
@@ -529,22 +421,17 @@ contract Liquidity is
                 returnMain
             );
         } else {
-            ensureTransferFrom(
-                IERC20Token(baseToken),
-                address(this),
-                converter,
-                returnBase
-            );
+            IUniswapV2Pair(converter).sync.value(returnBase)();
         }
 
-        lastReserveBalance = IERC20Token(baseToken).balanceOf(converter);
+        lastReserveBalance = converter.balance;
     }
 
     function recoverPriceVolatility() external returns (bool) {
         _recoverPriceDueToManipulation();
 
         uint256 baseTokenPrice = ICurrencyPrices(currencyPricesAddress)
-            .getCurrencyPrice(address(baseToken));
+            .getCurrencyPrice(baseToken);
 
         uint256 volatilty;
 
@@ -580,7 +467,7 @@ contract Liquidity is
     function _recoverPriceDueToManipulation() internal returns (bool) {
         uint256 volatilty;
 
-        uint256 _baseTokenBalance = IERC20Token(baseToken).balanceOf(converter);
+        uint256 _baseTokenBalance = converter.balance;
         bool isMainToken;
 
         if (_baseTokenBalance > lastReserveBalance) {
@@ -609,7 +496,7 @@ contract Liquidity is
     // we dont value in decimal we already provide _percent with decimal
     function _priceRecoveryWithConvertMainToken(uint256 _percent)
         internal
-        returns (bool)
+        returns (uint256)
     {
         uint256 tempX = safeDiv(_percent, appreciationLimit);
         uint256 root = nthRoot(tempX, 2, 0, maxIteration);
@@ -626,10 +513,10 @@ contract Liquidity is
         if (vaultBalance >= _reverseBalance) {
             ITokenVault(vaultAddress).directTransfer(
                 address(mainToken),
-                address(this),
+                converter,
                 _reverseBalance
             );
-            return _convertWithToken(_reverseBalance, mainTokenTobaseToken);
+            return convertMain(_reverseBalance, address(this));
         } else {
             uint256 converterBalance = IERC20Token(mainToken).balanceOf(
                 converter
@@ -657,24 +544,11 @@ contract Liquidity is
     // _amount*100/reserveBalance
     // (25*100)/100 so we get 25%
     // we multiply it with price PRICE_NOMINATOR so we can get excat amount 
-    function _recoverAfterRedemption(uint256 _amount) internal returns (bool) {
-        uint256 totalEthAmount = getReturnByPath(ethToBaseToken, _amount);
-
-        if (address(this).balance >= totalEthAmount) {
-            IBancorNetwork(bancorNetwork).convertByPath.value(totalEthAmount)(
-                ethToBaseToken,
-                totalEthAmount,
-                1,
-                address(0),
-                address(0),
-                0
-            );
-
-            return _convertWithToken(_amount, baseTokenToMainToken);
+    function _recoverAfterRedemption(uint256 _amount) internal returns (uint256) {
+        if (address(this).balance >= _amount) {
+            return convertBase(_amount, vaultAddress);
         } else {
-            uint256 converterBalance = IERC20Token(baseToken).balanceOf(
-                converter
-            );
+            uint256 converterBalance = converter.balance;
 
             uint256 _tempRelayPercent;
             
@@ -697,7 +571,7 @@ contract Liquidity is
                 safeDiv(safeMul(_amount, _tempRelayPercent),safeMul(100,PRICE_NOMINATOR))
             );
 
-            return _convertWithToken(_amount, baseTokenToMainToken);
+            return convertBase(_amount, vaultAddress);
         }
     }
 
@@ -738,7 +612,7 @@ contract Liquidity is
             "ERR_WALLET_ALREADY_REDEEM"
         );
 
-        uint256 _beforeBalance = IERC20Token(baseToken).balanceOf(converter);
+        uint256 _beforeBalance = converter.balance;
 
         if (_beforeBalance != lastReserveBalance) {
             _recoverPriceDueToManipulation();
@@ -747,19 +621,15 @@ contract Liquidity is
         ensureTransferFrom(
             IERC20Token(mainToken),
             _caller,
-            address(this),
+            converter,
             _amount
         );
 
-        approveTransferFrom(IERC20Token(mainToken), bancorNetwork, _amount);
-
-        uint256 returnAmount = IBancorNetwork(bancorNetwork)
-            .convertByPath
-            .value(0)(_path, _amount, 1, _reciver, address(0), 0);
+        uint256 returnAmount = convertMain(_amount, _reciver);
 
         lastReedeemDay[primaryWallet] = auctionDay;
 
-        uint256 _afterBalance = IERC20Token(baseToken).balanceOf(converter);
+        uint256 _afterBalance = converter.balance;
 
         emit Redemption(
             address(_path[safeSub(_path.length, 1)]),
@@ -779,11 +649,11 @@ contract Liquidity is
         allowedAddressOnly(msg.sender)
         returns (bool)
     {
-        uint256 _baseTokenBalance = IERC20Token(baseToken).balanceOf(converter);
+        uint256 _baseTokenBalance = converter.balance;
 
         uint256 yesterdayMainReserv = safeDiv(
             safeMul(_baseTokenBalance, baseLinePrice),
-            safeExponent(10, IERC20Token(baseToken).decimals())
+            safeExponent(10, 18)
         );
 
         IAuction auction = IAuction(auctionAddress);
@@ -825,13 +695,11 @@ contract Liquidity is
             address(this)
         );
 
-        uint256 _baseTokenBalance = IERC20Token(baseToken).balanceOf(
-            address(this)
-        );
+        uint256 _baseTokenBalance = address(this).balance;
 
         uint256 sellRelay = safeDiv(
             safeMul(
-                IERC20Token(relayToken).balanceOf(triggerAddress),
+                IERC20Token(converter).balanceOf(triggerAddress),
                 _relayPercent
             ),
             safeMul(100, PRICE_NOMINATOR)
@@ -840,17 +708,13 @@ contract Liquidity is
         require(sellRelay > 0, "ERR_RELAY_ZERO");
 
         IContributionTrigger(triggerAddress).transferTokenLiquidity(
-            IERC20Token(relayToken),
-            address(this),
+            IERC20Token(converter),
+            converter,
             sellRelay
         );
 
         //take out both side of token from the reserve
-        IBancorConverter(converter).removeLiquidity(
-            sellRelay,
-            relayPath,
-            returnAmountRelay
-        );
+        IUniswapV2Pair(converter).burn(address(this));
 
         _mainTokenBalance = safeSub(
             IERC20Token(mainToken).balanceOf(address(this)),
@@ -858,7 +722,7 @@ contract Liquidity is
         );
 
         _baseTokenBalance = safeSub(
-            IERC20Token(baseToken).balanceOf(address(this)),
+            address(this).balance,
             _baseTokenBalance
         );
 
@@ -868,11 +732,8 @@ contract Liquidity is
             vaultAddress,
             _mainTokenBalance
         );
-
-        // etherToken converted into
-        if (etherTokens(baseToken)) {
-            IEtherToken(baseToken).withdraw(_baseTokenBalance);
-        }
+        
+        lastReserveBalance = converter.balance;
         return (_baseTokenBalance, _mainTokenBalance);
     }
 
@@ -913,9 +774,11 @@ contract Liquidity is
     }
 
     function sendMainTokenToVault() external returns (bool) {
+        
         uint256 mainTokenBalance = IERC20Token(mainToken).balanceOf(
             address(this)
         );
+        
         ensureTransferFrom(
             IERC20Token(mainToken),
             address(this),
@@ -925,10 +788,6 @@ contract Liquidity is
         return true;
     }
 
-    function convertBaseTokenToEth() external returns (bool) {
-        _convertBaseTokenToEth();
-        return true;
-    }
-
+  
     function() external payable {}
 }

@@ -65,7 +65,7 @@ module.exports = async function (deployer) {
 
     tagAlongInstance = await TagAlong.at(tagAlongProxyAddress);
 
-    txHash3 = await whiteListInstance.addNewWallet(tagAlongProxyAddress, byPassCode, 0, {
+    txHash3 = await whiteListInstance.addNewWallet(tagAlongProxyAddress, byPassCode,10, {
         from: whiteListSecondary,
     });
     

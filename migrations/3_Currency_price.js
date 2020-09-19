@@ -37,7 +37,7 @@ module.exports = async function (deployer) {
         }
     );
 
-    CurrencyPricesInstnace = await CurrencyPrices.deployed();
+    CurrencyPricesInstnace = await CurrencyPrices.at(currentdata.CurrencyPrices);
 
     await deployer.deploy(
         CurrencyPriceTicker,
@@ -52,12 +52,15 @@ module.exports = async function (deployer) {
 
     ethPriceTracker = CurrencyPriceTicker.address;
     ethPriceTrackerInstance = await CurrencyPriceTicker.deployed();
+
     await web3.eth.sendTransaction({
       from: ownerWallet,
       to: ethPriceTracker,
       value: "15000000000000000",
     });
+
     await ethPriceTrackerInstance.update({from:otherSecondary});
+
     await CurrencyPricesInstnace.setCurrencyPriceContract(ethCode,ethPriceTracker,{
       from: otherSecondary
     });
@@ -110,14 +113,16 @@ module.exports = async function (deployer) {
 
     await AuctionRegistyInstance.registerContractAddress(
         currencyCode,
-        CurrencyPrices.address, {
+        "0x87efADf62DEfC7FA49d119b890d06aAAaC3e7a45", {
         from: otherSecondary
         }
     );
 
+    
+
     currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
     currentdata = JSON.parse(currentdata);
-    currentdata["CurrencyPrices"] = CurrencyPrices.address;
+    currentdata["CurrencyPrices"] = "0x87efADf62DEfC7FA49d119b890d06aAAaC3e7a45";//CurrencyPrices.address;
     await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata,undefined,2));
 
     

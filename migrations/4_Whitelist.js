@@ -40,8 +40,6 @@ module.exports = async function (deployer) {
     currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
     currentdata = JSON.parse(currentdata);
     auctionRegistery  = currentdata.AuctionRegistery;
-
-
     
     await deployer.deploy(WhiteListRegistery, whiteListSecondary, governance, {
       from: ownerWallet,
