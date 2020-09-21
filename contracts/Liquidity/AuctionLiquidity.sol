@@ -561,29 +561,26 @@ contract Liquidity is
     }
 
     function redemptionFromEscrow(
-        address[] memory _path,
         uint256 _amount,
         address payable _reciver
-    ) public returns (bool) {
+    ) external returns (bool) {
         require(msg.sender == escrowAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
-        return _redemption(_path, _amount, msg.sender, _reciver);
+        return _redemption( _amount, msg.sender, _reciver);
     }
 
-    function redemption(address[] memory _path, uint256 _amount)
-        public
+    function redemption(uint256 _amount)
+        external
         returns (bool)
     {
-        return _redemption(_path, _amount, msg.sender, msg.sender);
+        return _redemption(_amount, msg.sender, msg.sender);
     }
 
     function _redemption(
-        address[] memory _path,
         uint256 _amount,
         address payable _caller,
         address payable _reciver
     ) internal returns (bool) {
-        require(_path[0] == mainToken, "ERR_MAIN_TOKEN");
-
+        
         address primaryWallet = IWhiteList(whiteListAddress).address_belongs(
             _reciver
         );
@@ -617,7 +614,7 @@ contract Liquidity is
         uint256 _afterBalance = converter.balance;
 
         emit Redemption(
-            address(_path[safeSub(_path.length, 1)]),
+            baseToken,
             _amount,
             returnAmount
         );
