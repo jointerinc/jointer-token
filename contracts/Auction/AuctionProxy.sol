@@ -3,7 +3,7 @@ pragma solidity ^0.5.9;
 import "../Proxy/IRegistry.sol";
 import "../common/Ownable.sol";
 import "../Proxy/UpgradeabilityProxy.sol";
-import "../InterFaces/IERC20Token.sol";
+import "../InterFaces/IBEP20Token.sol";
 
 interface AuctionProxyInitializeInterface {
     function initialize(

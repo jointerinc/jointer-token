@@ -7,22 +7,23 @@ import "../InterFaces/IAuctionRegistery.sol";
 
 
 /**@dev keeps track of registry contract at which all the addresses of the wholes system's contracts are stored */
-contract RegisteryToken is AuctionRegisteryContracts, Ownable {
+contract AuctionRegistery is AuctionRegisteryContracts, Ownable {
+    
     IAuctionRegistery public contractsRegistry;
-
+    
     address public whiteListAddress;
     address public smartSwapAddress;
     address public currencyPricesAddress;
     address public vaultAddress;
     address public auctionAddress;
-
+    
     /**@dev sets the initial registry address */
-    constructor(address _registryaddress)
+    constructor(address _registeryAddress)
         public
-        notZeroAddress(_registryaddress)
+        notZeroAddress(_registeryAddress)
     {
-        contractsRegistry = IAuctionRegistery(_registryaddress);
-        _updateAddresses();
+        contractsRegistry = IAuctionRegistery(_registeryAddress);
+         _updateAddresses();
     }
 
     /**@dev updates the address of the registry, called only by the system */
@@ -46,7 +47,7 @@ contract RegisteryToken is AuctionRegisteryContracts, Ownable {
     {
         return contractsRegistry.getAddressOf(_contractName);
     }
-
+    
     /**@dev updates all the address from the registry contract
     this decision was made to save gas that occurs from calling an external view function */
     function _updateAddresses() internal {
@@ -56,33 +57,37 @@ contract RegisteryToken is AuctionRegisteryContracts, Ownable {
         vaultAddress = getAddressOf(VAULT);
         auctionAddress = getAddressOf(AUCTION);
     }
-
+    
     function updateAddresses() external returns (bool) {
         _updateAddresses();
-        return true;
     }
 }
 
 
-/**@dev Also is a standard ERC20 token*/
-contract TokenUtils is StandardToken, RegisteryToken {
+/**@dev Also is a standard IBEP20 token*/
+contract TokenUtils is StandardToken, AuctionRegistery {
+    
     /**
-     *@dev contructs standard erc20 token and auction registry
+     *@dev contructs standard IBEP20 token and auction registry
      *@param _name name of the token
      *@param _symbol symbol of the token
      *@param _systemAddress address that acts as an admin of the system
      *@param _authorityAddress address that can change the systemAddress
-     *@param _registryaddress address of the registry contract the keeps track of all the contract Addresses
+     *@param _registeryAddress address of the registry contract the keeps track of all the contract Addresses
      **/
     constructor(
         string memory _name,
         string memory _symbol,
         address _systemAddress,
         address _authorityAddress,
-        address _registryaddress
+        address _registeryAddress
     )
         public
         StandardToken(_name, _symbol, _systemAddress, _authorityAddress)
-        RegisteryToken(_registryaddress)
-    {}
+        AuctionRegistery(_registeryAddress)
+    {
+       _updateAddresses();
+    }
+
+    
 }

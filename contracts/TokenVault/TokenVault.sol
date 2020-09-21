@@ -6,7 +6,7 @@ import "../common/SafeMath.sol";
 import "../common/TokenTransfer.sol";
 import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
-import "../InterFaces/IERC20Token.sol";
+import "../InterFaces/IBEP20Token.sol";
 import "../InterFaces/IAuctionProtection.sol";
 
 
@@ -119,7 +119,7 @@ contract TokenVault is
         emit FundDeposited(address(0), msg.sender, msg.value);
     }
 
-    function depositeToken(IERC20Token _token, address _from, uint256 _amount)
+    function depositeToken(IBEP20Token _token, address _from, uint256 _amount)
         external
         returns (bool)
     {
@@ -130,7 +130,7 @@ contract TokenVault is
     
     
     function directTransfer(address _token,address _to,uint256 amount) external onlySpender() returns (bool){
-        ensureTransferFrom(IERC20Token(_token),address(this),_to,amount);
+        ensureTransferFrom(IBEP20Token(_token),address(this),_to,amount);
         emit FundTransfer(msg.sender,_to,_token,amount);
         return true;
     }

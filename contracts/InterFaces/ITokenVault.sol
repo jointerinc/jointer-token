@@ -1,10 +1,10 @@
 pragma solidity ^0.5.9;
 
-import "./IERC20Token.sol";
+import "./IBEP20Token.sol";
 
 interface ITokenVault {
     function depositeToken(
-        IERC20Token _token,
+        IBEP20Token _token,
         address _from,
         uint256 _amount
     ) external returns (bool);

@@ -15,20 +15,14 @@ const MainToken = artifacts.require("MainToken");
 const LiquadityRegistery = artifacts.require("LiquidityRegistery");
 const Liquadity = artifacts.require("Liquidity");
 
-const SmartToken = TruffleContract(require("../test/bancorArtifacts/SmartToken.json"));
-const BancorConverter = TruffleContract(require("../test/bancorArtifacts/BancorConverter.json"));
-
 const {
     ownerWallet,
     whiteListSecondary,
-    relayTokenAddress,
     baseTokenAddress,
     otherSecondary,
     governance,
     byPassCode,
-    bancorConverterAddress,
-    ethBaseTokenRelayAddress,
-    ethTokenAddress,
+    poolAddress,
     baseLinePrice
 } = require("../constant");
 
@@ -68,7 +62,7 @@ module.exports = async function (deployer) {
 
     txHash9 = await LiquadityRegisteryInstance.createProxy(
         1,
-        bancorConverterAddress,
+        poolAddress,
         baseTokenAddress,
         mainToken,
         ownerWallet,

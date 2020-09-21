@@ -12,18 +12,18 @@ const { ownerWallet , otherSecondary , governance } = require('../constant');
 
 module.exports = async function (deployer) {
     
-    await deployer.deploy(
-        AuctionRegistery,
-        otherSecondary,
-        governance, {
-        from: ownerWallet
-        }
-    );
+    // await deployer.deploy(
+    //     AuctionRegistery,
+    //     otherSecondary,
+    //     governance, {
+    //     from: ownerWallet
+    //     }
+    // );
 
-    currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
-    currentdata = JSON.parse(currentdata);
-    currentdata["AuctionRegistery"] = AuctionRegistery.address;
-    await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata,undefined,2));
+    // currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
+    // currentdata = JSON.parse(currentdata);
+    // currentdata["AuctionRegistery"] = AuctionRegistery.address;
+    // await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata,undefined,2));
 
 }
 

@@ -6,7 +6,7 @@ import "../Proxy/Upgradeable.sol";
 import "../common/TokenTransfer.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/ICurrencyPrices.sol";
-import "../InterFaces/IERC20Token.sol";
+import "../InterFaces/IBEP20Token.sol";
 import "../InterFaces/IAuctionLiquidity.sol";
 import "../InterFaces/IAuction.sol";
 import "../InterFaces/ITokenVault.sol";
@@ -107,7 +107,7 @@ contract ContributionTrigger is
 
     // relay token and bnt token
     function transferTokenLiquidity(
-        IERC20Token _token,
+        IBEP20Token _token,
         address _reciver,
         uint256 _amount
     ) external returns (bool) {
@@ -117,7 +117,7 @@ contract ContributionTrigger is
     }
 
     function depositeToken(
-        IERC20Token _token,
+        IBEP20Token _token,
         address _from,
         uint256 _amount
     ) external returns (bool) {

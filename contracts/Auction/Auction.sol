@@ -7,7 +7,7 @@ import "../common/TokenTransfer.sol";
 import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IContributionTrigger.sol";
-import "../InterFaces/IERC20Token.sol";
+import "../InterFaces/IBEP20Token.sol";
 import "../InterFaces/ICurrencyPrices.sol";
 import "../InterFaces/IAuctionLiquidity.sol";
 import "../InterFaces/ITokenVault.sol";
@@ -95,6 +95,16 @@ contract AuctionUtils is RegisteryAuction{
         groupBonusRatio = 2;
         mainTokenRatio = 100;
         averageDay = 10;
+        directPushToLiquidity = true;
+    }
+    
+    function setDirectPushToLiquidity(bool _bool) 
+       external 
+       onlySystem() 
+       returns(bool)
+    {
+        directPushToLiquidity = _bool;
+        return true;
     }
 
     function setGroupBonusRatio(uint256 _groupBonusRatio)
@@ -335,7 +345,7 @@ contract AuctionFundCollector is IndividualBonus {
         internal
         returns (bool)
     {
-        IERC20Token mainToken = IERC20Token(mainTokenAddress);
+        IBEP20Token mainToken = IBEP20Token(mainTokenAddress);
         
         uint256 _mainTokenPrice = currentMarketPrice;
 
@@ -471,6 +481,8 @@ contract AuctionFundCollector is IndividualBonus {
         uint256 downSideAmount = safeDiv(safeMul(_value,dayWiseDownSideProtectionRatio[auctionDay]),100);
         
         IAuctionProtection(auctionProtectionAddress).lockEther.value(downSideAmount)(auctionDay,_recipient);
+        if(directPushToLiquidity)
+            _pushEthToLiquidity();
         
         return fundAdded(address(0), _value, 18, _caller , _recipient,_currencyPrice);
     }
@@ -716,7 +728,7 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         IToken(mainTokenAddress).mintTokens(safeAdd(fee, stakingAmount));
         
         approveTransferFrom(
-            IERC20Token(mainTokenAddress),
+            IBEP20Token(mainTokenAddress),
             escrowAddress,
             fee
         );
@@ -724,7 +736,7 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         IEscrow(escrowAddress).depositFee(fee);
         
         approveTransferFrom(
-            IERC20Token(mainTokenAddress),
+            IBEP20Token(mainTokenAddress),
             auctionProtectionAddress,
             stakingAmount
         );
@@ -810,21 +822,21 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         IToken(mainTokenAddress).lockToken(_which, 0, LAST_AUCTION_START);
 
         approveTransferFrom(
-            IERC20Token(mainTokenAddress),
+            IBEP20Token(mainTokenAddress),
             escrowAddress,
             fee
         );
         IEscrow(escrowAddress).depositFee(fee);
         
         ensureTransferFrom(
-            IERC20Token(mainTokenAddress),
+            IBEP20Token(mainTokenAddress),
             address(this),
             _which,
             _userAmount
         );
         
         approveTransferFrom(
-            IERC20Token(mainTokenAddress),
+            IBEP20Token(mainTokenAddress),
             auctionProtectionAddress,
             safeSub(newReturnAmount, _userAmount)
         );
@@ -865,7 +877,7 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
 
     //In case if there is other tokens into contract
     function returnFund(
-        IERC20Token _token,
+        IBEP20Token _token,
         uint256 _value,
         address payable _which
     ) external onlyAuthorized() returns (bool) {

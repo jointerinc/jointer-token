@@ -1,10 +1,10 @@
 pragma solidity ^0.5.9;
 
-import "../InterFaces/IERC20Token.sol";
+import "../InterFaces/IBEP20Token.sol";
 
 contract TokenTransfer {
     function ensureTransferFrom(
-        IERC20Token _token,
+        IBEP20Token _token,
         address _from,
         address _to,
         uint256 _amount
@@ -19,7 +19,7 @@ contract TokenTransfer {
     }
 
     function approveTransferFrom(
-        IERC20Token _token,
+        IBEP20Token _token,
         address _spender,
         uint256 _amount
     ) internal {
