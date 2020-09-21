@@ -1,107 +1,44 @@
 pragma solidity ^0.5.9;
+pragma experimental ABIEncoderV2;
 
-import "./provableAPI.sol";
-import "../common/Ownable.sol";
 
-contract CurrencyPriceTicker is usingProvable, Ownable {
-    string public currency;
-
-    uint256 public priceUSD;
-
-    uint256 public currentGasPrice = 130000000000; //130gwei
-
-    uint256 public currentGasLimit = 100000;
-
-    string[] public parameters;
-
-    bytes32[] public queryIds;
-
-    mapping(bytes32 => bool) validIds;
-
-    event LogNewProvableQuery(string description);
-    event LogNewEthPriceTicker(uint256 price);
-    event LogProof(bytes proof);
-
-    constructor(
-        string memory _currency,
-        address _systemAddress,
-        address _multisigAddress,
-        string memory _parameter
-    ) public payable Ownable(_systemAddress, _multisigAddress) {
-        currency = _currency;
-        provable_setCustomGasPrice(currentGasPrice);
-        provable_setProof(proofType_Android | proofStorage_IPFS);
-        parameters.push(_parameter);
+interface IStdReference {
+    /// A structure returned whenever someone requests for standard reference data.
+    struct ReferenceData {
+        uint256 rate; // base/quote exchange rate, multiplied by 1e18.
+        uint256 lastUpdatedBase; // UNIX epoch of the last time when base price gets updated.
+        uint256 lastUpdatedQuote; // UNIX epoch of the last time when quote price gets updated.
     }
 
-    function setGasPrice(uint256 _gasPrice) external onlySystem() {
-        provable_setCustomGasPrice(_gasPrice);
-        currentGasPrice = _gasPrice;
-    }
-
-    function setGasLimit(uint256 _gasLimit) external onlyOwner() {
-        currentGasLimit = _gasLimit;
-    }
-
-    function updateParameter(string calldata _parameter)
+    /// Returns the price data for the given base/quote pair. Revert if not available.
+    function getReferenceData(string calldata _base, string calldata _quote)
         external
-        onlyAuthorized()
-    {
-        parameters[0] = _parameter;
+        view
+        returns (ReferenceData memory);
+
+}
+
+contract CurrencyPriceTicker {
+    
+    IStdReference public ref;
+
+    string public baseCurrency;
+    
+    string public vsCurrency;
+    
+    uint256 public constant PRICE_NOMINATOR = 10**9;
+    
+    constructor(IStdReference _ref,string memory _baseCurrency,string memory _vsCurrency) public {
+        baseCurrency = _baseCurrency;
+        vsCurrency = _vsCurrency;
+        ref = _ref;
     }
 
-    function __callback(
-        bytes32 _myid,
-        string memory _result,
-        bytes memory _proof
-    ) public {
-        require(msg.sender == provable_cbAddress());
-        require(validIds[_myid]);
-
-        uint256 _priceUSD = parseInt(_result);
-        if (_priceUSD > 0) {
-            priceUSD = _priceUSD;
-            delete validIds[_myid];
-            emit LogNewEthPriceTicker(priceUSD);
-            emit LogProof(_proof);
-        }
+    
+    function getCurrencyPrice() external view returns (uint256){
+        IStdReference.ReferenceData memory data = ref.getReferenceData(baseCurrency,vsCurrency);
+        return data.rate/PRICE_NOMINATOR;
     }
+    
 
-    function getCurrencyPrice() external view returns (uint256) {
-        return priceUSD;
-    }
-
-    function update() external payable {
-        uint256 fee = provable_getPrice("computation", currentGasLimit);
-
-        if (msg.sender != systemAddress) {
-            require(
-                msg.value >= fee,
-                "If user wants to call this they have to pay price for update"
-            );
-        }
-
-        if (fee > address(this).balance) {
-            emit LogNewProvableQuery(
-                "Provable query was NOT sent, please add some ETH to cover for the query fee!"
-            );
-        } else {
-            emit LogNewProvableQuery(
-                "Provable query was sent, standing by for the answer..."
-            );
-            bytes32 queryId = provable_query(
-                "computation",
-                parameters,
-                currentGasLimit
-            );
-            validIds[queryId] = true;
-            queryIds.push(queryId);
-        }
-    }
-
-    function() external payable {}
-
-    function withDrawEth(address payable _which) external onlyAuthorized() {
-        _which.transfer(address(this).balance);
-    }
 }

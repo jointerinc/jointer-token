@@ -71,7 +71,7 @@ contract Ownable is Constant {
      */
     function changePrimaryOwner(address _which)
         public
-        onlyAuthorized()
+        onlyOwner()
         notZeroAddress(_which)
         returns (bool)
     {
