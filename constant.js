@@ -13,8 +13,10 @@ const whiteListSecondary = "0x68bC87e4Ac145b33D917f6CEAB7AdcF398F90771"; // whit
 // const otherSecondary = "0x04a88313d287ABfd1ef62C8561dDFde09510b9Ca"; // wallet #3
 // const whiteListSecondary = "0x82c2935d9b3F800fb80A167070C38aA835041B98"; // white list wallet
 
-const realEstate =  "0xa54D503914E9f6Da63333F62625B0eD6dE49A68d";
 
+const mainTokenOwner = "0xD99634a54e2295f23d4DBD5B004f73D4ed0474F5";
+
+const realEstate =  "0xa54D503914E9f6Da63333F62625B0eD6dE49A68d";
 const governance = "0x3AED1defBD95F7c9476823f6348A88953507a7c5"; // GovernanceProxy address is here dynamic
 const escrow = "0x79F760C4259F7a5a8E0e7FEbce293c1263318Afa"; // dynamic 
 const gateWay = "0xEcC65C496bAb375d7be0A63C2788016ceB86494B"; // dynamic 
@@ -77,5 +79,6 @@ module.exports = {
     intervalTime:intervalTime,
     baseLinePrice:baseLinePrice,
     realEstate:realEstate,
-    gateWay:gateWay
+    gateWay:gateWay,
+    mainTokenOwner:mainTokenOwner
 }
