@@ -11,7 +11,7 @@ contract EtnToken is Exchangeable {
      *@param _symbol symbol of the token
      *@param _systemAddress address that acts as an admin of the system
      *@param _authorityAddress address that can change the systemAddress
-     *@param _registryaddress address of the registry contract the keeps track of all the contract Addresses
+     *@param _registeryAddress address of the registry contract the keeps track of all the contract Addresses
      *@param _returnToken address of the token user gets back when system forces them to convert(maintoken)
      **/
     constructor(
@@ -19,7 +19,7 @@ contract EtnToken is Exchangeable {
         string memory _symbol,
         address _systemAddress,
         address _authorityAddress,
-        address _registryaddress,
+        address _registeryAddress,
         address _returnToken
     )
         public
@@ -28,7 +28,7 @@ contract EtnToken is Exchangeable {
             _symbol,
             _systemAddress,
             _authorityAddress,
-            _registryaddress
+            _registeryAddress
         )
         ForceSwap(_returnToken)
     {}
@@ -74,23 +74,22 @@ contract EtnToken is Exchangeable {
         ICurrencyPrices currencyPrice = ICurrencyPrices(currencyPricesAddress);
 
         uint256 fromTokenPrice = currencyPrice.getCurrencyPrice(_fromToken);
-
-        require(fromTokenPrice > 0, "ERR_FROM_TOKEN_PRICE_NOT_SET");
+        
+        require(fromTokenPrice > 0, "ERR_TOKEN_PRICE_NOT_SET");
 
         uint256 currentTokenPrice = currencyPrice.getCurrencyPrice(
             address(this)
         );
-        require(currentTokenPrice > 0, "ERR_CURRENT_TOKEN_PRICE_NOT_SET");
-        
+
         uint256 _assignToken = safeDiv(
             safeMul(_amount, fromTokenPrice),
             currentTokenPrice
         );
 
         if (_fromToken == returnToken) {
-            ERC20(_fromToken).transferFrom(msg.sender, vaultAddress, _amount);
+            IBEP20(_fromToken).transferFrom(msg.sender, vaultAddress, _amount);
         } else {
-            ERC20(_fromToken).transferFrom(msg.sender, address(this), _amount);
+            IBEP20(_fromToken).transferFrom(msg.sender, address(this), _amount);
             IToken(_fromToken).burn(_amount);
         }
 
@@ -99,7 +98,7 @@ contract EtnToken is Exchangeable {
         return _assignToken;
     }
 
-    function transfer(address _to, uint256 _value) external returns (bool ok) {
+    function transfer(address _to, uint256 _value) external  returns (bool ok) {
         require(checkBeforeTransfer(msg.sender, _to));
         return _transfer(msg.sender, _to, _value);
     }
@@ -108,7 +107,7 @@ contract EtnToken is Exchangeable {
         address _from,
         address _to,
         uint256 _value
-    ) external returns (bool) {
+    ) external  returns (bool) {
         require(checkBeforeTransfer(_from, _to));
         return _transferFrom(_from, _to, _value);
     }

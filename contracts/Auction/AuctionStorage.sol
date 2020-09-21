@@ -53,6 +53,8 @@ contract AuctionStorage {
     uint256 public todaySupply;
 
     uint256 public averageDay;
+    
+    bool public directPushToLiquidity;
 
     // address how much invested by them in auciton till date
     mapping(address => uint256) public userTotalFund;

@@ -1,7 +1,7 @@
 pragma solidity ^0.5.9;
 
 
-interface IERC20Token {
+interface IBEP20Token {
     function name() external view returns (string memory);
 
     function symbol() external view returns (string memory);

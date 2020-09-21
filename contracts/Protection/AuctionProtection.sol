@@ -8,7 +8,7 @@ import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 import "../InterFaces/IContributionTrigger.sol";
 import "../InterFaces/ITokenVault.sol";
-import "../InterFaces/IERC20Token.sol";
+import "../InterFaces/IBEP20Token.sol";
 import "../InterFaces/IAuction.sol";
 import "../InterFaces/IWhiteList.sol";
 
@@ -117,7 +117,7 @@ contract Stacking is
         allowedAddressOnly(msg.sender)
         returns (bool)
     {
-        IERC20Token mainToken = IERC20Token(mainTokenAddress);
+        IBEP20Token mainToken = IBEP20Token(mainTokenAddress);
 
         if (totalTokenAmount > PERCENT_NOMINATOR) {
             ensureTransferFrom(mainToken, msg.sender, address(this), _amount);
@@ -216,7 +216,7 @@ contract Stacking is
         uint256 _stackToken = calulcateStackFund(_whom);
         uint256 actulToken = safeAdd(stackBalance[_whom], _stackToken);
         ensureTransferFrom(
-            IERC20Token(mainTokenAddress),
+            IBEP20Token(mainTokenAddress),
             address(this),
             _whom,
             actulToken
@@ -299,7 +299,7 @@ contract AuctionProtection is Upgradeable, Stacking {
 
         _tokenBalance = lockedTokens[_whom];
         if (_tokenBalance > 0) {
-            IERC20Token _token = IERC20Token(mainTokenAddress);
+            IBEP20Token _token = IBEP20Token(mainTokenAddress);
             approveTransferFrom(_token, vaultAddress, _tokenBalance);
 
             ITokenVault(vaultAddress).depositeToken(
@@ -343,7 +343,7 @@ contract AuctionProtection is Upgradeable, Stacking {
         _tokenBalance = lockedTokens[_which];
 
         if (_tokenBalance > 0) {
-            IERC20Token _token = IERC20Token(mainTokenAddress);
+            IBEP20Token _token = IBEP20Token(mainTokenAddress);
 
             if (isStacking) {
                 addFundToStacking(_which, _tokenBalance);
@@ -409,7 +409,7 @@ contract AuctionProtection is Upgradeable, Stacking {
         address _which,
         uint256 _amount
     ) external allowedAddressOnly(msg.sender) returns (bool) {
-        IERC20Token token = IERC20Token(mainTokenAddress);
+        IBEP20Token token = IBEP20Token(mainTokenAddress);
 
         ensureTransferFrom(token, msg.sender , address(this), _amount);
 

@@ -47,6 +47,16 @@ module.exports = {
       timeoutBlocks: 200,
       skipDryRun: true,
     },
+    BSC_TESTNET: {
+      provider: function () {
+        return new HDWalletProvider(MNEMONIC,"https://data-seed-prebsc-1-s1.binance.org:8545");
+      },
+      network_id: 97,
+      gas: 7000000,
+      gasPrice: 30000000000,
+      timeoutBlocks: 300,
+      skipDryRun: true,
+    }
   },
   mocha: {
     reporter: "eth-gas-reporter",

@@ -7,7 +7,7 @@ import "../common/TokenTransfer.sol";
 import "../Proxy/Upgradeable.sol";
 import "../InterFaces/IContributionTrigger.sol";
 import "../InterFaces/ICurrencyPrices.sol";
-import "../InterFaces/IERC20Token.sol";
+import "../InterFaces/IBEP20Token.sol";
 import "../InterFaces/IAuction.sol";
 import "../InterFaces/ITokenVault.sol";
 import "../InterFaces/IWhiteList.sol";
@@ -41,16 +41,7 @@ contract UniConverterLiquidity is ProxyOwnable, SafeMath, LiquidityStorage {
         converter = _converter;
         return true;
     }
-
-    function getTokensReserveRatio()
-        internal
-        view
-        returns (uint256 _baseTokenRatio, uint256 _mainTokenRatio)
-    {
-        (_baseTokenRatio, _mainTokenRatio,) = IUniswapV2Pair(converter).getReserves();
-        return (_baseTokenRatio, _mainTokenRatio);
-    }
-
+    
     // convert base to main token. baseTokenAmount = BNB, mainTokenAmount = JNTR
     function convertBase(uint baseTokenAmount, address payable to) internal  returns(uint256) {
         
@@ -226,21 +217,14 @@ contract LiquidityFormula is LiquidityUtils {
     // current market price calculate according to baseLinePrice
     // if baseToken Price differ from
     function _getCurrentMarketPrice() internal view returns (uint256) {
-        uint256 _mainTokenBalance = IERC20Token(mainToken).balanceOf(converter);
-
-        (
-            uint256 _baseTokenRatio,
-            uint256 _mainTokenRatio
-        ) = getTokensReserveRatio();
-
+        uint256 _mainTokenBalance = IBEP20Token(mainToken).balanceOf(converter);
         uint256 ratio = safeDiv(
             safeMul(
-                safeMul(lastReserveBalance, _mainTokenRatio),
+                lastReserveBalance,
                 BIG_NOMINATOR
             ),
-            safeMul(_mainTokenBalance, _baseTokenRatio)
+            _mainTokenBalance
         );
-
         return safeDiv(safeMul(ratio, baseLinePrice), BIG_NOMINATOR);
     }
 
@@ -502,14 +486,14 @@ contract Liquidity is
         uint256 tempX = safeDiv(_percent, appreciationLimit);
         uint256 root = nthRoot(tempX, 2, 0, maxIteration);
         uint256 _tempValue = safeSub(root, PRICE_NOMINATOR);
-        uint256 _supply = IERC20Token(mainToken).balanceOf(converter);
+        uint256 _supply = IBEP20Token(mainToken).balanceOf(converter);
 
         uint256 _reverseBalance = safeDiv(
             safeMul(_supply, _tempValue),
             PRICE_NOMINATOR
         );
 
-        uint256 vaultBalance = IERC20Token(mainToken).balanceOf(vaultAddress);
+        uint256 vaultBalance = IBEP20Token(mainToken).balanceOf(vaultAddress);
 
         if (vaultBalance >= _reverseBalance) {
             ITokenVault(vaultAddress).directTransfer(
@@ -519,7 +503,7 @@ contract Liquidity is
             );
             return convertMain(_reverseBalance, address(this));
         } else {
-            uint256 converterBalance = IERC20Token(mainToken).balanceOf(
+            uint256 converterBalance = IBEP20Token(mainToken).balanceOf(
                 converter
             );
 
@@ -577,26 +561,28 @@ contract Liquidity is
     }
 
     function redemptionFromEscrow(
+        address[] memory _path,
         uint256 _amount,
         address payable _reciver
     ) public returns (bool) {
         require(msg.sender == escrowAddress, ERR_AUTHORIZED_ADDRESS_ONLY);
-        return _redemption(_amount, msg.sender, _reciver);
+        return _redemption(_path, _amount, msg.sender, _reciver);
     }
 
-    function redemption(uint256 _amount)
+    function redemption(address[] memory _path, uint256 _amount)
         public
         returns (bool)
     {
-        return _redemption(_amount, msg.sender, msg.sender);
+        return _redemption(_path, _amount, msg.sender, msg.sender);
     }
 
     function _redemption(
+        address[] memory _path,
         uint256 _amount,
         address payable _caller,
         address payable _reciver
     ) internal returns (bool) {
-        
+        require(_path[0] == mainToken, "ERR_MAIN_TOKEN");
 
         address primaryWallet = IWhiteList(whiteListAddress).address_belongs(
             _reciver
@@ -618,7 +604,7 @@ contract Liquidity is
         }
 
         ensureTransferFrom(
-            IERC20Token(mainToken),
+            IBEP20Token(mainToken),
             _caller,
             converter,
             _amount
@@ -631,7 +617,7 @@ contract Liquidity is
         uint256 _afterBalance = converter.balance;
 
         emit Redemption(
-            baseToken,
+            address(_path[safeSub(_path.length, 1)]),
             _amount,
             returnAmount
         );
@@ -690,7 +676,7 @@ contract Liquidity is
         internal
         returns (uint256, uint256)
     {
-        uint256 _mainTokenBalance = IERC20Token(mainToken).balanceOf(
+        uint256 _mainTokenBalance = IBEP20Token(mainToken).balanceOf(
             address(this)
         );
 
@@ -698,7 +684,7 @@ contract Liquidity is
 
         uint256 sellRelay = safeDiv(
             safeMul(
-                IERC20Token(converter).balanceOf(triggerAddress),
+                IBEP20Token(converter).balanceOf(triggerAddress),
                 _relayPercent
             ),
             safeMul(100, PRICE_NOMINATOR)
@@ -707,7 +693,7 @@ contract Liquidity is
         require(sellRelay > 0, "ERR_RELAY_ZERO");
 
         IContributionTrigger(triggerAddress).transferTokenLiquidity(
-            IERC20Token(converter),
+            IBEP20Token(converter),
             converter,
             sellRelay
         );
@@ -716,7 +702,7 @@ contract Liquidity is
         IUniswapV2Pair(converter).burn(address(this));
 
         _mainTokenBalance = safeSub(
-            IERC20Token(mainToken).balanceOf(address(this)),
+            IBEP20Token(mainToken).balanceOf(address(this)),
             _mainTokenBalance
         );
 
@@ -726,7 +712,7 @@ contract Liquidity is
         );
 
         ensureTransferFrom(
-            IERC20Token(mainToken),
+            IBEP20Token(mainToken),
             address(this),
             vaultAddress,
             _mainTokenBalance
@@ -736,7 +722,7 @@ contract Liquidity is
         return (_baseTokenBalance, _mainTokenBalance);
     }
 
-    function returnFundToTagAlong(IERC20Token _token, uint256 _value)
+    function returnFundToTagAlong(IBEP20Token _token, uint256 _value)
         external
         onlyOwner()
         returns (bool)
@@ -750,7 +736,7 @@ contract Liquidity is
     }
 
     //return token and ether from tagalong to here  as we only need ether
-    function takeFundFromTagAlong(IERC20Token _token, uint256 _value)
+    function takeFundFromTagAlong(IBEP20Token _token, uint256 _value)
         external
         onlyOwner()
         returns (bool)
@@ -774,12 +760,12 @@ contract Liquidity is
 
     function sendMainTokenToVault() external returns (bool) {
         
-        uint256 mainTokenBalance = IERC20Token(mainToken).balanceOf(
+        uint256 mainTokenBalance = IBEP20Token(mainToken).balanceOf(
             address(this)
         );
         
         ensureTransferFrom(
-            IERC20Token(mainToken),
+            IBEP20Token(mainToken),
             address(this),
             vaultAddress,
             mainTokenBalance

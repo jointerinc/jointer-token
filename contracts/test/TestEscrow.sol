@@ -3,12 +3,12 @@ pragma solidity ^0.5.9;
 //the auctionTests.js itself
 
 import "../common/TokenTransfer.sol";
-import "../InterFaces/IERC20Token.sol";
+import "../InterFaces/IBEP20Token.sol";
 
 contract TestEscrow is TokenTransfer{
 
-    IERC20Token mainToken ;
-    constructor(IERC20Token _mainToken) public {
+    IBEP20Token mainToken ;
+    constructor(IBEP20Token _mainToken) public {
         mainToken = _mainToken;
     }
 

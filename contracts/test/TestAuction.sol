@@ -5,7 +5,7 @@ pragma solidity ^0.5.9;
 //the auctionTests.js itself
 
 
-import "../InterFaces/IERC20Token.sol";
+import "../InterFaces/IBEP20Token.sol";
 
 contract TestAuction {
     // uint256 public auctionDay = 1;
@@ -44,9 +44,9 @@ contract TestAuction {
     //     return IAuctionProtection(protectionAddress).stackFund(_amount);
     // }
 
-    // //ERC20 stuff
+    // //IBEP20 stuff
     // function approve(
-    //     IERC20Token _token,
+    //     IBEP20Token _token,
     //     address _spender,
     //     uint256 _value
     // ) external returns (bool) {

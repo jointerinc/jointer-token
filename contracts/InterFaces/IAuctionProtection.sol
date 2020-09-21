@@ -1,6 +1,6 @@
 pragma solidity ^0.5.9;
 
-import "./IERC20Token.sol";
+import "./IBEP20Token.sol";
 
 interface IAuctionProtection {
     function lockEther(uint256 _auctionDay,address _which)

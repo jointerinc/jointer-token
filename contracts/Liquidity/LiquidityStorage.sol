@@ -1,5 +1,5 @@
 pragma solidity ^0.5.9;
-import "../InterFaces/IERC20Token.sol";
+import "../InterFaces/IBEP20Token.sol";
 import "../InterFaces/IAuctionRegistery.sol";
 
 contract LiquidityStorage {

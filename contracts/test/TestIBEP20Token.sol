@@ -18,7 +18,7 @@ library SafeMath {
 }
 
 
-interface IERC20 {
+interface IBEP20 {
     event Approval(
         address indexed owner,
         address indexed spender,
@@ -53,7 +53,7 @@ interface IERC20 {
 }
 
 
-contract CustomERC20 is IERC20 {
+contract CustomIBEP20 is IBEP20 {
     using SafeMath for uint256;
 
     string  public name;
@@ -194,8 +194,8 @@ contract CustomERC20 is IERC20 {
 }
 
 
-contract TestERC20 is CustomERC20 {
-    constructor() public CustomERC20("mDAI", "mDAI", 0, 0) {}
+contract TestIBEP20 is CustomIBEP20 {
+    constructor() public CustomIBEP20("mDAI", "mDAI", 0, 0) {}
 
     function mint(address who, uint256 amount) public {
         _mint(who, amount);

@@ -1,10 +1,10 @@
 pragma solidity ^0.5.9;
 
-import "./IERC20Token.sol";
+import "./IBEP20Token.sol";
 
 interface IContributionTrigger {
     function depositeToken(
-        IERC20Token _token,
+        IBEP20Token _token,
         address _from,
         uint256 _amount
     ) external returns (bool);
@@ -14,7 +14,7 @@ interface IContributionTrigger {
         returns (uint256);
 
     function transferTokenLiquidity(
-        IERC20Token _token,
+        IBEP20Token _token,
         address _reciver,
         uint256 _amount
     ) external returns (bool);

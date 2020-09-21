@@ -1,5 +1,6 @@
 pragma solidity ^0.5.9;
 
+
 import "./StandardToken.sol";
 import "../InterFaces/ICurrencyPrices.sol";
 import "../InterFaces/ITokenVault.sol";
@@ -32,11 +33,12 @@ contract ForceSwap is TokenUtils {
         _burn(_which, _amount);
 
         ICurrencyPrices currencyPrice = ICurrencyPrices(currencyPricesAddress);
+        
 
         ITokenVault tokenVault = ITokenVault(vaultAddress);
 
         uint256 retunTokenPrice = currencyPrice.getCurrencyPrice(returnToken);
-
+        
         require(retunTokenPrice > 0, "ERR_TOKEN_PRICE_NOT_SET");
 
         uint256 currentTokenPrice = currencyPrice.getCurrencyPrice(
