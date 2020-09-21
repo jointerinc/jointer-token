@@ -24,61 +24,61 @@ const tagAlongCode =
 
 module.exports = async function (deployer) {
 
-    // currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
-    // currentdata = JSON.parse(currentdata);
+    currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
+    currentdata = JSON.parse(currentdata);
     
-    // auctionRegistery  = currentdata.AuctionRegistery;
-    // whiteList  = currentdata.WhiteList;
+    auctionRegistery  = currentdata.AuctionRegistery;
+    whiteList  = currentdata.WhiteList;
 
-    // whiteListInstance = await WhiteList.at(whiteList);
-    // auctionRegistyInstance = await AuctionRegistery.at(auctionRegistery);
+    whiteListInstance = await WhiteList.at(whiteList);
+    auctionRegistyInstance = await AuctionRegistery.at(auctionRegistery);
 
-    // await deployer.deploy(
-    //     TagAlongRegistry,
-    //     otherSecondary,
-    //     governance,{
-    //        from: ownerWallet,
-    //     }
-    // );
+    await deployer.deploy(
+        TagAlongRegistry,
+        otherSecondary,
+        governance,{
+           from: ownerWallet,
+        }
+    );
 
-    // tagAlongRegistryInstance = await TagAlongRegistry.deployed();
+    tagAlongRegistryInstance = await TagAlongRegistry.deployed();
 
-    // await deployer.deploy(TagAlong, {
-    //     from: ownerWallet,
-    // });
+    await deployer.deploy(TagAlong, {
+        from: ownerWallet,
+    });
 
-    // txHash1 = await tagAlongRegistryInstance.addVersion(1, TagAlong.address, {
-    //     from: ownerWallet,
-    // });
+    txHash1 = await tagAlongRegistryInstance.addVersion(1, TagAlong.address, {
+        from: ownerWallet,
+    });
 
-    // txHash2 = await tagAlongRegistryInstance.createProxy(
-    //     1,
-    //     ownerWallet,
-    //     otherSecondary,
-    //     governance,
-    //     auctionRegistery, {
-    //     from: ownerWallet,
-    //     }
-    // );
+    txHash2 = await tagAlongRegistryInstance.createProxy(
+        1,
+        ownerWallet,
+        otherSecondary,
+        governance,
+        auctionRegistery, {
+        from: ownerWallet,
+        }
+    );
     
-    // tagAlongProxyAddress = await tagAlongRegistryInstance.proxyAddress();
+    tagAlongProxyAddress = await tagAlongRegistryInstance.proxyAddress();
 
-    // tagAlongInstance = await TagAlong.at(tagAlongProxyAddress);
+    tagAlongInstance = await TagAlong.at(tagAlongProxyAddress);
 
-    // txHash3 = await whiteListInstance.addNewWallet(tagAlongProxyAddress, byPassCode,10, {
-    //     from: whiteListSecondary,
-    // });
+    txHash3 = await whiteListInstance.addNewWallet(tagAlongProxyAddress, byPassCode,10, {
+        from: whiteListSecondary,
+    });
     
-    // txHash4 =  await auctionRegistyInstance.registerContractAddress(
-    //     tagAlongCode,
-    //     tagAlongProxyAddress, {
-    //     from: otherSecondary
-    //     }
-    // );
+    txHash4 =  await auctionRegistyInstance.registerContractAddress(
+        tagAlongCode,
+        tagAlongProxyAddress, {
+        from: otherSecondary
+        }
+    );
 
-    // currentdata["TagAlongRegistry"] = TagAlongRegistry.address;
-    // currentdata["TagAlong"] = tagAlongProxyAddress;
-    // await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata,undefined,2));
+    currentdata["TagAlongRegistry"] = TagAlongRegistry.address;
+    currentdata["TagAlong"] = tagAlongProxyAddress;
+    await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata,undefined,2));
 
 }   
 

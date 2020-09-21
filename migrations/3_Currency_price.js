@@ -20,47 +20,47 @@ const currencyCode =
 
 module.exports = async function (deployer) {
     
-    // currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
-    // currentdata = JSON.parse(currentdata);
+    currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
+    currentdata = JSON.parse(currentdata);
 
-    // auctionRegistery  = currentdata.AuctionRegistery;
-    // AuctionRegistyInstance = await AuctionRegistery.at(auctionRegistery);
+    auctionRegistery  = currentdata.AuctionRegistery;
+    AuctionRegistyInstance = await AuctionRegistery.at(auctionRegistery);
 
-    // await deployer.deploy(
-    //     CurrencyPrices,
-    //     otherSecondary,
-    //     governance, {
-    //       from: ownerWallet
-    //     }
-    // );
+    await deployer.deploy(
+        CurrencyPrices,
+        otherSecondary,
+        governance, {
+          from: ownerWallet
+        }
+    );
 
-    // CurrencyPricesInstnace = await CurrencyPrices.deployed();
+    CurrencyPricesInstnace = await CurrencyPrices.deployed();
 
-    // await deployer.deploy(
-    //     CurrencyPriceTicker,
-    //     bandProtocol,
-    //     "BNB",
-    //     "USD",
-    //     {
-    //       from: ownerWallet
-    //     }
-    // );
+    await deployer.deploy(
+        CurrencyPriceTicker,
+        bandProtocol,
+        "BNB",
+        "USD",
+        {
+          from: ownerWallet
+        }
+    );
 
-    // await CurrencyPricesInstnace.setCurrencyPriceContract(baseTokenAddress,CurrencyPriceTicker.address,{
-    //   from: otherSecondary
-    // });
+    await CurrencyPricesInstnace.setCurrencyPriceContract(baseTokenAddress,CurrencyPriceTicker.address,{
+      from: otherSecondary
+    });
     
-    // await AuctionRegistyInstance.registerContractAddress(
-    //     currencyCode,
-    //     CurrencyPrices.address, {
-    //     from: otherSecondary
-    //     }
-    // );
+    await AuctionRegistyInstance.registerContractAddress(
+        currencyCode,
+        CurrencyPrices.address, {
+        from: otherSecondary
+        }
+    );
 
-    // currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
-    // currentdata = JSON.parse(currentdata);
-    // currentdata["CurrencyPrices"] =  CurrencyPrices.address;//CurrencyPrices.address;
-    // await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata,undefined,2));
+    currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
+    currentdata = JSON.parse(currentdata);
+    currentdata["CurrencyPrices"] =  CurrencyPrices.address;//CurrencyPrices.address;
+    await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata,undefined,2));
 
     
     
