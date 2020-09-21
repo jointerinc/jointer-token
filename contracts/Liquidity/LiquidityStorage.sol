@@ -9,8 +9,10 @@ contract LiquidityStorage {
     uint256 public constant DECIMAL_NOMINATOR = 10**18;
     uint256 public constant PRICE_NOMINATOR = 10**9;
 
-    address public converter;
+    address payable public converter;
+
     address public baseToken; // basetoken
+
     address public mainToken; // maintoken
 
   

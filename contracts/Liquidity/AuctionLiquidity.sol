@@ -14,7 +14,7 @@ import "../InterFaces/IWhiteList.sol";
 
 interface LiquidityInitializeInterface {
     function initialize(
-        address _converter,
+        address payable _converter,
         address _baseToken,
         address _mainToken,
         address _primaryOwner,
@@ -33,7 +33,7 @@ interface IUniswapV2Pair {
 }
 
 contract UniConverterLiquidity is ProxyOwnable, SafeMath, LiquidityStorage {
-    function updateConverter(address _converter)
+    function updateConverter(address payable _converter)
         public
         onlyOwner()
         returns (bool)
@@ -279,7 +279,7 @@ contract Liquidity is
     LiquidityInitializeInterface
 {
     function initialize(
-        address _converter,
+        address payable _converter,
         address _baseToken,
         address _mainToken,
         address _primaryOwner,
@@ -420,6 +420,7 @@ contract Liquidity is
                 converter,
                 returnMain
             );
+            IUniswapV2Pair(converter).sync.value(0)();
         } else {
             IUniswapV2Pair(converter).sync.value(returnBase)();
         }
