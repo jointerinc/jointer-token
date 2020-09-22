@@ -413,6 +413,7 @@ contract Liquidity is
     }
 
     function recoverPriceVolatility() external returns (bool) {
+        
         _recoverPriceDueToManipulation();
 
         uint256 baseTokenPrice = ICurrencyPrices(currencyPricesAddress)
@@ -444,8 +445,8 @@ contract Liquidity is
 
         if (volatilty >= baseTokenVolatiltyRatio) {
             _recoverReserve(isMainToken, volatilty);
+            baseLinePrice = baseTokenPrice;
         }
-        baseLinePrice = baseTokenPrice;
         return true;
     }
 
