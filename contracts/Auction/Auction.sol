@@ -97,6 +97,11 @@ contract AuctionUtils is RegisteryAuction{
         directPushToLiquidity = true;
     }
     
+    modifier isAuctionStart(){
+        require(now >= LAST_AUCTION_START,"ERR_AUCTION_DAY_NOT_STARTED_YET");
+        _;
+    }
+
     function setDirectPushToLiquidity(bool _bool) 
        external 
        onlySystem() 
@@ -487,7 +492,7 @@ contract AuctionFundCollector is IndividualBonus {
     }
 
     // we only start with ether we dont need any token right now
-    function contributeWithEther() external payable returns (bool) {
+    function contributeWithEther() external payable isAuctionStart() returns (bool) {
         
         require(_checkContribution(msg.sender));
         
@@ -497,7 +502,7 @@ contract AuctionFundCollector is IndividualBonus {
     // This Method For Exchange 
     // Exchange invests on behalf of their users
     // so we check caller maintoken balance 
-    function contributeWithEtherBehalf(address payable _whom) external payable returns (bool) {
+    function contributeWithEtherBehalf(address payable _whom) external payable isAuctionStart() returns (bool) {
         
         require(IWhiteList(whiteListAddress).isExchangeAddress(msg.sender),ERR_AUTHORIZED_ADDRESS_ONLY);
         
