@@ -4,7 +4,7 @@ import "./WhiteListStorage.sol";
 import "../common/ProxyOwnable.sol";
 import "../common/SafeMath.sol";
 import "../Proxy/Upgradeable.sol";
-import "../InterFaces/IBEP20Token.sol";
+
 
 interface WhiteListInitializeInterface {
     function initialize(

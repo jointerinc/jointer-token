@@ -81,7 +81,7 @@ contract AuctionRegistery is Ownable, SafeMath {
         address payable _contractAddress
     )
         external
-        onlyAuthorized()
+        onlyOwner()
         notZeroValue(_contractName.length)
         notZeroAddress(_contractAddress)
         notZeroAddress(contractAddress[_contractName])
