@@ -45,9 +45,9 @@ const preMintAmount = ["11883610133000000000000000000","100000000000000000000000
 const byPassCode = 20483;
 const poolCode = 8195;
 
-const starTime = 1600084800;
-const minAuctionTime = 60;
-const intervalTime = 60;
+const starTime = 1600862400;
+const minAuctionTime = 82800;
+const intervalTime = 86400;
 const mainTokenCheckDay = 11;
 
 module.exports = {
