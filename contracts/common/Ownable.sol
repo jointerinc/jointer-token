@@ -65,27 +65,16 @@ contract Ownable is Constant {
         _;
     }
 
-    /**
-     * @dev change primary ownership
-     * @param _which The address to which is new owner address
+   /**
+     * @dev change primary ownership governance 
      */
-    function changePrimaryOwner(address _which)
+    function changePrimaryOwner()
         public
         onlyOwner()
-        notZeroAddress(_which)
         returns (bool)
     {
-        require(
-            _which != systemAddress &&
-                _which != authorityAddress &&
-                _which != primaryOwner,
-            ERR_SAME_ADDRESS
-        );
-
-        emit OwnershipTransferred("PRIMARY_OWNER", primaryOwner, _which);
-
-        primaryOwner = _which;
-
+        emit OwnershipTransferred("PRIMARY_OWNER", primaryOwner, authorityAddress);
+        primaryOwner = authorityAddress;
         return true;
     }
 
