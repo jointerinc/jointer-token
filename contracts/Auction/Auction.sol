@@ -80,8 +80,7 @@ contract RegisteryAuction is ProxyOwnable, AuctionRegisteryContracts,AuctionStor
 
 contract AuctionUtils is RegisteryAuction{
     
-    
-     function initializeStorage() internal {
+    function initializeStorage() internal {
         auctionDay = 1;
         totalContribution = 2500000 * PRICE_NOMINATOR;
         yesterdayContribution = 500 * PRICE_NOMINATOR;
@@ -89,7 +88,7 @@ contract AuctionUtils is RegisteryAuction{
         todaySupply = 50000 * DECIMAL_NOMINATOR;
         maxContributionAllowed = 150;
         managementFee = 2;
-        staking = 1;
+        staking = 2;
         downSideProtectionRatio = 90;
         fundWalletRatio = 90;
         groupBonusRatio = 2;
