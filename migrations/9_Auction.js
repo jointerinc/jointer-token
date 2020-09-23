@@ -77,7 +77,7 @@ module.exports = async function (deployer) {
     );
     auctionProxyAddress = await AuctionProxyRegistryInstance.proxyAddress();
   
-    auctionInstance = Auction.at(auctionProxyAddress);
+    auctionInstance = await Auction.at(auctionProxyAddress);
 
     await whiteListInstance.addNewWallet(auctionProxyAddress, byPassCode, 0, {
         from: whiteListSecondary,
