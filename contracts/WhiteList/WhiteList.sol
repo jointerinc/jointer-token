@@ -235,8 +235,9 @@ contract WhiteList is
         details.wallets.push(_which);
         emit WalletAdded(primaryAddress, _which);
         return true;
-        
     }
+    
+    
 
     /**@dev allows primary whitelisted address to add wallet address controlled by them(reverts if maximum wallets is reached)*/
     
@@ -356,6 +357,16 @@ contract WhiteList is
         address to = address_belongs[_to];
         address msgSender = address_belongs[_msgSender];
         bool result;
+        address from = address_belongs[_from];
+        uint256 from_flags = user_details[from].flags;
+        require(from != address(0), "ERR_TRANSFER_CHECK_WHITELIST");
+        
+        if(!_checkRule(from_flags,KYC,KYC))
+            return false;
+        
+        if(!_checkRule(from_flags,AML,AML))
+            return false;
+        
 
         //If transfer is happening to a bypassed address then check nothing
         if (_isAddressByPassed(to)) {
@@ -378,9 +389,7 @@ contract WhiteList is
 
         result = _isReceiveAllowed(_to, token); // Check receiver at first
         if (!result) return false; // if receiver disallowed the transfer disallowed too.
-        address from = address_belongs[_from];
-        require(from != address(0), "ERR_TRANSFER_CHECK_WHITELIST");
-        uint256 from_flags = user_details[from].flags;
+
         uint256 to_flags = user_details[to].flags;
         //makes sure that token is not mature
         if (tokenToMaturityDaysTimeStamp[token] != 0)
@@ -392,7 +401,7 @@ contract WhiteList is
         if (tokenToHoldBackDaysTimeStamp[token] != 0)
             require(
                 now >= tokenToHoldBackDaysTimeStamp[token],
-                "ERR_TOKEN_HOLDBACK_NOT_OVER"
+                "ERR_TOKEN_HOLDBACK_NOT_OVER"   
             );
 
         for (
