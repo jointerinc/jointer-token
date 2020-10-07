@@ -555,8 +555,8 @@ contract Auction is Upgradeable, AuctionFundCollector, AuctionInitializeInterfac
         returns (bool)
     {
         if (_flag == 1) MIN_AUCTION_END_TIME = _time;
-        else if (_flag == 2) LAST_AUCTION_START == _time;
-        else if (_flag == 3) INTERVAL == _time;
+        else if (_flag == 2) LAST_AUCTION_START = _time;
+        else if (_flag == 3) INTERVAL = _time;
         return true;
     }
 
