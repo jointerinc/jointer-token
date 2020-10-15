@@ -203,7 +203,7 @@ contract WhiteList is
     /**@dev updates the maximum wallets allowed for a primary whitelisted address*/
     function updateMaxWallet(address _which, uint256 _maxWallets)
         public
-        onlyOwner
+        onlySystem()
         returns (bool)
     {
         require(_isWhiteListed(_which), ERR_AUTHORIZED_ADDRESS_ONLY);
@@ -250,6 +250,7 @@ contract WhiteList is
     }
     
     
+
     
     function addWalletBehalfExchange(address _mainWallet,address _subWallet)
         public
@@ -257,7 +258,12 @@ contract WhiteList is
         returns (bool)
     {   
         require(auctionAddress == msg.sender,"ERR_ONLY_AUCTION_ADDRESS_ALLOWED");
-        return _addMoreWallets(_mainWallet,_subWallet);
+        if(_mainWallet != address(0)){
+            return _addMoreWallets(_mainWallet,_subWallet);    
+        }else{
+            return whiteListAccount(_subWallet,IS_ALLOWED_AUCTION,10);
+        }
+        
     }
 
 
