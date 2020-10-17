@@ -12,7 +12,7 @@ import "../InterFaces/IBEP20Token.sol";
 import "../InterFaces/IAuction.sol";
 import "../InterFaces/IWhiteList.sol";
 
-interface InitializeInterface {
+interface InitializeInterfaceProtection {
     function initialize(
         address _primaryOwner,
         address _systemAddress,
@@ -105,7 +105,7 @@ contract Utils is SafeMath, ProtectionRegistery {
 contract Stacking is
     Utils,
     TokenTransfer,
-    InitializeInterface
+    InitializeInterfaceProtection
 {
     
 
