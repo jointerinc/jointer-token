@@ -90,16 +90,16 @@ contract AuctionUtils is RegisteryAuction {
         directPushToLiquidity = true;
     }
 
-    function updateData(address _oldCode)  external
+    function updateData(address payable _oldCode)  external
         onlySystem()
         returns (bool)
     {   
-        require(todaySupply === 0,"ERR_ALREADY_UPDATED");
+        require(todaySupply == 0,"ERR_ALREADY_UPDATED");
         totalContribution = Auction(_oldCode).totalContribution();
         yesterdayContribution = Auction(_oldCode).yesterdayContribution();
         allowMaxContribution = Auction(_oldCode).allowMaxContribution();
         todaySupply = Auction(_oldCode).todaySupply();
-        for(uint8 i=0; i< = auctionDay ; i++){
+        for(uint8 i=0; i < auctionDay ; i++){
             dayWiseSupplyBonus[i] = Auction(_oldCode).dayWiseSupplyBonus(i);
             dayWiseSupplyCore[i] = Auction(_oldCode).dayWiseSupplyCore(i);
             dayWiseSupply[i] = Auction(_oldCode).dayWiseSupply(i);

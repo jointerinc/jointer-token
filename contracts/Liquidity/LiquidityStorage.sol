@@ -70,6 +70,8 @@ contract LiquidityStorage {
     // check if today token price reach certain level
     bool public isAppreciationLimitReached;
 
+    bool public isBuyBackOpen;
+
     uint256 public relayPercent;
 
     // mapping for where user last reddeem

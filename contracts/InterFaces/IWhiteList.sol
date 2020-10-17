@@ -15,19 +15,19 @@ interface IWhiteList {
         address _msgSender,
         address _from,
         address _to
-    ) external view returns (bool);
+    ) external returns (bool);
 
     function etn_isTransferAllowed(
         address _msgSender,
         address _from,
         address _to
-    ) external view returns (bool);
+    ) external returns (bool);
 
     function stock_isTransferAllowed(
         address _msgSender,
         address _from,
         address _to
-    ) external view returns (bool);
+    ) external returns (bool);
 
     function addWalletBehalfExchange(address _mainWallet, address _subWallet)
         external

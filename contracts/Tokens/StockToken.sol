@@ -54,7 +54,6 @@ contract StockToken is Exchangeable {
      */
     function checkBeforeTransfer(address _from, address _to)
         internal
-        view
         returns (bool)
     {
         require(

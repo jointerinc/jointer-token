@@ -342,7 +342,7 @@ contract WhiteList is
     {   
 
         address investor = address_belongs[user];
-        require(investor != address(0), "ERR_TRANSFER_CHECK_WHITELIST");
+        require(investor != address(0), "ERR_RECIVER_NOT_WHITLISTED");
         uint256 flags = user_details[investor].flags;
         bool result;
         result = _checkRule(
@@ -350,7 +350,7 @@ contract WhiteList is
             tokenToReceivingRule[token].mask,
             tokenToReceivingRule[token].condition
         );
-        if (!result) return false; // if rule don't passed - receiving token disallowed.
+        require(result,"ERR_RECIVING_RULE_NOT_SATISFIED");
         return true;
     }
 
@@ -360,27 +360,25 @@ contract WhiteList is
         address _from,
         address _to,
         uint8 token
-    ) internal view returns (bool) {
+    ) internal returns (bool) {
         address to = address_belongs[_to];
         address msgSender = address_belongs[_msgSender];
         bool result;
         address from = address_belongs[_from];
         uint256 from_flags = user_details[from].flags;
         require(from != address(0), "ERR_TRANSFER_CHECK_WHITELIST");
-        
         require(_checkRule(from_flags,KYC | AML ,KYC | AML),"ERR_KYC_AML_NOT_PASSED");
-        
         //If transfer is happening to a bypassed address then check nothing
         if (_isAddressByPassed(to)) {
             return true;
         }
-        //If a byPassed Address calls a transfer or transferFrom function then just check if _to is whitelisted and return
+        //If a byPassed Address calls a transfer or transferFrom function then just check if _to is whitelisted if not then whitelist 
         if (_isAddressByPassed(msgSender)) {
             result = _isWhiteListed(to);
             if(!result){
-                whiteListAccount(to,IS_ALLOWED_AUCTION,10)
+                whiteListAccount(to,IS_ALLOWED_AUCTION,10);
             }else{
-                return result;
+                require(result,"ERR_RECIVER_NOT_WHITLISTED");
             }
            
         }
@@ -394,11 +392,8 @@ contract WhiteList is
             else return false;
         } else if (_isPoolAddress(to)) return false;
 
-
-
-        result = _isReceiveAllowed(_to, token); // Check receiver at first
-        if (!result) return false; // if receiver disallowed the transfer disallowed too.
-
+        _isReceiveAllowed(_to, token); // Check receiver at first
+        
         uint256 to_flags = user_details[to].flags;
         //makes sure that token is not mature
         if (tokenToMaturityDaysTimeStamp[token] != 0)
@@ -431,7 +426,7 @@ contract WhiteList is
                     tokenToTransferringRuleArray[token][i].to_mask,
                     tokenToTransferringRuleArray[token][i].to_condition
                 );
-                if (result) return false; // if receiver is restricted, the transfer disallowed.
+                require(result,"ERR_SENDING_RULE_NOT_SATISFIED");
             }
         }
         return true;
@@ -476,7 +471,7 @@ contract WhiteList is
         address _msgSender,
         address _from,
         address _to
-    ) public view returns (bool) {
+    ) public returns (bool) {
         return _isTransferAllowed(_msgSender, _from, _to, 0);
     }
 
@@ -485,7 +480,7 @@ contract WhiteList is
         address _msgSender,
         address _from,
         address _to
-    ) public view returns (bool) {
+    ) public returns (bool) {
         return _isTransferAllowed(_msgSender, _from, _to, 1);
     }
 
@@ -528,7 +523,7 @@ contract WhiteList is
         address _msgSender,
         address _from,
         address _to
-    ) public view returns (bool) {
+    ) public returns (bool) {
         return _isTransferAllowed(_msgSender, _from, _to, 2);
     }
 

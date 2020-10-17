@@ -211,6 +211,19 @@ contract LiquidityUtils is RegisteryLiquidity {
         relayPercent = _relayPercent;
         return true;
     }
+
+     function setisBuyBackOpen(bool _isBuyBackOpen)
+        public
+        onlyOwner()
+        returns (bool)
+    {
+       
+        isBuyBackOpen = _isBuyBackOpen;
+        return true;
+    }
+
+
+    
 }
 
 contract LiquidityFormula is LiquidityUtils {
@@ -582,6 +595,9 @@ contract Liquidity is
         address payable _reciver
     ) internal returns (bool) {
         
+
+        require(isBuyBackOpen,"ERR_BUYBACK_IS_CLOSED");
+
         address primaryWallet = IWhiteList(whiteListAddress).address_belongs(
             _reciver
         );
