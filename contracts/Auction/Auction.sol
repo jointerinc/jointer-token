@@ -79,10 +79,6 @@ contract RegisteryAuction is
 contract AuctionUtils is RegisteryAuction {
     function initializeStorage() internal {
         auctionDay = 46;
-        totalContribution = 2989375681865249;
-        yesterdayContribution = 3100350384172;
-        allowMaxContribution = 12797500175463;
-        todaySupply = 7111364008905284097758;
         maxContributionAllowed = 150;
         managementFee = 2;
         staking = 2;
@@ -92,6 +88,25 @@ contract AuctionUtils is RegisteryAuction {
         mainTokenRatio = 100;
         averageDay = 10;
         directPushToLiquidity = true;
+    }
+
+    function updateData(address _oldCode)  external
+        onlySystem()
+        returns (bool)
+    {   
+        require(todaySupply === 0,"ERR_ALREADY_UPDATED");
+        totalContribution = Auction(_oldCode).totalContribution();
+        yesterdayContribution = Auction(_oldCode).yesterdayContribution();
+        allowMaxContribution = Auction(_oldCode).allowMaxContribution();
+        todaySupply = Auction(_oldCode).todaySupply();
+        for(uint8 i=0; i< = auctionDay ; i++){
+            dayWiseSupplyBonus[i] = Auction(_oldCode).dayWiseSupplyBonus(i);
+            dayWiseSupplyCore[i] = Auction(_oldCode).dayWiseSupplyCore(i);
+            dayWiseSupply[i] = Auction(_oldCode).dayWiseSupply(i);
+            dayWiseMarketPrice[i] = Auction(_oldCode).dayWiseMarketPrice(i);
+            dayWiseContribution[i] = Auction(_oldCode).dayWiseContribution(i);
+        }
+
     }
 
     modifier isAuctionStart() {
@@ -713,11 +728,11 @@ contract Auction is
         uint256 _avgDays = averageDay;
         uint256 _avgInvestment = 0;
 
-        if (auctionDay < 56 && auctionDay > 46) {
+        if (auctionDay < 11 && auctionDay > 1) {
             _avgDays = safeSub(auctionDay, 1);
         }
 
-        if (auctionDay > 46) {
+        if (auctionDay > 1) {
             for (uint32 tempX = 1; tempX <= _avgDays; tempX++) {
                 _avgInvestment = safeAdd(
                     _avgInvestment,
