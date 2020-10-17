@@ -78,11 +78,11 @@ contract RegisteryAuction is
 
 contract AuctionUtils is RegisteryAuction {
     function initializeStorage() internal {
-        auctionDay = 1;
-        totalContribution = 2500000 * PRICE_NOMINATOR;
-        yesterdayContribution = 500 * PRICE_NOMINATOR;
-        allowMaxContribution = 500 * PRICE_NOMINATOR;
-        todaySupply = 50000 * DECIMAL_NOMINATOR;
+        auctionDay = 46;
+        totalContribution = 2989375681865249;
+        yesterdayContribution = 3100350384172;
+        allowMaxContribution = 12797500175463;
+        todaySupply = 7111364008905284097758;
         maxContributionAllowed = 150;
         managementFee = 2;
         staking = 2;
@@ -713,11 +713,11 @@ contract Auction is
         uint256 _avgDays = averageDay;
         uint256 _avgInvestment = 0;
 
-        if (auctionDay < 11 && auctionDay > 1) {
+        if (auctionDay < 56 && auctionDay > 46) {
             _avgDays = safeSub(auctionDay, 1);
         }
 
-        if (auctionDay > 1) {
+        if (auctionDay > 46) {
             for (uint32 tempX = 1; tempX <= _avgDays; tempX++) {
                 _avgInvestment = safeAdd(
                     _avgInvestment,
@@ -882,7 +882,9 @@ contract Auction is
         external
         returns (bool)
     {
+        
         require(dayId < auctionDay, "ERR_AUCTION_DAY");
+
         for (uint256 tempX = 0; tempX < _which.length; tempX++) {
             if (returnToken[dayId][_which[tempX]] == false)
                 disturbuteTokenInternal(dayId, _which[tempX]);

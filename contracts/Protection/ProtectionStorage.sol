@@ -7,7 +7,7 @@ contract ProtectionStorage {
 
     address payable public vaultAddress;
     address payable public auctionAddress;
-    address payable public triggerAddress;
+    address payable public liquidityAddress;
     address payable public mainTokenAddress;
     address payable public companyFundWalletAddress;
     address payable public whiteListAddress;

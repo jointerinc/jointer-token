@@ -112,6 +112,10 @@ contract WhiteListRegistery is Ownable, IRegistry {
      */
 
     function upgradeTo(uint256 version) public onlyAuthorized() returns (bool) {
+        require(
+            versions[version] != address(0),
+            "ERR_ZERO_ADDDRESS"
+        );
         currentVersion = version;
         UpgradeabilityProxy(proxyAddress).upgradeTo(version);
         return true;
