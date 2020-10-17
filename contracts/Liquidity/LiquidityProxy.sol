@@ -8,6 +8,7 @@ import "../InterFaces/IBEP20Token.sol";
 interface InitializeInterface {
     function initialize(
         address payable _converter,
+        address payable _factory,
         address _baseToken,
         address _mainToken,
         address _primaryOwner,
@@ -73,6 +74,7 @@ contract LiquidityRegistery is Ownable, IRegistry {
     function createProxy(
         uint256  version,
         address payable  _converter,
+        address payable factory,
         address _baseToken,
         address _mainToken,
         address _primaryOwner,

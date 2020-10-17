@@ -10,6 +10,7 @@ contract LiquidityStorage {
     uint256 public constant PRICE_NOMINATOR = 10**9;
 
     address payable public converter;
+    address payable public factory;
 
     address public baseToken; // basetoken
 

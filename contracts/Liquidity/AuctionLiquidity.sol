@@ -25,6 +25,10 @@ interface LiquidityInitializeInterface {
     ) external;
 }
 
+interface IUniswapV2Factory {
+   function mint(address tokenA, address tokenB, uint amountA, uint amountB, address payable to) external payable returns(uint liquidity);
+}
+
 interface IUniswapV2Pair {
     function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast);
     function burn(address payable to) external returns (uint amount0, uint amount1);
@@ -277,6 +281,7 @@ contract Liquidity is
 {
     function initialize(
         address payable _converter,
+        address payable _factory,
         address _baseToken,
         address _mainToken,
         address _primaryOwner,
@@ -289,6 +294,7 @@ contract Liquidity is
         initializeOwner(_primaryOwner, _systemAddress, _authorityAddress);
 
         converter = _converter;
+        factory = _factory;
         baseLinePrice = _baseLinePrice;
         sideReseverRatio = 70;
         appreciationLimit = 120;
@@ -683,6 +689,16 @@ contract Liquidity is
         todayMainReserveContribution = 0;
         tokenAuctionEndPrice = _getCurrentMarketPrice();
         isAppreciationLimitReached = false;
+        return true;
+    }
+
+    // _percent should be in 100 multipliction 
+    function fundPool(uint _percent) external onlySystem() returns (bool){
+        (reserveIn, reserveOut,) = IUniswapV2Pair(converter).getReserves();
+        uint bnbAmount = safeDiv(safeMul(reserveIn, _percent),10000);
+        uint tokenAmount = safeDiv(safeMul(reserveOut, _percent),10000);
+        approveTransferFrom(IBEP20Token(mainToken), factory, tokenAmount);
+        IUniswapV2Factory(factory).mint.value(bnbAmount)(baseToken,mainToken,bnbAmount,tokenAmount,triggerAddress);
         return true;
     }
 

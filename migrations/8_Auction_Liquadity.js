@@ -23,7 +23,8 @@ const {
     governance,
     byPassCode,
     poolAddress,
-    baseLinePrice
+    baseLinePrice,
+    factoryAddress
 } = require("../constant");
 
 const liquadityCode = "0x4c49515549444954590000000000000000000000000000000000000000000000";
@@ -63,6 +64,7 @@ module.exports = async function (deployer) {
     txHash9 = await LiquadityRegisteryInstance.createProxy(
         1,
         poolAddress,
+        factoryAddress,
         baseTokenAddress,
         mainToken,
         ownerWallet,
