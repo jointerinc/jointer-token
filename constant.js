@@ -9,9 +9,9 @@
 
  //have to chanage according 
 const ownerWallet = "0xD99634a54e2295f23d4DBD5B004f73D4ed0474F5"; // wallet #1
-const auctionSecondary = "0x58f06b0eA4F92750999e024e75D13dA7A06ab079"; // wallet #2
-const otherSecondary = "0xb511de8f9A4B1A66D1d63125089A55bD299f0c0a"; // wallet #3
-const whiteListSecondary = "0x68bC87e4Ac145b33D917f6CEAB7AdcF398F90771"; // white list wallet
+const auctionSecondary = "0xc56975a27B5cBfbc31eDAcbf0ffd9d0c9b3A77c4"; // wallet #2
+const otherSecondary = "0x04a88313d287ABfd1ef62C8561dDFde09510b9Ca"; // wallet #3
+const whiteListSecondary = "0x82c2935d9b3F800fb80A167070C38aA835041B98"; // white list wallet
 
 // for bep20
 const mainTokenOwner = "0x154A7eD86F3CceECfb54fD03034b3311D102399e";
