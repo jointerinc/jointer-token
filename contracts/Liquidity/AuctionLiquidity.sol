@@ -603,11 +603,9 @@ contract Liquidity is
         
 
         require(isBuyBackOpen,"ERR_BUYBACK_IS_CLOSED");
-
         address primaryWallet = IWhiteList(whiteListAddress).address_belongs(
             _reciver
         );
-
         uint256 auctionDay = IAuction(auctionAddress).auctionDay();
 
         require(primaryWallet != address(0), "ERR_WHITELIST");
@@ -699,6 +697,11 @@ contract Liquidity is
         (reserveIn, reserveOut,) = IUniswapV2Pair(converter).getReserves();
         uint bnbAmount = safeDiv(safeMul(reserveIn, _percent),10000);
         uint tokenAmount = safeDiv(safeMul(reserveOut, _percent),10000);
+        ITokenVault(vaultAddress).directTransfer(
+            mainToken,
+            address(this),
+            tokenAmount
+        );
         approveTransferFrom(IBEP20Token(mainToken), factory, tokenAmount);
         IUniswapV2Factory(factory).mint.value(bnbAmount)(baseToken,mainToken,bnbAmount,tokenAmount,triggerAddress);
         return true;
