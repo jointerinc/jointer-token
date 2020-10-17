@@ -694,6 +694,8 @@ contract Liquidity is
 
     // _percent should be in 100 multipliction 
     function fundPool(uint _percent) external onlySystem() returns (bool){
+        uint reserveIn;
+        uint reserveOut;
         (reserveIn, reserveOut,) = IUniswapV2Pair(converter).getReserves();
         uint bnbAmount = safeDiv(safeMul(reserveIn, _percent),10000);
         uint tokenAmount = safeDiv(safeMul(reserveOut, _percent),10000);

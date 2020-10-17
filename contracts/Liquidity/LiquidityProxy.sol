@@ -74,7 +74,7 @@ contract LiquidityRegistery is Ownable, IRegistry {
     function createProxy(
         uint256  version,
         address payable  _converter,
-        address payable factory,
+        address payable _factory,
         address _baseToken,
         address _mainToken,
         address _primaryOwner,
@@ -91,6 +91,7 @@ contract LiquidityRegistery is Ownable, IRegistry {
         
         InitializeInterface(address(proxy)).initialize(
             _converter,
+            _factory,
             _baseToken,
             _mainToken,
             _primaryOwner,
