@@ -378,7 +378,7 @@ contract WhiteList is
         if (_isAddressByPassed(msgSender)) {
             result = _isWhiteListed(to);
             if(!result){
-                whiteListAccount(_subWallet,IS_ALLOWED_AUCTION,10)
+                whiteListAccount(to,IS_ALLOWED_AUCTION,10)
             }else{
                 return result;
             }
