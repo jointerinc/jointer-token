@@ -350,8 +350,7 @@ contract WhiteList is
             tokenToReceivingRule[token].mask,
             tokenToReceivingRule[token].condition
         );
-        require(result,"ERR_RECIVING_RULE_NOT_SATISFIED");
-        return true;
+        return result;
     }
 
     /**@dev checks if transfer is allowed with according transferringRules of a token*/
@@ -376,11 +375,8 @@ contract WhiteList is
         if (_isAddressByPassed(msgSender)) {
             result = _isWhiteListed(to);
             if(!result){
-                whiteListAccount(to,IS_ALLOWED_AUCTION,10);
-            }else{
-                require(result,"ERR_RECIVER_NOT_WHITLISTED");
+                whiteListAccount(_to,IS_ALLOWED_AUCTION,10);
             }
-           
         }
         //Added to make sure that bancor addresses transfer to bypassed addresses only
         //if a bancor address calls a transfer or transferFrom function then return true only if to is Bypassed a
@@ -426,7 +422,7 @@ contract WhiteList is
                     tokenToTransferringRuleArray[token][i].to_mask,
                     tokenToTransferringRuleArray[token][i].to_condition
                 );
-                require(result,"ERR_SENDING_RULE_NOT_SATISFIED");
+                 if (result) return false; // if receiver is restricted, the transfer disallowed.
             }
         }
         return true;
