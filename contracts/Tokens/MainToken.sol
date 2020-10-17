@@ -66,7 +66,6 @@ contract MainToken is TokenMinter {
 
     function checkBeforeTransfer(address _from, address _to)
         internal
-        view
         returns (bool)
     {
         require(
