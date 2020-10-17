@@ -10,7 +10,7 @@ import "../InterFaces/IBEP20Token.sol";
 import "../InterFaces/IAuctionProtection.sol";
 
 
-interface InitializeInterface {
+interface InitializeInterfaceVault {
     function initialize(
         address _primaryOwner,
         address _systemAddress,
@@ -91,7 +91,7 @@ contract TokenSpenders is TokenRegistery,SafeMath {
 contract TokenVault is
     Upgradeable,
     TokenSpenders,
-    InitializeInterface,
+    InitializeInterfaceVault,
     TokenTransfer
 {   
     
