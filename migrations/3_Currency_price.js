@@ -12,7 +12,7 @@ const { ownerWallet , otherSecondary , governance , baseTokenAddress } = require
 
 
 
-const bandProtocol = "0x2d12c12d17fbc9185d75baf216164130fc269ff1";
+const bandProtocol = "0xDA7a001b254CD22e46d3eAB04d937489c93174C3";
 
 const currencyCode =
   "0x43555252454e4359000000000000000000000000000000000000000000000000";
@@ -49,18 +49,22 @@ module.exports = async function (deployer) {
     await CurrencyPricesInstnace.setCurrencyPriceContract(baseTokenAddress,CurrencyPriceTicker.address,{
       from: otherSecondary
     });
-    
-    await AuctionRegistyInstance.registerContractAddress(
-        currencyCode,
-        CurrencyPrices.address, {
-        from: otherSecondary
-        }
-    );
 
-    currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
-    currentdata = JSON.parse(currentdata);
-    currentdata["CurrencyPrices"] =  CurrencyPrices.address;//CurrencyPrices.address;
-    await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata,undefined,2));
+    await CurrencyPricesInstnace.setCurrencyPriceContract("0x0000000000000000000000000000000000000000",CurrencyPriceTicker.address,{
+      from: otherSecondary
+    });
+    
+    // await AuctionRegistyInstance.registerContractAddress(
+    //     currencyCode,
+    //     CurrencyPrices.address, {
+    //     from: otherSecondary
+    //     }
+    // );
+
+    // currentdata = await readFileAsync(path.resolve(__dirname, '../latestContract.json'));
+    // currentdata = JSON.parse(currentdata);
+    // currentdata["CurrencyPrices"] =  CurrencyPrices.address;//CurrencyPrices.address;
+    // await writeFileAsync(path.resolve(__dirname, '../latestContract.json'), JSON.stringify(currentdata,undefined,2));
 
     
     
