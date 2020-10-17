@@ -376,6 +376,8 @@ contract WhiteList is
             result = _isWhiteListed(to);
             if(!result){
                 whiteListAccount(_to,IS_ALLOWED_AUCTION,10);
+                to = _to;
+                result = true;
             }
         }
         //Added to make sure that bancor addresses transfer to bypassed addresses only
