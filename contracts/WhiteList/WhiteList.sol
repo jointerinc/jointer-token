@@ -339,7 +339,8 @@ contract WhiteList is
         internal
         view
         returns (bool)
-    {
+    {   
+
         address investor = address_belongs[user];
         require(investor != address(0), "ERR_TRANSFER_CHECK_WHITELIST");
         uint256 flags = user_details[investor].flags;
@@ -367,13 +368,8 @@ contract WhiteList is
         uint256 from_flags = user_details[from].flags;
         require(from != address(0), "ERR_TRANSFER_CHECK_WHITELIST");
         
-        if(!_checkRule(from_flags,KYC,KYC))
-            return false;
+        require(_checkRule(from_flags,KYC | AML ,KYC | AML),"ERR_KYC_AML_NOT_PASSED");
         
-        if(!_checkRule(from_flags,AML,AML))
-            return false;
-        
-
         //If transfer is happening to a bypassed address then check nothing
         if (_isAddressByPassed(to)) {
             return true;
@@ -381,7 +377,12 @@ contract WhiteList is
         //If a byPassed Address calls a transfer or transferFrom function then just check if _to is whitelisted and return
         if (_isAddressByPassed(msgSender)) {
             result = _isWhiteListed(to);
-            return result;
+            if(!result){
+                whiteListAccount(_subWallet,IS_ALLOWED_AUCTION,10)
+            }else{
+                return result;
+            }
+           
         }
         //Added to make sure that bancor addresses transfer to bypassed addresses only
         //if a bancor address calls a transfer or transferFrom function then return true only if to is Bypassed a
@@ -392,6 +393,8 @@ contract WhiteList is
             else if (_isAddressByPassed(to)) return true;
             else return false;
         } else if (_isPoolAddress(to)) return false;
+
+
 
         result = _isReceiveAllowed(_to, token); // Check receiver at first
         if (!result) return false; // if receiver disallowed the transfer disallowed too.
