@@ -438,7 +438,7 @@ contract AuctionProtection is Upgradeable, Stacking {
         require(msg.value > 0,"ERR_VALUE_IS_ZERO");
         ensureTransferFrom(mainTokenAddress,msg.sender,address(this), _amount);
         lockedFunds[_whom][address(0)] = safeAdd(lockedFunds[_whom][address(0)],msg.value);
-        lockedTokens[_whom] = safeAdd(lockedTokens[_which], _amount);
+        lockedTokens[_whom] = safeAdd(lockedTokens[_whom], _amount);
         return true;
     }
 }
