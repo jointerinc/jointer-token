@@ -682,6 +682,8 @@ contract Liquidity is
                 _yesterdayContribution,
                 yesterdayMainReserv
             );
+        }else{
+            virtualReserverDivisor = 0;
         }
         previousMainReserveContribution = todayMainReserveContribution;
         todayMainReserveContribution = 0;

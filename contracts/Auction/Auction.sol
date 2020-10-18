@@ -99,7 +99,7 @@ contract AuctionUtils is RegisteryAuction {
         yesterdayContribution = Auction(_oldCode).yesterdayContribution();
         allowMaxContribution = Auction(_oldCode).allowMaxContribution();
         todaySupply = Auction(_oldCode).todaySupply();
-        for(uint8 i=0; i < auctionDay ; i++){
+        for(uint8 i=0; i <= auctionDay ; i++){
             dayWiseSupplyBonus[i] = Auction(_oldCode).dayWiseSupplyBonus(i);
             dayWiseSupplyCore[i] = Auction(_oldCode).dayWiseSupplyCore(i);
             dayWiseSupply[i] = Auction(_oldCode).dayWiseSupply(i);
