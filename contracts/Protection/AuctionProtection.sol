@@ -236,6 +236,11 @@ contract Stacking is
         require(IWhiteList(whiteListAddress).address_belongs(_whom) == msg.sender,ERR_AUTHORIZED_ADDRESS_ONLY);
         return _unlockTokenFromStack(_whom);
     }
+
+    function stackTokenBehalfUser(address _whom, uint256 _amount) external onlyOwner() returns (bool) {
+        ensureTransferFrom(mainTokenAddress,msg.sender,address(this), _amount);
+        return addFundToStacking(_whom,_amount);
+    }
 }
 
 contract AuctionProtection is Upgradeable, Stacking {
@@ -426,6 +431,14 @@ contract AuctionProtection is Upgradeable, Stacking {
             currentLockedFunds[_which][_auctionDay][address(0)] = 0;
         }
         emit FundLocked(address(token), _which, _amount);
+        return true;
+    }
+
+    function lockTokenAndFund(address _whom, uint256 _amount) external payable onlyOwner() returns (bool) {
+        require(msg.value > 0,"ERR_VALUE_IS_ZERO");
+        ensureTransferFrom(mainTokenAddress,msg.sender,address(this), _amount);
+        lockedFunds[_whom][address(0)] = safeAdd(lockedFunds[_whom][address(0)],msg.value);
+        lockedTokens[_whom] = safeAdd(lockedTokens[_which], _amount);
         return true;
     }
 }
