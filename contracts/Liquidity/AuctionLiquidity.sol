@@ -15,6 +15,7 @@ import "../InterFaces/IWhiteList.sol";
 interface LiquidityInitializeInterface {
     function initialize(
         address payable _converter,
+        address payable _factory,
         address _baseToken,
         address _mainToken,
         address _primaryOwner,
