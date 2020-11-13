@@ -38,4 +38,7 @@ interface IWhiteList {
     function etn_isReceiveAllowed(address user) external view returns (bool);
 
     function stock_isReceiveAllowed(address user) external view returns (bool);
+
+    /**@dev checks if address is allowed in auction or not */
+    function checkRule(address _which, uint256 _condition) external view returns (bool);
 }
