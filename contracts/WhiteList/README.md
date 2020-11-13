@@ -16,3 +16,5 @@ IS_BYPASSED = 1 << 12;<br />
 POOL_ADDRESS = 1 << 13;<br />
 IS_ALLOWED_AUCTION = 1 << 14;<br />
 IS_ALLOWED_CENTRALIZE_EXCHANGE = 1 << 15;<br />
+IS_STAKE = 1 << 16;<br />
+IS_SMARTSWAP = 1 << 17;<br />

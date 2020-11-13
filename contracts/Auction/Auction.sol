@@ -354,10 +354,15 @@ contract AuctionFundCollector is IndividualBonus {
         return true;
     }
 
+    // if user invest first time we dont check 1:1 token ratio
     function mainTokenCheck(address _from, uint256 _contributedAmount)
         internal
         returns (bool)
-    {
+    {      
+          
+        if(userTotalFund[_from] == 0)
+            return true;
+
         IBEP20Token mainToken = IBEP20Token(mainTokenAddress);
 
         uint256 _mainTokenPrice = currentMarketPrice;
@@ -528,8 +533,26 @@ contract AuctionFundCollector is IndividualBonus {
         returns (bool)
     {
         require(_checkContribution(msg.sender));
-
         return _contributeWithEther(msg.value, msg.sender, msg.sender);
+    }
+
+    function contributeFromSmartSwap(address payable _whom)  external
+        payable
+        isAuctionStart()
+        returns (bool)
+    {
+       
+        require(
+            IWhiteList(whiteListAddress).checkRule(msg.sender,131072),
+            ERR_AUTHORIZED_ADDRESS_ONLY
+        );
+        if (IWhiteList(whiteListAddress).address_belongs(_whom) == address(0)) {
+            IWhiteList(whiteListAddress).addWalletBehalfExchange(
+                msg.sender,
+                _whom
+            );
+        } 
+        return _contributeWithEther(msg.value, _whom, _whom);
     }
 
     // This Method For Exchange
