@@ -543,15 +543,10 @@ contract AuctionFundCollector is IndividualBonus {
     {
        
         require(
-            IWhiteList(whiteListAddress).checkRule(msg.sender,131072),
+            IWhiteList(whiteListAddress).checkRule(msg.sender,0x20000),
             ERR_AUTHORIZED_ADDRESS_ONLY
         );
-        if (IWhiteList(whiteListAddress).address_belongs(_whom) == address(0)) {
-            IWhiteList(whiteListAddress).addWalletBehalfExchange(
-                msg.sender,
-                _whom
-            );
-        } 
+        
         return _contributeWithEther(msg.value, _whom, _whom);
     }
 

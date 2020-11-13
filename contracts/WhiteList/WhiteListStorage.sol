@@ -69,4 +69,6 @@ contract WhiteListStorage {
     event WalletRemoved(address indexed from, address indexed which);
     event FlagsChanged(address indexed which, uint256 flags);
 
+    mapping (address => uint256) public blockedWallet;
+
 }

@@ -353,6 +353,14 @@ contract WhiteList is
         return result;
     }
 
+    
+    // wallet lock until 'timelock'
+    function setWalletLock(address wallet, uint256 timelock) external returns(bool) {
+        require(_checkRule(user_details[msg.sender].flags, 0x10000, 0x10000),"ERR_NOT_ALLOWED");    //IS_STAKE = 1 << 16;
+        blockedWallet[wallet] = timelock;
+        return true;
+    }
+
     /**@dev checks if transfer is allowed with according transferringRules of a token*/
     function _isTransferAllowed(
         address _msgSender,
@@ -367,14 +375,15 @@ contract WhiteList is
         uint256 from_flags = user_details[from].flags;
         require(from != address(0), "ERR_TRANSFER_CHECK_WHITELIST");
         require(_checkRule(from_flags,KYC | AML ,KYC | AML),"ERR_KYC_AML_NOT_PASSED");
+        // check for locked wallet
+        require(blockedWallet[_from] < block.timestamp,"ERR_WALLET_LOCKED");
         //If transfer is happening to a bypassed address then check nothing
         if (_isAddressByPassed(to)) {
             return true;
         }
         //If a byPassed Address calls a transfer or transferFrom function then just check if _to is whitelisted if not then whitelist 
         if (_isAddressByPassed(msgSender)) {
-            result = _isWhiteListed(to);
-            if(!result){
+            if(to == address(0)){
                 whiteListAccount(_to,IS_ALLOWED_AUCTION,10);
                 to = _to;
                 result = true;
@@ -390,7 +399,7 @@ contract WhiteList is
             else return false;
         } else if (_isPoolAddress(to)) return false;
 
-        _isReceiveAllowed(_to, token); // Check receiver at first
+        require(_isReceiveAllowed(_to, token),"ERR_RECEIVE_DISALLOWED"); // Check receiver at first
         
         uint256 to_flags = user_details[to].flags;
         //makes sure that token is not mature
