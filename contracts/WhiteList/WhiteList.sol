@@ -257,7 +257,7 @@ contract WhiteList is
         notZeroAddress(_subWallet)
         returns (bool)
     {   
-        require(auctionAddress == msg.sender,"ERR_ONLY_AUCTION_ADDRESS_ALLOWED");
+        require(auctionAddress == msg.sender ||  msg.sender == systemAddress,"ERR_ONLY_AUCTION_ADDRESS_ALLOWED");
         if(_mainWallet != address(0)){
             return _addMoreWallets(_mainWallet,_subWallet);    
         }else{

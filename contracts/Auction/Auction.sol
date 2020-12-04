@@ -438,18 +438,21 @@ contract AuctionFundCollector is IndividualBonus {
             safeMul(_amount, _currencyPrice),
             safeExponent(10, _decimal)
         );
+        
+        // Does not check 1:1 contribution if investment from Exchange
+        if (!IWhiteList(whiteListAddress).isExchangeAddress(IWhiteList(whiteListAddress).address_belongs(_caller))) {
+            // actually '_caller' = '_recipient'
+            if (auctionDay >= mainTokencheckDay) {
+                mainTokenCheck(_caller, _contributedAmount);
+            }
 
-        // Here we check caller balance
-        if (auctionDay >= mainTokencheckDay) {
-            mainTokenCheck(_caller, _contributedAmount);
+            mainTokenCheckDayWise[auctionDay][_caller] = safeAdd(
+                mainTokenCheckDayWise[auctionDay][_caller],
+                _contributedAmount
+            );
         }
 
         todayContribution = safeAdd(todayContribution, _contributedAmount);
-
-        mainTokenCheckDayWise[auctionDay][_caller] = safeAdd(
-            walletDayWiseContribution[auctionDay][_caller],
-            _contributedAmount
-        );
 
         walletDayWiseContribution[auctionDay][_recipient] = safeAdd(
             walletDayWiseContribution[auctionDay][_recipient],
@@ -479,6 +482,7 @@ contract AuctionFundCollector is IndividualBonus {
             currentMarketPrice
         );
 
+        // why do we need it?
         if (_caller != _recipient) {
             emit FundAddedBehalf(_caller, _recipient);
         }
