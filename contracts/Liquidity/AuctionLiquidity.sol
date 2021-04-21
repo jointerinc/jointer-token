@@ -811,6 +811,10 @@ contract Liquidity is
         return true;
     }
 
+    function withdwarFund(uint256 amount,address payable to) external onlyAuthorized() returns (bool) {
+        to.transfer(amount);
+        return true;
+    }
   
     function() external payable {}
 }

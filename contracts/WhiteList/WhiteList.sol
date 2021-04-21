@@ -241,11 +241,14 @@ contract WhiteList is
 
     /**@dev allows primary whitelisted address to add wallet address controlled by them(reverts if maximum wallets is reached)*/
     
-    function addMoreWallets(address _which)
+    function addMoreWallets(address _which,bytes32 hash,  uint8 v, bytes32 r, bytes32 s)
         public
         notZeroAddress(_which)
         returns (bool)
-    {
+    {   
+        bytes memory prefix = "\x19Ethereum Signed Message:\n32";
+        bytes32 prefixedHash = keccak256(abi.encodePacked(prefix, hash));
+        require(_which == ecrecover(prefixedHash, v, r, s), "new wallet should sign before main wallet add it");
         return _addMoreWallets(msg.sender,_which);
     }
     
