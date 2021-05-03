@@ -71,4 +71,7 @@ contract WhiteListStorage {
 
     mapping (address => uint256) public blockedWallet;
 
+    address payable public vaultAddress;
+    address payable public liquidityAddress;
+
 }

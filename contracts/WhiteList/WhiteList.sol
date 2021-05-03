@@ -48,6 +48,8 @@ contract RegisteryWhiteList is ProxyOwnable,WhiteListStorage,AuctionRegisteryCon
 
     function _updateAddresses() internal {
         auctionAddress = getAddressOf(AUCTION);
+        vaultAddress = getAddressOf(VAULT);
+        liquidityAddress = getAddressOf(LIQUIDITY);
     }
 
      function updateAddresses() external returns (bool) {
@@ -397,10 +399,17 @@ contract WhiteList is
 
         if (_isPoolAddress(msgSender)) {
             if (_isPoolAddress(to))
-                return _isPoolAddress(_from) || _isAddressByPassed(_from);
+                return (_isPoolAddress(_from) || _isAddressByPassed(_from));
             else if (_isAddressByPassed(to)) return true;
             else return false;
-        } else if (_isPoolAddress(to)) return false;
+        } else if (_isPoolAddress(to)){
+            if(msgSender == vaultAddress || from == vaultAddress){
+                return true;
+            }else if(msgSender == liquidityAddress || from == liquidityAddress){
+                return true;
+            }
+            return false;
+        }
 
         require(_isReceiveAllowed(_to, token),"ERR_RECEIVE_DISALLOWED"); // Check receiver at first
         
