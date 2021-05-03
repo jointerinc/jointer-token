@@ -399,7 +399,7 @@ contract WhiteList is
 
         if (_isPoolAddress(msgSender)) {
             if (_isPoolAddress(to))
-                return (_isPoolAddress(_from) || _isAddressByPassed(_from));
+                return (_isPoolAddress(from) || _isAddressByPassed(from));
             else if (_isAddressByPassed(to)) return true;
             else return false;
         } else if (_isPoolAddress(to)){
