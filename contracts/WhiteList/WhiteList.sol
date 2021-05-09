@@ -387,7 +387,7 @@ contract WhiteList is
             return true;
         }
         //If a byPassed Address calls a transfer or transferFrom function then just check if _to is whitelisted if not then whitelist 
-        if (_isAddressByPassed(msgSender)) {
+        if (_isAddressByPassed(msgSender) || isExchangeAddress(msgSender)) {
             if(to == address(0)){
                 whiteListAccount(_to,IS_ALLOWED_AUCTION,10);
                 to = _to;
