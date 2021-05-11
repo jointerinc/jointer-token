@@ -82,4 +82,6 @@ contract LiquidityStorage {
     event RecoverPrice(uint256 _oldPrice, uint256 _newPrice);
     event Redemption(address _token, uint256 _amount, uint256 returnAmount);
     event FundDeposited(address _token, address indexed _from, uint256 _amount);
+
+    uint256 public redemptionDayRelay;
 }

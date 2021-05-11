@@ -581,6 +581,11 @@ contract Liquidity is
         }
     }
 
+    function setRdemptionDayRelay(uint256 _redemptionDayRelay) external onlyAuthorized() returns (bool){
+        redemptionDayRelay = _redemptionDayRelay;
+        return true;
+    }
+
     function redemptionFromEscrow(
         uint256 _amount,
         address payable _reciver
@@ -612,7 +617,7 @@ contract Liquidity is
         require(primaryWallet != address(0), "ERR_WHITELIST");
 
         require(
-            auctionDay > lastReedeemDay[primaryWallet],
+            auctionDay > (lastReedeemDay[primaryWallet] + redemptionDayRelay),
             "ERR_WALLET_ALREADY_REDEEM"
         );
 
